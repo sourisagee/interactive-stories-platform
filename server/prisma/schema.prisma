@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  role      UserRole @default(USER)
+  
+  // Отношения
+  stories      Story[]       // Истории автора (проверять role === AUTHOR)
+  playthroughs Playthrough[] // Прохождения игрока (проверять role === USER)
+  
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  AUTHOR
+}
+
+model Story {
+  id          Int           @id @default(autoincrement())
+  title       String        @db.VarChar(255)
+  genre       String        @db.VarChar(100)
+  authorName  String        @db.VarChar(255)
+  description String        @db.Text
+  isPublished Boolean       @default(false) @map("is_published")
+  authorId    Int           @map("author_id")
+  
+  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  nodes       Node[]
+  playthroughs Playthrough[]
+  
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("stories")
+  @@index([authorId])      // Быстрый поиск историй автора
+  @@index([genre])         // Быстрая фильтрация по жанру
+  @@index([isPublished])   // Быстрое получение опубликованных
+  @@index([createdAt])     // Сортировка по новизне
+}
+
+model Node {
+  id            Int          @id @default(autoincrement())
+  title         String       @db.VarChar(255)
+  content       String       @db.Text
+  isStart       Boolean      @default(false) @map("is_start")
+  isEnd         Boolean      @default(false) @map("is_end")
+  storyId       Int          @map("story_id")
+  
+  // Связи
+  story         Story        @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  
+  // Две связи с Choice (для from_node_id и to_node_id)
+  fromChoices   Choice[]     @relation("FromNode")  // Выборы, которые начинаются в этом узле
+  toChoices     Choice[]     @relation("ToNode")    // Выборы, которые ведут в этот узел
+  
+  playthroughs  Playthrough[] @relation("CurrentNode")
+  
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@map("nodes")
+}
+
+model Choice {
+  id          Int      @id @default(autoincrement())
+  choiceText  String   @db.Text @map("choice_text")  // Текст выбора
+  fromNodeId  Int      @map("from_node_id")          // Из какого узла
+  toNodeId    Int      @map("to_node_id")            // В какой узел
+  
+  // Связи
+  fromNode    Node     @relation("FromNode", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  toNode      Node     @relation("ToNode", fields: [toNodeId], references: [id], onDelete: Cascade)
+  
+  // Таймстемпы
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("choices")
+}
+
+model Playthrough {
+  id            Int      @id @default(autoincrement())
+  isCompleted   Boolean  @default(false) @map("is_completed")
+  variables     Json?    // JSON для характеристик: { "сила": 10, "ловкость": 5, "предметы": ["меч"] }
+  
+  // Внешние ключи (все обязательные)
+  userId        Int      @map("user_id")          // FK → User.id
+  storyId       Int      @map("story_id")         // FK → Story.id  
+  currentNodeId Int      @map("current_node_id")  // FK → Node.id (текущая позиция)
+  
+  // Связи
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story         Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  currentNode   Node     @relation("CurrentNode", fields: [currentNodeId], references: [id], onDelete: Cascade)
+  
+  // Таймстемпы
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  completedAt   DateTime? @map("completed_at")  // Когда завершено
+
+  // Ограничения
+  @@unique([userId, storyId])  // Один пользователь → одно прохождение истории
+  @@map("playthroughs")
+}

@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 
 # Local History
 .history/
+/src/generated/prisma
