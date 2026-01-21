@@ -20,7 +20,7 @@ function verifyAccessToken(req: Request, res: TypedResponse, next: NextFunction)
 
     const accessToken = authHeader.split(' ')[1];
 
-    if (!authHeader) {
+    if (!accessToken) {
       res
         .status(403)
         .json(
