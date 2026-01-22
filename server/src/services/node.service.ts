@@ -1,15 +1,8 @@
-import { PrismaClient, Node } from "@prisma/client";
+import prisma from "../lib/prisma";
 import { CreateNodeDto, UpdateNodeDto, NodeWithChoices } from "../types/node";
+import { Node } from "@prisma/client";
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url:
-        process.env.DATABASE_URL ||
-        "postgresql://postgres:password@localhost:5432/interactive_stories_db",
-    },
-  },
-});
+
 
 export class NodeService {
   // Создать новый узел

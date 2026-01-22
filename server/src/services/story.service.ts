@@ -1,4 +1,5 @@
-import { PrismaClient, Story } from "@prisma/client";
+import { Story } from "@prisma/client";
+import prisma from "../lib/prisma";
 import {
   CreateStoryDto,
   UpdateStoryDto,
@@ -6,15 +7,8 @@ import {
   StoryFull,
 } from "../types/story";
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url:
-        process.env.DATABASE_URL ||
-        "postgresql://postgres:password@localhost:5432/interactive_stories_db",
-    },
-  },
-});
+
+
 
 export class StoryService {
   // Создать новую историю
