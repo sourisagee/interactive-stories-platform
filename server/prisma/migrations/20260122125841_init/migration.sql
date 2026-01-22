@@ -32,6 +32,7 @@ CREATE TABLE "stories" (
 -- CreateTable
 CREATE TABLE "nodes" (
     "id" SERIAL NOT NULL,
+    "picture" VARCHAR(255) NOT NULL,
     "title" VARCHAR(255) NOT NULL,
     "content" TEXT NOT NULL,
     "is_start" BOOLEAN NOT NULL DEFAULT false,

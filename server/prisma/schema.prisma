@@ -53,6 +53,7 @@ model Story {
 
 model Node {
   id            Int          @id @default(autoincrement())
+  picture       String       @db.VarChar(255)
   title         String       @db.VarChar(255)
   content       String       @db.Text
   isStart       Boolean      @default(false) @map("is_start")

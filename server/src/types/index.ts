@@ -5,4 +5,9 @@ export interface ApiResponse<T = unknown> {
   error: unknown;
 }
 
-export * from './user';
+export interface ValidationResult {
+  isValid: boolean;
+  error: string | null;
+}
+
+export * from "./user";
