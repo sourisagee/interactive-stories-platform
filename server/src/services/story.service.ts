@@ -1,60 +1,40 @@
-import { PrismaClient, Story } from "@prisma/client";
+import { Story } from "@prisma/client";
+import prisma from "../lib/prisma";
 import {
   CreateStoryDto,
   UpdateStoryDto,
   StoryWithAuthor,
-  StoryWithNodes,
   StoryFull,
 } from "../types/story";
 
-const prisma = new PrismaClient();
+
+
 
 export class StoryService {
   // Создать новую историю
-   
+
   async createStory(data: CreateStoryDto): Promise<Story> {
     return await prisma.story.create({
       data,
     });
   }
 
-  // Получить историю по ID
-
-  async getStoryById(id: number): Promise<Story | null> {
-    return await prisma.story.findUnique({
-      where: { id },
-    });
-  }
-
   // Получить историю по ID с автором
-   
-  async getStoryWithAuthor(id: number): Promise<StoryWithAuthor | null> {
+
+  async getStoryById(storyId: number): Promise<StoryWithAuthor | null> {
     return await prisma.story.findUnique({
-      where: { id },
+      where: { id: storyId },
       include: {
         author: true,
       },
     });
   }
 
-  // Получить историю по ID с узлами
-   
-  async getStoryWithNodes(id: number): Promise<StoryWithNodes | null> {
-    return await prisma.story.findUnique({
-      where: { id },
-      include: {
-        nodes: {
-          orderBy: { createdAt: "asc" },
-        },
-      },
-    });
-  }
-
   // Получить полную историю с узлами и выборами
-   
-  async getStoryFull(id: number): Promise<StoryFull | null> {
+
+  async getStoryFull(storyId: number): Promise<StoryFull | null> {
     return await prisma.story.findUnique({
-      where: { id },
+      where: { id: storyId },
       include: {
         author: true,
         nodes: {
@@ -68,12 +48,11 @@ export class StoryService {
     });
   }
 
-
   // Обновить историю (только если не опубликована)
-  async updateStory(id: number, data: UpdateStoryDto): Promise<Story> {
+  async updateStory(storyId: number, data: UpdateStoryDto): Promise<Story> {
     // Сначала проверяем, существует ли история и опубликована ли она
     const existingStory = await prisma.story.findUnique({
-      where: { id },
+      where: { id: storyId },
       select: { id: true, isPublished: true },
     });
 
@@ -86,17 +65,17 @@ export class StoryService {
     }
 
     return await prisma.story.update({
-      where: { id },
+      where: { id: storyId },
       data,
     });
   }
 
   //  Удалить историю (только если не опубликована)
-   
-  async deleteStory(id: number): Promise<Story> {
+
+  async deleteStory(storyId: number): Promise<Story> {
     // Сначала проверяем, существует ли история и опубликована ли она
     const existingStory = await prisma.story.findUnique({
-      where: { id },
+      where: { id: storyId },
       select: { id: true, isPublished: true },
     });
 
@@ -109,23 +88,29 @@ export class StoryService {
     }
 
     return await prisma.story.delete({
-      where: { id },
+      where: { id: storyId },
     });
   }
 
-  //  Получить все истории
-   
-  async getAllStories(): Promise<Story[]> {
+  // Получить все истории с авторами
+
+  async getAllStories(): Promise<StoryWithAuthor[]> {
     return await prisma.story.findMany({
+      include: {
+        author: true,
+      },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  //  Получить истории автора
-   
-  async getStoriesByAuthor(authorId: number): Promise<Story[]> {
+  // Получить истории автора с информацией об авторе
+
+  async getStoriesByAuthor(authorId: number): Promise<StoryWithAuthor[]> {
     return await prisma.story.findMany({
       where: { authorId },
+      include: {
+        author: true,
+      },
       orderBy: { createdAt: "desc" },
     });
   }
