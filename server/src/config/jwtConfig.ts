@@ -1,4 +1,4 @@
-import { JwtConfig } from '../types';
+import { JwtConfig } from "../types";
 
 const jwtConfig: JwtConfig = {
   access: {
