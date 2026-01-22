@@ -12,8 +12,11 @@ storyRouter.get("/", (req, res) =>
 storyRouter.get("/:id", (req, res) =>
   StoryController.getStoryById(req, res as TypedResponse)
 );
+storyRouter.get("/:id/full", (req, res) =>
+  StoryController.getStoryFull(req, res as TypedResponse)
+);
 
-// Приватные 
+// Приватные
 storyRouter.post("/", verifyAccessToken, (req, res) =>
   StoryController.createStory(req, res as TypedResponse)
 );

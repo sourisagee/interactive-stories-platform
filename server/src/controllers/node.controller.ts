@@ -14,7 +14,58 @@ export class NodeController {
         return;
       }
 
-      const nodeData: CreateNodeDto = req.body;
+      const { title, content, storyId } = req.body;
+
+      // Валидация обязательных полей
+      if (!title || typeof title !== "string" || title.trim().length === 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Title is required", null, null));
+        return;
+      }
+
+      if (title.length > 200) {
+        res
+          .status(400)
+          .json(
+            formatResponse(400, "Title too long (max 200 chars)", null, null)
+          );
+        return;
+      }
+
+      if (
+        !content ||
+        typeof content !== "string" ||
+        content.trim().length === 0
+      ) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Content is required", null, null));
+        return;
+      }
+
+      if (content.length > 5000) {
+        res
+          .status(400)
+          .json(
+            formatResponse(400, "Content too long (max 5000 chars)", null, null)
+          );
+        return;
+      }
+
+      if (!storyId || isNaN(Number(storyId)) || Number(storyId) <= 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Valid story ID is required", null, null));
+        return;
+      }
+
+      const nodeData: CreateNodeDto = {
+        title: title.trim(),
+        content: content.trim(),
+        storyId: Number(storyId),
+      };
+
       const node = await nodeService.createNode(nodeData);
       res.status(201).json(formatResponse(201, "Node created", node, null));
     } catch (e) {
@@ -23,22 +74,20 @@ export class NodeController {
     }
   }
 
-  // Получить узел по ID GET /api/nodes/:id?include=story,choices
+  // Получить узел с выборами GET /api/nodes/:id
   static async getNodeById(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const id = Number(req.params.id);
-      const include = req.query.include as string;
-      let node;
+      const nodeId = Number(req.params.id);
 
-      if (include?.includes("story") && include?.includes("choices")) {
-        node = await nodeService.getNodeFull(id);
-      } else if (include?.includes("story")) {
-        node = await nodeService.getNodeWithStory(id);
-      } else if (include?.includes("choices")) {
-        node = await nodeService.getNodeWithChoices(id);
-      } else {
-        node = await nodeService.getNodeById(id);
+      // Валидация ID
+      if (isNaN(nodeId) || nodeId <= 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Invalid node ID", null, null));
+        return;
       }
+
+      const node = await nodeService.getNodeWithChoices(nodeId);
 
       if (!node) {
         res.status(404).json(formatResponse(404, "Node not found", null, null));
@@ -61,9 +110,63 @@ export class NodeController {
         return;
       }
 
-      const id = Number(req.params.id);
-      const updateData: UpdateNodeDto = req.body;
-      const updatedNode = await nodeService.updateNode(id, updateData);
+      const nodeId = Number(req.params.id);
+
+      // Валидация ID
+      if (isNaN(nodeId) || nodeId <= 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Invalid node ID", null, null));
+        return;
+      }
+
+      const { title, content } = req.body;
+
+      // Валидация данных для обновления
+      if (title !== undefined) {
+        if (typeof title !== "string" || title.trim().length === 0) {
+          res
+            .status(400)
+            .json(formatResponse(400, "Title cannot be empty", null, null));
+          return;
+        }
+        if (title.length > 200) {
+          res
+            .status(400)
+            .json(
+              formatResponse(400, "Title too long (max 200 chars)", null, null)
+            );
+          return;
+        }
+      }
+
+      if (content !== undefined) {
+        if (typeof content !== "string" || content.trim().length === 0) {
+          res
+            .status(400)
+            .json(formatResponse(400, "Content cannot be empty", null, null));
+          return;
+        }
+        if (content.length > 5000) {
+          res
+            .status(400)
+            .json(
+              formatResponse(
+                400,
+                "Content too long (max 5000 chars)",
+                null,
+                null
+              )
+            );
+          return;
+        }
+      }
+
+      const updateData: UpdateNodeDto = {};
+      if (title !== undefined) updateData.title = title.trim();
+      if (content !== undefined) updateData.content = content.trim();
+
+      const updatedNode = await nodeService.updateNode(nodeId, updateData);
 
       res.json(formatResponse(200, "Node updated", updatedNode, null));
     } catch (e) {
@@ -81,8 +184,17 @@ export class NodeController {
         return;
       }
 
-      const id = Number(req.params.id);
-      const deletedNode = await nodeService.deleteNode(id);
+      const nodeId = Number(req.params.id);
+
+      // Валидация ID
+      if (isNaN(nodeId) || nodeId <= 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Invalid node ID", null, null));
+        return;
+      }
+
+      const deletedNode = await nodeService.deleteNode(nodeId);
       res.json(formatResponse(200, "Node deleted", deletedNode, null));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Internal server error";
@@ -90,18 +202,27 @@ export class NodeController {
     }
   }
 
-  // Получить узлы GET /api/nodes?story=123
+  // Получить узлы истории GET /api/nodes?story=123
   static async getNodes(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const storyId = req.query.story ? Number(req.query.story) : undefined;
+      const storyIdParam = req.query.story;
 
-      let nodes;
-      if (storyId) {
-        nodes = await nodeService.getNodesByStory(storyId);
-      } else {
-        nodes = await nodeService.getAllNodes();
+      if (!storyIdParam) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Story ID required", null, null));
+        return;
       }
 
+      const storyId = Number(storyIdParam);
+      if (isNaN(storyId) || storyId <= 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Invalid story ID", null, null));
+        return;
+      }
+
+      const nodes = await nodeService.getNodesByStory(storyId);
       res.json(formatResponse(200, "Nodes retrieved", nodes, null));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Internal server error";

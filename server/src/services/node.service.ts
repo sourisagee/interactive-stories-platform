@@ -1,13 +1,15 @@
 import { PrismaClient, Node } from "@prisma/client";
-import {
-  CreateNodeDto,
-  UpdateNodeDto,
-  NodeWithStory,
-  NodeWithChoices,
-  NodeFull,
-} from "../types/node";
+import { CreateNodeDto, UpdateNodeDto, NodeWithChoices } from "../types/node";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url:
+        process.env.DATABASE_URL ||
+        "postgresql://postgres:password@localhost:5432/interactive_stories_db",
+    },
+  },
+});
 
 export class NodeService {
   // Создать новый узел
@@ -17,40 +19,11 @@ export class NodeService {
     });
   }
 
-  // Получить узел по ID
-  async getNodeById(id: number): Promise<Node | null> {
+  // Получить узел с выборами (для редактора)
+  async getNodeWithChoices(nodeId: number): Promise<NodeWithChoices | null> {
     return await prisma.node.findUnique({
-      where: { id },
-    });
-  }
-
-  // Получить узел по ID с историей
-  async getNodeWithStory(id: number): Promise<NodeWithStory | null> {
-    return await prisma.node.findUnique({
-      where: { id },
+      where: { id: nodeId },
       include: {
-        story: true,
-      },
-    });
-  }
-
-  // Получить узел по ID с выборами
-  async getNodeWithChoices(id: number): Promise<NodeWithChoices | null> {
-    return await prisma.node.findUnique({
-      where: { id },
-      include: {
-        fromChoices: true,
-        toChoices: true,
-      },
-    });
-  }
-
-  // Получить полный узел (история + выборы)
-  async getNodeFull(id: number): Promise<NodeFull | null> {
-    return await prisma.node.findUnique({
-      where: { id },
-      include: {
-        story: true,
         fromChoices: true,
         toChoices: true,
       },
@@ -58,25 +31,17 @@ export class NodeService {
   }
 
   // Обновить узел
-  async updateNode(id: number, data: UpdateNodeDto): Promise<Node> {
+  async updateNode(nodeId: number, data: UpdateNodeDto): Promise<Node> {
     return await prisma.node.update({
-      where: { id },
+      where: { id: nodeId },
       data,
     });
   }
 
   // Удалить узел
-  async deleteNode(id: number): Promise<Node> {
+  async deleteNode(nodeId: number): Promise<Node> {
     return await prisma.node.delete({
-      where: { id },
-    });
-  }
-
-  // Получить все узлы
-
-  async getAllNodes(): Promise<Node[]> {
-    return await prisma.node.findMany({
-      orderBy: { createdAt: "desc" },
+      where: { id: nodeId },
     });
   }
 
