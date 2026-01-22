@@ -5,7 +5,7 @@ import ChoiceService from "../services/choice.service";
 import { CreateChoiceData, UpdateChoiceData } from "../types/choice";
 
 export default class ChoiceController {
-  static async createChoice(req: Request, res: TypedResponse) {
+  static async createChoice(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
       const { choiceText, fromNodeId, toNodeId } = req.body;
@@ -55,7 +55,7 @@ export default class ChoiceController {
     }
   }
 
-  static async updateChoice(req: Request, res: TypedResponse) {
+  static async updateChoice(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
       const { choiceText, fromNodeId, toNodeId } = req.body;
@@ -130,7 +130,7 @@ export default class ChoiceController {
         .json(formatResponse(200, "Choice updated", updatedChoice, null));
     } catch (error) {
       console.error("Error in updateChoice:", error);
-      return res
+      res
         .status(500)
         .json(
           formatResponse(
@@ -143,7 +143,7 @@ export default class ChoiceController {
     }
   }
 
-  static async deleteChoice(req: Request, res: TypedResponse) {
+  static async deleteChoice(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
       const { choiceId } = req.params;
@@ -185,7 +185,10 @@ export default class ChoiceController {
     }
   }
 
-  static async getAllChoicesForStory(req: Request, res: TypedResponse) {
+  static async getAllChoicesForStory(
+    req: Request,
+    res: TypedResponse,
+  ): Promise<void> {
     try {
       const userId = res.locals.user?.id;
       const { storyId } = req.params;
@@ -234,7 +237,10 @@ export default class ChoiceController {
     }
   }
 
-  static async getChoicesFromNode(req: Request, res: TypedResponse) {
+  static async getChoicesFromNode(
+    req: Request,
+    res: TypedResponse,
+  ): Promise<void> {
     try {
       const userId = res.locals.user?.id;
       const { nodeId } = req.params;
@@ -283,7 +289,7 @@ export default class ChoiceController {
     }
   }
 
-  static async getChoiceById(req: Request, res: TypedResponse) {
+  static async getChoiceById(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
       const { choiceId } = req.params;

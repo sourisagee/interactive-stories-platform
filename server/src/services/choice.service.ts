@@ -1,8 +1,23 @@
 import prisma from "../lib/prisma";
 import type { CreateChoiceData, UpdateChoiceData } from "../types/choice";
+import type { Choice, Node, Story } from "@prisma/client"
+
+interface ChoiceWithRelations extends Choice {
+  fromNode?: Node;
+  toNode?: Node;
+};
+
+interface ChoiceWithStory extends Choice {
+  fromNode: Node & { story: Story };
+};
+
+interface ChoiceWithBothNodes extends Choice {
+  fromNode: Node;
+  toNode: Node;
+}
 
 export default class ChoiceService {
-  static async createChoice(data: CreateChoiceData, userId: number) {
+  static async createChoice(data: CreateChoiceData, userId: number): Promise<Choice | null> {
     const fromNode = await prisma.node.findUnique({
       where: { id: data.fromNodeId },
       include: { story: true },
@@ -32,7 +47,7 @@ export default class ChoiceService {
     data: UpdateChoiceData,
     choiceId: number,
     userId: number,
-  ) {
+  ): Promise<Choice | null> {
     const choice = await prisma.choice.findUnique({
       where: { id: choiceId },
       include: { fromNode: { include: { story: true } } },
@@ -74,7 +89,7 @@ export default class ChoiceService {
     });
   }
 
-  static async deleteChoice(choiceId: number, userId: number) {
+  static async deleteChoice(choiceId: number, userId: number): Promise<Choice | null> {
     const choice = await prisma.choice.findUnique({
       where: { id: choiceId },
       include: { fromNode: { include: { story: true } } },
@@ -85,7 +100,7 @@ export default class ChoiceService {
     return await prisma.choice.delete({ where: { id: choiceId } });
   }
 
-  static async getAllChoicesForStory(storyId: number, userId: number) {
+  static async getAllChoicesForStory(storyId: number, userId: number): Promise<ChoiceWithBothNodes[] | null> {
     const story = await prisma.story.findFirst({
       where: { id: storyId, authorId: userId },
     });
@@ -104,7 +119,7 @@ export default class ChoiceService {
     });
   }
 
-  static async getChoicesFromNode(nodeId: number, userId: number) {
+  static async getChoicesFromNode(nodeId: number, userId: number): Promise<ChoiceWithRelations[] | null> {
     const node = await prisma.node.findUnique({
       where: { id: nodeId },
       include: { story: true },
@@ -122,7 +137,7 @@ export default class ChoiceService {
     });
   }
 
-  static async getChoiceById(choiceId: number, userId: number) {
+  static async getChoiceById(choiceId: number, userId: number): Promise<ChoiceWithStory | null> {
     const choice = await prisma.choice.findUnique({
       where: { id: choiceId },
       include: {
