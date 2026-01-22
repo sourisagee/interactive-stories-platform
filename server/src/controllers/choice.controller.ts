@@ -2,7 +2,7 @@ import { Request } from "express";
 import { TypedResponse } from "../types";
 import formatResponse from "../utils/formatResponse";
 import ChoiceService from "../services/choice.service";
-import { CreateChoiceData, UpdateChoiceData } from "../types/choice";
+import { UpdateChoiceData } from "../types/choice";
 
 export default class ChoiceController {
   static async createChoice(req: Request, res: TypedResponse): Promise<void> {
