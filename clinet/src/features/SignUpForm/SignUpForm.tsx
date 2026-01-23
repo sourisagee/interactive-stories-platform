@@ -86,7 +86,7 @@ export default function SignUpForm() {
             className="register-input"
             required
           >
-            <option value={UserRole.USER}>Пользователь</option>
+            <option value={UserRole.USER}>Игрок</option>
             <option value={UserRole.AUTHOR}>Автор</option>
           </select>
 
