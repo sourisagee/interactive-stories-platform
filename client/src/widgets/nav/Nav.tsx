@@ -23,6 +23,9 @@ export default function Nav() {
             <NavLink to={CLIENT_ROUTES.SIGN_OUT} className="nav-link">
               Выход
             </NavLink>
+            <NavLink to={CLIENT_ROUTES.PROFILE} className="nav-link">
+              Профиль
+            </NavLink>
           </>
         ) : (
           <>

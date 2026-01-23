@@ -4,6 +4,7 @@ import { Node, Choice } from "@prisma/client";
 export interface CreateNodeDto {
   title: string;
   content: string;
+  picture: string;
   isStart?: boolean;
   isEnd?: boolean;
   storyId: number;
@@ -12,6 +13,7 @@ export interface CreateNodeDto {
 export interface UpdateNodeDto {
   title?: string;
   content?: string;
+  picture?: string;
   isStart?: boolean;
   isEnd?: boolean;
 }

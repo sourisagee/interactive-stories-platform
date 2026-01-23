@@ -14,7 +14,7 @@ export class NodeController {
         return;
       }
 
-      const { title, content, storyId } = req.body;
+      const { title, content, picture, storyId } = req.body;
 
       // Валидация обязательных полей
       if (!title || typeof title !== "string" || title.trim().length === 0) {
@@ -53,6 +53,69 @@ export class NodeController {
         return;
       }
 
+      if (
+        !picture ||
+        typeof picture !== "string" ||
+        picture.trim().length === 0
+      ) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Picture is required", null, null));
+        return;
+      }
+
+      if (picture.length > 255) {
+        res
+          .status(400)
+          .json(
+            formatResponse(
+              400,
+              "Picture URL too long (max 255 chars)",
+              null,
+              null
+            )
+          );
+        return;
+      }
+
+      // Проверка на валидный URL
+      try {
+        new URL(picture.trim());
+      } catch {
+        res
+          .status(400)
+          .json(formatResponse(400, "Picture must be a valid URL", null, null));
+        return;
+      }
+
+      // Проверка на формат изображения
+      const imageExtensions = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp",
+        ".svg",
+      ];
+      const pictureUrl = picture.trim().toLowerCase();
+      const hasValidExtension = imageExtensions.some(
+        (ext) => pictureUrl.endsWith(ext) || pictureUrl.includes(ext + "?")
+      );
+
+      if (!hasValidExtension) {
+        res
+          .status(400)
+          .json(
+            formatResponse(
+              400,
+              "Picture must be an image file (.jpg, .jpeg, .png, .gif, .webp, .svg)",
+              null,
+              null
+            )
+          );
+        return;
+      }
+
       if (!storyId || isNaN(Number(storyId)) || Number(storyId) <= 0) {
         res
           .status(400)
@@ -63,6 +126,7 @@ export class NodeController {
       const nodeData: CreateNodeDto = {
         title: title.trim(),
         content: content.trim(),
+        picture: picture.trim(),
         storyId: Number(storyId),
       };
 
@@ -120,7 +184,7 @@ export class NodeController {
         return;
       }
 
-      const { title, content } = req.body;
+      const { title, content, picture } = req.body;
 
       // Валидация данных для обновления
       if (title !== undefined) {
@@ -162,9 +226,72 @@ export class NodeController {
         }
       }
 
+      if (picture !== undefined) {
+        if (typeof picture !== "string" || picture.trim().length === 0) {
+          res
+            .status(400)
+            .json(formatResponse(400, "Picture cannot be empty", null, null));
+          return;
+        }
+        if (picture.length > 255) {
+          res
+            .status(400)
+            .json(
+              formatResponse(
+                400,
+                "Picture URL too long (max 255 chars)",
+                null,
+                null
+              )
+            );
+          return;
+        }
+
+        // Проверка на валидный URL
+        try {
+          new URL(picture.trim());
+        } catch {
+          res
+            .status(400)
+            .json(
+              formatResponse(400, "Picture must be a valid URL", null, null)
+            );
+          return;
+        }
+
+        // Проверка на формат изображения
+        const imageExtensions = [
+          ".jpg",
+          ".jpeg",
+          ".png",
+          ".gif",
+          ".webp",
+          ".svg",
+        ];
+        const pictureUrl = picture.trim().toLowerCase();
+        const hasValidExtension = imageExtensions.some(
+          (ext) => pictureUrl.endsWith(ext) || pictureUrl.includes(ext + "?")
+        );
+
+        if (!hasValidExtension) {
+          res
+            .status(400)
+            .json(
+              formatResponse(
+                400,
+                "Picture must be an image file (.jpg, .jpeg, .png, .gif, .webp, .svg)",
+                null,
+                null
+              )
+            );
+          return;
+        }
+      }
+
       const updateData: UpdateNodeDto = {};
       if (title !== undefined) updateData.title = title.trim();
       if (content !== undefined) updateData.content = content.trim();
+      if (picture !== undefined) updateData.picture = picture.trim();
 
       const updatedNode = await nodeService.updateNode(nodeId, updateData);
 
