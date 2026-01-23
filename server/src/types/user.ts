@@ -52,6 +52,10 @@ export interface JwtConfig {
 export interface CookieConfig {
   httpOnly: boolean;
   maxAge: number;
+  sameSite?: 'strict' | 'lax' | 'none';
+  secure?: boolean;
+  path?: string;
+  domain?: string;
 }
 
 // --- Express (locals) ---
