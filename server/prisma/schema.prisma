@@ -30,6 +30,7 @@ enum UserRole {
 
 model Story {
   id          Int           @id @default(autoincrement())
+  cover       String        @db.VarChar(255)
   title       String        @db.VarChar(255)
   genre       String        @db.VarChar(100)
   authorName  String        @db.VarChar(255)
@@ -58,6 +59,8 @@ model Node {
   content       String       @db.Text
   isStart       Boolean      @default(false) @map("is_start")
   isEnd         Boolean      @default(false) @map("is_end")
+  position_x    Float 
+  position_y    Float
   storyId       Int          @map("story_id")
   
   // Связи
