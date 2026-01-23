@@ -1,0 +1,76 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import "./SignInForm.css";
+import type { ChangeEvent, FormEvent } from "react";
+import { useAppDispatch } from "../../shared/hooks/reduxHooks";
+import { signinThunk } from "../../entities/user/api/UserApi";
+import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
+
+const INITIAL_INPUTS_DATA = {
+  email: "",
+  password: "",
+};
+
+export default function SignInForm() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [inputs, setInputs] = useState(INITIAL_INPUTS_DATA);
+
+  const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputs((prevState) => ({
+      ...prevState,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  function loginUserHandler(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    dispatch(signinThunk(inputs))
+      .unwrap()
+      .then(() => {
+        navigate(CLIENT_ROUTES.HOME);
+      })
+      .catch((error) => {
+        alert(error || "Login failed");
+      });
+  }
+
+  return (
+    <div className="login-container">
+  <div className="login-card">
+    <h2 className="login-title">Войти в аккаунт</h2>
+
+    <form onSubmit={loginUserHandler} className="space-y-6">
+      <input
+        name="email"
+        type="email"
+        value={inputs.email}
+        onChange={onChangeHandler}
+        placeholder="Email"
+        className="login-input"
+        required
+      />
+
+      <input
+        name="password"
+        type="password"
+        value={inputs.password}
+        onChange={onChangeHandler}
+        placeholder="Пароль"
+        className="login-input"
+        required
+      />
+
+      <button
+        type="submit"
+        disabled={!inputs.email || !inputs.password}
+        className="login-button"
+      >
+        Войти
+      </button>
+    </form>
+  </div>
+</div>
+  );
+}

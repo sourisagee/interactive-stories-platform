@@ -22,6 +22,8 @@ const accessLogStream = fs.createWriteStream(
 const corsOptions: cors.CorsOptions = {
   origin: CLIENT_URL,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 const serverConfig = (app: Express): void => {
@@ -40,3 +42,4 @@ const serverConfig = (app: Express): void => {
 };
 
 export default serverConfig;
+

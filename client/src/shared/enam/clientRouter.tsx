@@ -1,7 +1,6 @@
 export const CLIENT_ROUTES = {
   HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  PROFILE: '/profile',
-  ADMIN: '/admin',
+  SIGN_UP: '/signUp',
+  SIGN_IN: '/signIn',
+  SIGN_OUT: '/signOut',
 };

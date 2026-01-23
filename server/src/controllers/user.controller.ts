@@ -12,20 +12,31 @@ export class UserController {
   static refreshTokens(req: Request, res: TypedResponse): void {
     try {
       const refreshToken = req.cookies?.refreshToken;
+
+    
+      
+      
       if (!refreshToken) {
-        res.status(401).clearCookie('refreshToken').json(formatResponse(401, 'No refresh token', null, 'No refresh token'));
+        res.status(401).clearCookie('refreshToken', cookieConfig).json(formatResponse(401, 'No refresh token', null, 'No refresh token'));
         return;
       }
-      const decoded = jwt.verify(refreshToken, process.env.SECRET_REFRESH_TOKEN as string) as JwtPayload;
-      const { accessToken, refreshToken: newRefreshToken } = generateJwtTokens(decoded);
+      
+      const {user} = jwt.verify(refreshToken, process.env.SECRET_REFRESH_TOKEN as string) as JwtPayload;
+
+
+
+      const { accessToken, refreshToken: newRefreshToken } = generateJwtTokens(user);
+      
       res
         .status(200)
         .cookie('refreshToken', newRefreshToken, cookieConfig)
-        .json(formatResponse(200, 'Session extended', { user: decoded.user, accessToken }, null));
-    } catch {
+        .json(formatResponse(200, 'Session extended', { user: user, accessToken }, null));
+    } catch (error) {
+      
+      
       res
         .status(401)
-        .clearCookie('refreshToken')
+        .clearCookie('refreshToken', cookieConfig)
         .json(formatResponse(401, 'Invalid refresh token', null, 'Invalid refresh token'));
     }
   }
@@ -76,8 +87,11 @@ export class UserController {
     }
   }
 
-  static signOut(_req: Request, res: TypedResponse): void {
-    res.clearCookie('refreshToken').json(formatResponse(200, 'Sign out successful', null, null));
+  static signOut(req: Request, res: TypedResponse): void {
+
+      console.log(req.cookies);
+
+    res.clearCookie('refreshToken', cookieConfig).json(formatResponse(200, 'Sign out successful', null, null));
   }
 
   static async getAll(_req: Request, res: TypedResponse): Promise<void> {

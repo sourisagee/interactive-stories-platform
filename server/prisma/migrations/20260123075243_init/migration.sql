@@ -17,6 +17,7 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "stories" (
     "id" SERIAL NOT NULL,
+    "cover" VARCHAR(255) NOT NULL,
     "title" VARCHAR(255) NOT NULL,
     "genre" VARCHAR(100) NOT NULL,
     "authorName" VARCHAR(255) NOT NULL,
@@ -37,6 +38,8 @@ CREATE TABLE "nodes" (
     "content" TEXT NOT NULL,
     "is_start" BOOLEAN NOT NULL DEFAULT false,
     "is_end" BOOLEAN NOT NULL DEFAULT false,
+    "position_x" DOUBLE PRECISION NOT NULL,
+    "position_y" DOUBLE PRECISION NOT NULL,
     "story_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
