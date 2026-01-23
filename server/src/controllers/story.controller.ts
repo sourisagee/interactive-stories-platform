@@ -14,7 +14,7 @@ export class StoryController {
         return;
       }
 
-      const { title, description, genre, authorName } = req.body;
+      const { title, description, genre, authorName, cover } = req.body;
 
       // Валидация обязательных полей
       if (!title || typeof title !== "string" || title.trim().length === 0) {
@@ -50,6 +50,13 @@ export class StoryController {
         res
           .status(400)
           .json(formatResponse(400, "Author name is required", null, null));
+        return;
+      }
+
+      if (!cover || typeof cover !== "string" || cover.trim().length === 0) {
+        res
+          .status(400)
+          .json(formatResponse(400, "Cover is required", null, null));
         return;
       }
 
@@ -99,11 +106,26 @@ export class StoryController {
         return;
       }
 
+      if (cover.length > 255) {
+        res
+          .status(400)
+          .json(
+            formatResponse(
+              400,
+              "Cover URL too long (max 255 chars)",
+              null,
+              null
+            )
+          );
+        return;
+      }
+
       const storyData: CreateStoryDto = {
         title: title.trim(),
         description: description.trim(),
         genre: genre.trim(),
         authorName: authorName.trim(),
+        cover: cover.trim(),
         authorId: userId,
       };
 
@@ -192,7 +214,7 @@ export class StoryController {
         return;
       }
 
-      const { title, description, genre, authorName } = req.body;
+      const { title, description, genre, authorName, cover } = req.body;
 
       // Валидация данных для обновления
       if (title !== undefined) {
@@ -280,12 +302,35 @@ export class StoryController {
         }
       }
 
+      if (cover !== undefined) {
+        if (typeof cover !== "string" || cover.trim().length === 0) {
+          res
+            .status(400)
+            .json(formatResponse(400, "Cover cannot be empty", null, null));
+          return;
+        }
+        if (cover.length > 255) {
+          res
+            .status(400)
+            .json(
+              formatResponse(
+                400,
+                "Cover URL too long (max 255 chars)",
+                null,
+                null
+              )
+            );
+          return;
+        }
+      }
+
       const updateData: UpdateStoryDto = {};
       if (title !== undefined) updateData.title = title.trim();
       if (description !== undefined)
         updateData.description = description.trim();
       if (genre !== undefined) updateData.genre = genre.trim();
       if (authorName !== undefined) updateData.authorName = authorName.trim();
+      if (cover !== undefined) updateData.cover = cover.trim();
 
       const updatedStory = await storyService.updateStory(storyId, updateData);
 
