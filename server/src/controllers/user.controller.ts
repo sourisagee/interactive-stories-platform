@@ -31,6 +31,8 @@ export class UserController {
       const { accessToken, refreshToken: newRefreshToken } =
         generateJwtTokens({user});
 
+      const { accessToken, refreshToken: newRefreshToken } = generateJwtTokens({user});
+      
       res
         .status(200)
         .cookie("refreshToken", newRefreshToken, cookieConfig)
