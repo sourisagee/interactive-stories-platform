@@ -18,21 +18,20 @@ export class UserController {
           .status(401)
           .clearCookie("refreshToken", cookieConfig)
           .json(
-            formatResponse(401, "No refresh token", null, "No refresh token")
+            formatResponse(401, "No refresh token", null, "No refresh token"),
           );
         return;
       }
 
       const { user } = jwt.verify(
         refreshToken,
-        process.env.SECRET_REFRESH_TOKEN as string
+        process.env.SECRET_REFRESH_TOKEN as string,
       ) as JwtPayload;
 
-      const { accessToken, refreshToken: newRefreshToken } =
-        generateJwtTokens({user});
+      const { accessToken, refreshToken: newRefreshToken } = generateJwtTokens({
+        user,
+      });
 
-      const { accessToken, refreshToken: newRefreshToken } = generateJwtTokens({user});
-      
       res
         .status(200)
         .cookie("refreshToken", newRefreshToken, cookieConfig)
@@ -41,8 +40,8 @@ export class UserController {
             200,
             "Session extended",
             { user: user, accessToken },
-            null
-          )
+            null,
+          ),
         );
     } catch (error) {
       res
@@ -53,8 +52,8 @@ export class UserController {
             401,
             "Invalid refresh token",
             null,
-            "Invalid refresh token"
-          )
+            "Invalid refresh token",
+          ),
         );
     }
   }
@@ -72,8 +71,8 @@ export class UserController {
               400,
               "User with this email already exists",
               null,
-              "User with this email already exists"
-            )
+              "User with this email already exists",
+            ),
           );
         return;
       }
@@ -92,8 +91,8 @@ export class UserController {
             201,
             "Registration successful",
             { user, accessToken },
-            null
-          )
+            null,
+          ),
         );
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Internal server error";
@@ -107,7 +106,7 @@ export class UserController {
     const { email, password } = req.body;
     try {
       const userFound = await UserService.getUserByEmail(
-        (email as string)?.trim().toLowerCase()
+        (email as string)?.trim().toLowerCase(),
       );
       if (!userFound) {
         res
@@ -117,8 +116,8 @@ export class UserController {
               400,
               "User with this email not found",
               null,
-              "User with this email not found"
-            )
+              "User with this email not found",
+            ),
           );
         return;
       }
@@ -127,7 +126,7 @@ export class UserController {
         res
           .status(400)
           .json(
-            formatResponse(400, "Invalid password", null, "Invalid password")
+            formatResponse(400, "Invalid password", null, "Invalid password"),
           );
         return;
       }
@@ -137,7 +136,12 @@ export class UserController {
         .status(200)
         .cookie("refreshToken", refreshToken, cookieConfig)
         .json(
-          formatResponse(200, "Sign in successful", { user, accessToken }, null)
+          formatResponse(
+            200,
+            "Sign in successful",
+            { user, accessToken },
+            null,
+          ),
         );
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Internal server error";
@@ -209,8 +213,8 @@ export class UserController {
             403,
             "You can only update your own profile",
             null,
-            "Forbidden"
-          )
+            "Forbidden",
+          ),
         );
       return;
     }
@@ -224,8 +228,8 @@ export class UserController {
               400,
               "Email already in use",
               null,
-              "Email already in use"
-            )
+              "Email already in use",
+            ),
           );
         return;
       }
@@ -255,8 +259,8 @@ export class UserController {
             403,
             "You can only delete your own account",
             null,
-            "Forbidden"
-          )
+            "Forbidden",
+          ),
         );
       return;
     }
