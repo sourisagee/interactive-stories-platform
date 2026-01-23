@@ -96,6 +96,7 @@ async function main() {
   const fantasyStory = await prisma.story.create({
     data: {
       title: "Путешествие в Забытые Земли",
+      cover: "covers/journey_to_Forgotten_Lands.jpg",
       genre: "Фэнтези",
       authorName: "Джон Сторителлер",
       description: "Эпическое фэнтезийное приключение в мире магии и драконов.",
@@ -108,6 +109,7 @@ async function main() {
   const cyberpunkStory = await prisma.story.create({
     data: {
       title: "Киберпанк: Нейрошпион",
+      cover:  "covers/Cyberpunk_Neurospy.png",
       genre: "Научная фантастика",
       authorName: "Эмма Техно",
       description: "Киберпанк история о хакере в неоновом городе будущего.",
@@ -120,6 +122,7 @@ async function main() {
   const horrorStory = await prisma.story.create({
     data: {
       title: "Тайна Старого Особняка",
+      cover: "covers/the_Mystery_of_the_Old_Mansion.jpg",
       genre: "Хоррор",
       authorName: "Джон Сторителлер",
       description: "Страшная история с привидениями в заброшенном особняке.",
@@ -146,6 +149,9 @@ async function main() {
           "Вы стоите на краю древнего леса. Тропинка ведет вглубь чащи. Воздух наполнен магией.",
         isStart: true,
         isEnd: false,
+        // Верхний левый узел
+        position_x: 0,
+        position_y: 0,
         storyId: fantasyStory.id,
       },
     }),
@@ -157,6 +163,9 @@ async function main() {
           "Вы вышли к быстрой реке. Мост выглядит старым и ненадежным. На другом берегу виднеется пещера.",
         isStart: false,
         isEnd: false,
+        // Узел справа от входа в лес
+        position_x: 320,
+        position_y: 0,
         storyId: fantasyStory.id,
       },
     }),
@@ -168,6 +177,9 @@ async function main() {
           "В пещере вы находите спящего дракона. Рядом с ним блестит сокровище.",
         isStart: false,
         isEnd: false,
+        // Центр композиции
+        position_x: 640,
+        position_y: 0,
         storyId: fantasyStory.id,
       },
     }),
@@ -179,6 +191,9 @@ async function main() {
           "Вы победили дракона и забрали сокровище! Лес снова в безопасности.",
         isStart: false,
         isEnd: true,
+        // Финал «Победа» — чуть выше и правее
+        position_x: 960,
+        position_y: -160,
         storyId: fantasyStory.id,
       },
     }),
@@ -190,6 +205,9 @@ async function main() {
           "Дракон оказался слишком сильным. Ваше приключение закончилось здесь...",
         isStart: false,
         isEnd: true,
+        // Финал «Поражение» — чуть ниже и правее
+        position_x: 960,
+        position_y: 160,
         storyId: fantasyStory.id,
       },
     }),
@@ -207,6 +225,9 @@ async function main() {
           "Ночь 2077 года. Дождь стучит по неоновым вывескам. У вас есть задание.",
         isStart: true,
         isEnd: false,
+        // Старт киберпанк-истории — внизу слева
+        position_x: 0,
+        position_y: 360,
         storyId: cyberpunkStory.id,
       },
     }),
@@ -218,6 +239,9 @@ async function main() {
           "Вы проникаете в штаб-квартиру корпорации. Охранные системы активны.",
         isStart: false,
         isEnd: false,
+        // Следующий шаг по горизонтали
+        position_x: 320,
+        position_y: 360,
         storyId: cyberpunkStory.id,
       },
     }),
@@ -228,6 +252,8 @@ async function main() {
         content: "Вы нашли главный сервер. Данные защищены крипто-щитом.",
         isStart: false,
         isEnd: false,
+        position_x: 640,
+        position_y: 360,
         storyId: cyberpunkStory.id,
       },
     }),
@@ -239,6 +265,9 @@ async function main() {
           "Задание выполнено! Вы скрываетесь с данными, пока не сработала тревога.",
         isStart: false,
         isEnd: true,
+        // Финал киберпанк-истории
+        position_x: 960,
+        position_y: 360,
         storyId: cyberpunkStory.id,
       },
     }),
