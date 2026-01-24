@@ -13,8 +13,8 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/users", userRouter);
 apiRouter.use("/stories", storyRouter);
 apiRouter.use("/nodes", nodeRouter);
-apiRouter.use("/playthrough", playthroughRouter);
-apiRouter.use("/choice", choiceRouter);
+apiRouter.use("/playthroughs", playthroughRouter);
+apiRouter.use("/choices", choiceRouter);
 
 
 export default apiRouter;
