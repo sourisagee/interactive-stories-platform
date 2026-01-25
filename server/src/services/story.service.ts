@@ -92,25 +92,19 @@ export class StoryService {
     });
   }
 
-  // Получить все истории с авторами
+  // Получить все истории (authorName в модели Story, author не нужен для списка)
 
-  async getAllStories(): Promise<StoryWithAuthor[]> {
+  async getAllStories(): Promise<Story[]> {
     return await prisma.story.findMany({
-      include: {
-        author: true,
-      },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  // Получить истории автора с информацией об авторе
+  // Получить истории автора
 
-  async getStoriesByAuthor(authorId: number): Promise<StoryWithAuthor[]> {
+  async getStoriesByAuthor(authorId: number): Promise<Story[]> {
     return await prisma.story.findMany({
       where: { authorId },
-      include: {
-        author: true,
-      },
       orderBy: { createdAt: "desc" },
     });
   }

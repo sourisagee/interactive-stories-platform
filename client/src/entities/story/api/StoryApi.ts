@@ -2,6 +2,7 @@ import { axiosInstance } from "../../../shared/lib/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type {
   StoryData,
+  StoryFullData,
   CreateStoryFormData,
 } from "../model";
 import type { ServerResponseType } from "../../../shared/types";
@@ -128,19 +129,17 @@ export const getStoryByIdThunk = createAsyncThunk<
   }
 });
 
-// getStoryFullThunk - Thunk для получения полной истории с узлами и выборами
-// Используется для отображения истории в редакторе или для игры
+// getStoryFullThunk - полная история с узлами и выборами для игры
 export const getStoryFullThunk = createAsyncThunk<
-  StoryData, // Тип возвращаемого значения (полная история)
-  number, // Тип параметра (ID истории)
+  StoryFullData,
+  number,
   { rejectValue: string }
 >(STORY_THUNK_NAMES.GET_STORY_FULL, async (storyId, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get<ServerResponseType<StoryData>>(
+    const response = await axiosInstance.get<ServerResponseType<StoryFullData>>(
       STORY_API_URL.GET_FULL(storyId),
     );
-
-    return response.data.data as StoryData;
+    return response.data.data as StoryFullData;
   } catch (error) {
     const axiosError = error as AxiosError<ServerResponseType<null>>;
     const errorMessage =

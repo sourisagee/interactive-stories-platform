@@ -11,6 +11,27 @@ export type StoryData = {
   updatedAt: string;
 };
 
+/** Выбор в узле истории; toNodeId — следующий узел */
+export type ChoiceData = {
+  id: number;
+  choiceText: string;
+  toNodeId: number;
+};
+
+/** Узел истории: картинка, текст, выборы (fromChoices), isStart/isEnd */
+export type NodeData = {
+  id: number;
+  title: string;
+  content: string;
+  picture: string;
+  isStart: boolean;
+  isEnd: boolean;
+  fromChoices: ChoiceData[];
+};
+
+/** История с узлами для страницы игры (GET /stories/:id/full) */
+export type StoryFullData = StoryData & { nodes: NodeData[] };
+
 export type StoryType = {
   story: StoryData | null;
 };
