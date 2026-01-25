@@ -20,11 +20,16 @@ export default function Nav() {
           <>
             {/* Для зарегистрированного пользователя */}
 
-            <NavLink to={CLIENT_ROUTES.SIGN_OUT} className="nav-link">
-              Выход
+            <NavLink to={CLIENT_ROUTES.ALLSTORIES} className="nav-link">
+              Все истории
             </NavLink>
+
             <NavLink to={CLIENT_ROUTES.PROFILE} className="nav-link">
               Профиль
+            </NavLink>
+
+            <NavLink to={CLIENT_ROUTES.SIGN_OUT} className="nav-link">
+              Выход
             </NavLink>
           </>
         ) : (
