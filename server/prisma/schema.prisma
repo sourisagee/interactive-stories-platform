@@ -33,7 +33,7 @@ model Story {
   cover       String        @db.VarChar(255)
   title       String        @db.VarChar(255)
   genre       String        @db.VarChar(100)
-  authorName  String        @db.VarChar(255)
+  authorName  String        @db.VarChar(255) @map("author_name")
   description String        @db.Text
   isPublished Boolean       @default(false) @map("is_published")
   authorId    Int           @map("author_id")
