@@ -14,7 +14,8 @@ export class NodeController {
         return;
       }
 
-      const { title, content, picture, storyId } = req.body;
+      const { title, content, picture, position_x, position_y, storyId } =
+        req.body;
 
       // Валидация обязательных полей
       if (!title || typeof title !== "string" || title.trim().length === 0) {
@@ -123,10 +124,26 @@ export class NodeController {
         return;
       }
 
+      if (position_x === undefined || typeof position_x !== "number") {
+        res
+          .status(400)
+          .json(formatResponse(400, "Position X is required", null, null));
+        return;
+      }
+
+      if (position_y === undefined || typeof position_y !== "number") {
+        res
+          .status(400)
+          .json(formatResponse(400, "Position Y is required", null, null));
+        return;
+      }
+
       const nodeData: CreateNodeDto = {
         title: title.trim(),
         content: content.trim(),
         picture: picture.trim(),
+        position_x: position_x,
+        position_y: position_y,
         storyId: Number(storyId),
       };
 
@@ -184,7 +201,7 @@ export class NodeController {
         return;
       }
 
-      const { title, content, picture } = req.body;
+      const { title, content, picture, position_x, position_y } = req.body;
 
       // Валидация данных для обновления
       if (title !== undefined) {
@@ -288,10 +305,26 @@ export class NodeController {
         }
       }
 
+      if (position_x !== undefined && typeof position_x !== "number") {
+        res
+          .status(400)
+          .json(formatResponse(400, "Position X must be a number", null, null));
+        return;
+      }
+
+      if (position_y !== undefined && typeof position_y !== "number") {
+        res
+          .status(400)
+          .json(formatResponse(400, "Position Y must be a number", null, null));
+        return;
+      }
+
       const updateData: UpdateNodeDto = {};
       if (title !== undefined) updateData.title = title.trim();
       if (content !== undefined) updateData.content = content.trim();
       if (picture !== undefined) updateData.picture = picture.trim();
+      if (position_x !== undefined) updateData.position_x = position_x;
+      if (position_y !== undefined) updateData.position_y = position_y;
 
       const updatedNode = await nodeService.updateNode(nodeId, updateData);
 
