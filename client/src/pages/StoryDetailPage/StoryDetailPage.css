@@ -38,8 +38,9 @@
 
 .story-detail-title {
   margin: 0 0 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.7rem;
+  font-weight: 400;
+  font-family: 'MedievalSharp', 'Uncial Antiqua', cursive;
   color: var(--color-text, #e8e4f0);
   text-shadow: 0 0 16px var(--glow, rgba(139, 107, 184, 0.2));
 }

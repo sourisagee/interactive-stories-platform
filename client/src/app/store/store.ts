@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { userReducer } from "../../entities/user/slice/userSlice";
 import { storyEditorReducer } from "../../entities/story/slice/storyEditorSlice";
+import { storyReducer } from "../../entities/story/slice/storySlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    stories: storyReducer,
     storyEditor: storyEditorReducer,
   },
 

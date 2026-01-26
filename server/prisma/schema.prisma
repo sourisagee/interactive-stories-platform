@@ -16,6 +16,7 @@ model User {
   // Отношения
   stories      Story[]       // Истории автора (проверять role === AUTHOR)
   playthroughs Playthrough[] // Прохождения игрока (проверять role === USER)
+  ratings      Rating[]      // Оценки пользователя
   
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -41,6 +42,7 @@ model Story {
   author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   nodes       Node[]
   playthroughs Playthrough[]
+  ratings     Rating[]
   
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
@@ -118,4 +120,23 @@ model Playthrough {
   // Ограничения
   @@unique([userId, storyId])  // Один пользователь → одно прохождение истории
   @@map("playthroughs")
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rating    Int      // Значение от 1 до 5
+  userId    Int      @map("user_id")
+  storyId   Int      @map("story_id")
+  
+  // Связи
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@unique([userId, storyId])  // Один пользователь → одна оценка истории
+  @@index([storyId])           // Быстрый поиск всех рейтингов истории
+  @@index([userId])           // Быстрый поиск всех рейтингов пользователя
+  @@map("ratings")
 }

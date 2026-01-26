@@ -140,7 +140,7 @@ export class StoryController {
   // Получить историю с автором GET /api/stories/:id
   static async getStoryById(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const storyId = Number(req.params.id);
+      const storyId = Number(req.params.id); // id истории
 
       // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
@@ -169,7 +169,7 @@ export class StoryController {
   // Получить полную историю для игры GET /api/stories/:id/full
   static async getStoryFull(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const storyId = Number(req.params.id);
+      const storyId = Number(req.params.id); // id истории
 
       // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
@@ -204,7 +204,7 @@ export class StoryController {
         return;
       }
 
-      const storyId = Number(req.params.id);
+      const storyId = Number(req.params.id); // id истории
 
       // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
@@ -350,7 +350,7 @@ export class StoryController {
         return;
       }
 
-      const storyId = Number(req.params.id);
+      const storyId = Number(req.params.id); // id истории
 
       // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {

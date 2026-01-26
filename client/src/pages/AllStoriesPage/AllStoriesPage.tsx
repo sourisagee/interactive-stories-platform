@@ -2,10 +2,18 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getAllStoriesThunk } from "../../entities/story/api/StoryApi";
+import {
+  getPopularStoriesThunk,
+  getStoryRatingThunk,
+  type PopularStory,
+  type StoryRatingInfo,
+} from "../../entities/rating/api/RatingApi";
 import { UserRole, type UserData } from "../../entities/user/model";
 import { CLIENT_ROUTES, storyDetailPath, gamePlayPath } from "../../shared/enam/clientRouter";
 import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
 import type { StoryData } from "../../entities/story/model";
+import StarRating from "../../shared/components/StarRating/StarRating";
+import RatingModal from "../../shared/components/RatingModal/RatingModal";
 import "./AllStoriesPage.css";
 
 /** Максимальная длина описания в карточке */
@@ -14,49 +22,107 @@ const DESC_PREVIEW_LEN = 100;
 type StoryCardProps = {
   story: StoryData;
   user: UserData | null;
-  onPlay: (id: number) => void; // Функция-колбэк для кнопки Играть (id истории)
-  onDetails: (id: number) => void; // Функция-колбэк для кнопки Подробнее (id истории)
-  onSignIn: () => void; // Функция-колбэк для кнопки Войти для игры
+  ratingInfo?: StoryRatingInfo;
+  isPopular?: boolean;
+  showPopularBadge?: boolean; // Показывать ли значок популярности
+  onPlay: (id: number) => void;
+  onDetails: (id: number) => void;
+  onSignIn: () => void;
+  onRatingChange?: (storyId: number, ratingInfo: StoryRatingInfo) => void;
 };
 
-/** Карточка одной истории: обложка, описание, кнопки Играть / Подробнее / Войти */
-function StoryCard({ story, user, onPlay, onDetails, onSignIn }: StoryCardProps) {
+/** Карточка одной истории: обложка, описание, рейтинг, кнопки Играть / Подробнее / Войти */
+function StoryCard({
+  story,
+  user,
+  ratingInfo,
+  isPopular = false,
+  showPopularBadge = false,
+  onPlay,
+  onDetails,
+  onSignIn,
+  onRatingChange,
+}: StoryCardProps) {
   const isAuthor = user?.role === UserRole.AUTHOR;
   const isPlayer = user?.role === UserRole.USER;
+  // Кнопка "Оценить" только для игроков (не авторов) и только если пользователь не автор истории
+  const canRate = isPlayer && story.authorId !== user?.id;
+  const hasRated = !!ratingInfo && ratingInfo.userRating !== null && ratingInfo.userRating !== undefined;
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const description =
     story.description.length > DESC_PREVIEW_LEN
       ? `${story.description.slice(0, DESC_PREVIEW_LEN)}...`
       : story.description;
 
+  const handleRatingSubmitted = (newRatingInfo: StoryRatingInfo) => {
+    if (onRatingChange) {
+      onRatingChange(story.id, newRatingInfo);
+    }
+  };
+
   return (
-    <div className="story-card">
-      <div className="story-cover">
-        <img src={`${getServerBaseUrl()}/${story.cover}`} alt={story.title} />
-      </div>
-      <div className="story-content">
-        <h3 className="story-title">{story.title}</h3>
-        <p className="story-author">Автор: {story.authorName}</p>
-        <p className="story-genre">Жанр: {story.genre}</p>
-        <p className="story-description">{description}</p>
-      </div>
-      <div className="story-actions">
-        {isPlayer && (
-          <button type="button" className="btn btn-primary" onClick={() => onPlay(story.id)}>
-            Играть
-          </button>
+    <>
+      <div className={`story-card ${showPopularBadge ? "story-card-popular" : ""}`}>
+        {showPopularBadge && (
+          <div className="story-card-popular-badge" aria-label="Популярная история">
+            <span className="popular-icon">✦</span>
+          </div>
         )}
-        {isAuthor && (
-          <button type="button" className="btn btn-secondary" onClick={() => onDetails(story.id)}>
-            Подробнее
-          </button>
-        )}
-        {!user && (
-          <button type="button" className="btn btn-primary" onClick={onSignIn}>
-            Войти для игры
-          </button>
-        )}
+        <div className="story-cover">
+          <img src={`${getServerBaseUrl()}/${story.cover}`} alt={story.title} />
+        </div>
+        <div className="story-content">
+          <h3 className="story-title">{story.title}</h3>
+          <p className="story-author">Автор: {story.authorName}</p>
+          <p className="story-genre">Жанр: {story.genre}</p>
+          <p className="story-description">{description}</p>
+          {ratingInfo && (
+            <div className="story-rating">
+              <StarRating
+                averageRating={ratingInfo.averageRating}
+                totalRatings={ratingInfo.totalRatings}
+              />
+            </div>
+          )}
+        </div>
+        <div className="story-actions">
+          {canRate && (
+            <button
+              type="button"
+              className={`btn btn-rating ${hasRated ? "btn-rating-rated" : ""}`}
+              onClick={() => setIsRatingModalOpen(true)}
+              disabled={hasRated}
+            >
+              {hasRated && ratingInfo?.userRating ? `✓ Оценено (${ratingInfo.userRating})` : "Оценить"}
+            </button>
+          )}
+          {isPlayer && (
+            <button type="button" className="btn btn-primary" onClick={() => onPlay(story.id)}>
+              Играть
+            </button>
+          )}
+          {isAuthor && (
+            <button type="button" className="btn btn-secondary" onClick={() => onDetails(story.id)}>
+              Подробнее
+            </button>
+          )}
+          {!user && (
+            <button type="button" className="btn btn-primary" onClick={onSignIn}>
+              Войти для игры
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+      {canRate && (
+        <RatingModal
+          storyId={story.id}
+          storyTitle={story.title}
+          isOpen={isRatingModalOpen}
+          onClose={() => setIsRatingModalOpen(false)}
+          onRatingSubmitted={handleRatingSubmitted}
+        />
+      )}
+    </>
   );
 }
 
@@ -65,13 +131,89 @@ export default function AllStoriesPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
+  const [popularStories, setPopularStories] = useState<PopularStory[]>([]);
+  const [storyRatings, setStoryRatings] = useState<
+    Record<number, StoryRatingInfo>
+  >({});
+  const [isLoadingPopular, setIsLoadingPopular] = useState(false);
 
   const { stories, isLoading, error } = useAppSelector((state) => state.stories);
   const { user } = useAppSelector((state) => state.user);
 
+  // Загрузка всех историй
   useEffect(() => {
     dispatch(getAllStoriesThunk());
   }, [dispatch]);
+
+  // Загрузка популярных историй
+  useEffect(() => {
+    const loadPopularStories = async () => {
+      setIsLoadingPopular(true);
+      try {
+        const popular = await dispatch(getPopularStoriesThunk(4)).unwrap();
+        setPopularStories(popular);
+        // Загружаем рейтинги для популярных историй
+        const ratingPromises = popular.map((story) =>
+          dispatch(getStoryRatingThunk(story.id))
+            .unwrap()
+            .then((rating) => ({ storyId: story.id, rating }))
+            .catch(() => null)
+        );
+        const ratings = await Promise.all(ratingPromises);
+        ratings.forEach((item) => {
+          if (item) {
+            setStoryRatings((prev) => ({
+              ...prev,
+              [item.storyId]: item.rating,
+            }));
+          }
+        });
+      } catch (error) {
+        console.error("Ошибка загрузки популярных историй:", error);
+      } finally {
+        setIsLoadingPopular(false);
+      }
+    };
+    loadPopularStories();
+  }, [dispatch]);
+
+  // Загрузка рейтингов для всех историй при изменении списка
+  useEffect(() => {
+    const loadRatings = async () => {
+      const publishedIds = stories
+        .filter((s) => s.isPublished)
+        .map((s) => s.id);
+      
+      // Загружаем рейтинги только для историй, у которых еще нет рейтинга
+      const idsToLoad = publishedIds.filter((id) => !storyRatings[id]);
+      
+      if (idsToLoad.length === 0) return;
+      
+      const ratingPromises = idsToLoad.map((id) =>
+        dispatch(getStoryRatingThunk(id))
+          .unwrap()
+          .then((rating) => ({ storyId: id, rating }))
+          .catch((error) => {
+            // Игнорируем ошибки 400/404 - просто нет рейтинга
+            console.debug(`Рейтинг для истории ${id} не найден`);
+            return null;
+          })
+      );
+      
+      const ratings = await Promise.all(ratingPromises);
+      const ratingsMap: Record<number, StoryRatingInfo> = {};
+      ratings.forEach((item) => {
+        if (item) {
+          ratingsMap[item.storyId] = item.rating;
+        }
+      });
+      setStoryRatings((prev) => ({ ...prev, ...ratingsMap }));
+    };
+
+    if (stories.length > 0) {
+      loadRatings();
+    }
+  }, [stories, dispatch, storyRatings]);
 
   /** Только опубликованные */
   const publishedStories = useMemo(
@@ -122,10 +264,30 @@ export default function AllStoriesPage() {
   const hasStories = filteredStories.length > 0;
   const hasFilters = Boolean(searchQuery.trim() || selectedGenre);
 
-  const handlePlay = (id: number) => navigate(gamePlayPath(id)); /** Навигация для игры */
-  const handleDetails = (id: number) => navigate(storyDetailPath(id)); /** Смотреть детали */
-
+  const handlePlay = (id: number) => navigate(gamePlayPath(id));
+  const handleDetails = (id: number) => navigate(storyDetailPath(id));
   const goToSignIn = () => navigate(CLIENT_ROUTES.SIGN_IN);
+
+  const handleRatingChange = (storyId: number, ratingInfo: StoryRatingInfo) => {
+    setStoryRatings((prev) => ({
+      ...prev,
+      [storyId]: ratingInfo,
+    }));
+    // Обновляем популярные истории, если изменился рейтинг
+    setPopularStories((prev) =>
+      prev.map((story) =>
+        story.id === storyId
+          ? { ...story, averageRating: ratingInfo.averageRating, totalRatings: ratingInfo.totalRatings }
+          : story
+      )
+    );
+  };
+
+  // Получаем ID популярных историй для проверки
+  const popularStoryIds = useMemo(
+    () => new Set(popularStories.map((s) => s.id)),
+    [popularStories]
+  );
 
   if (isLoading) {
     return (
@@ -206,6 +368,32 @@ export default function AllStoriesPage() {
             </div>
           </div>
 
+          {/* Секция Популярное */}
+          {popularStories.length > 0 && (
+            <section className="popular-stories-section">
+              <h2 className="section-title">
+                <span className="title-icon title-icon-cosmic" aria-hidden />
+                Популярное
+              </h2>
+              <div className="stories-grid">
+                {popularStories.map((story) => (
+                  <StoryCard
+                    key={story.id}
+                    story={story}
+                    user={user}
+                    ratingInfo={storyRatings[story.id]}
+                    isPopular={true}
+                    showPopularBadge={true}
+                    onPlay={handlePlay}
+                    onDetails={handleDetails}
+                    onSignIn={goToSignIn}
+                    onRatingChange={handleRatingChange}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           {!hasStories ? (
             <div className="no-stories">
               <p>
@@ -224,9 +412,13 @@ export default function AllStoriesPage() {
                     key={story.id}
                     story={story}
                     user={user}
+                    ratingInfo={storyRatings[story.id]}
+                    isPopular={popularStoryIds.has(story.id)}
+                    showPopularBadge={false}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
                     onSignIn={goToSignIn}
+                    onRatingChange={handleRatingChange}
                   />
                 ))}
               </div>
