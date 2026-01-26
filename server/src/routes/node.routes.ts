@@ -9,7 +9,7 @@ const nodeRouter = Router();
 nodeRouter.get("/", (req, res) =>
   NodeController.getNodes(req, res as TypedResponse)
 );
-nodeRouter.get("/:id", (req, res) =>
+nodeRouter.get("/:nodeId", (req, res) =>
   NodeController.getNodeById(req, res as TypedResponse)
 );
 
@@ -17,10 +17,10 @@ nodeRouter.get("/:id", (req, res) =>
 nodeRouter.post("/", verifyAccessToken, (req, res) =>
   NodeController.createNode(req, res as TypedResponse)
 );
-nodeRouter.put("/:id", verifyAccessToken, (req, res) =>
+nodeRouter.put("/:nodeId", verifyAccessToken, (req, res) =>
   NodeController.updateNode(req, res as TypedResponse)
 );
-nodeRouter.delete("/:id", verifyAccessToken, (req, res) =>
+nodeRouter.delete("/:nodeId", verifyAccessToken, (req, res) =>
   NodeController.deleteNode(req, res as TypedResponse)
 );
 
