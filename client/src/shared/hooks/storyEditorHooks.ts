@@ -21,7 +21,7 @@ import {
   createStoryThunk,
   getFullStoryThunk,
   updateStoryThunk,
-  getUserStoriesThunk,
+  getMyStoriesThunk,
   getStoryChoicesThunk,
   createNodeThunk,
   updateNodeThunk,
@@ -156,7 +156,7 @@ export const useStoryEditorActions = () => {
     getFullStory: (storyId: number) => dispatch(getFullStoryThunk(storyId)),
     updateStory: (storyId: number, updates: Partial<Story>) =>
       dispatch(updateStoryThunk({ storyId, updates })),
-    getUserStories: () => dispatch(getUserStoriesThunk()),
+    getUserStories: () => dispatch(getMyStoriesThunk()),
     getStoryChoices: (storyId: number) =>
       dispatch(getStoryChoicesThunk(storyId)),
 

@@ -272,7 +272,7 @@ export const getFullStoryThunk = createAsyncThunk<
   number,
   { rejectValue: string }
 >(
-  STORY_THUNK_NAMES.GET_FULL_STORY,
+  STORY_THUNK_NAMES.GET_STORY_FULL,
   async (storyId, { rejectWithValue }) => {
     try {
       return await StoryApi.getFullStory(storyId);
