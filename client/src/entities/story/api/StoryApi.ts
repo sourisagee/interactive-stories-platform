@@ -1,195 +1,446 @@
-import { axiosInstance } from "../../../shared/lib/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { axiosInstance } from "../../../shared/lib/axiosInstance";
 import type {
-  StoryData,
-  StoryFullData,
+  Story,
+  StoryNode,
+  Choice,
+  StoryWithNodes,
   CreateStoryFormData,
+  UpdateNodeFormData,
+  CreateChoiceFormData,
+  StoryData,
+  StoryFullData
 } from "../model";
 import type { ServerResponseType } from "../../../shared/types";
 import type { AxiosError } from "axios";
 
-// Базовый URL для API историй
+// Базовые URL для API
 const API_STORIES_URL = "/stories";
+const API_NODES_URL = "/nodes";
+const API_CHOICES_URL = "/choices";
 
-// Класс StoryApi - содержит статические методы для работы с API историй
-// Используется для прямых вызовов API без Redux (если нужно)
-export default class StoryApi {
-  // Получить все истории (публичный эндпоинт)
-  // GET /api/stories?author=123 (опциональный query параметр для фильтрации по автору)
-  static async getAllStories(authorId?: number) {
-    const url = authorId
-      ? `${API_STORIES_URL}?author=${authorId}`
-      : API_STORIES_URL;
-    const { data } = await axiosInstance.get(url);
-    return data;
-  }
-
-  // Получить историю по ID (публичный эндпоинт)
-  // GET /api/stories/:id
-  static async getStoryById(storyId: number) {
-    const { data } = await axiosInstance.get(`${API_STORIES_URL}/${storyId}`);
-    return data;
-  }
-
-  // Получить полную историю с узлами и выборами (публичный эндпоинт)
-  // GET /api/stories/:id/full
-  static async getStoryFull(storyId: number) {
-    const { data } = await axiosInstance.get(
-      `${API_STORIES_URL}/${storyId}/full`,
-    );
-    return data;
-  }
-
-  // Создать новую историю (требует авторизации)
-  // POST /api/stories
-  static async createStory(storyData: CreateStoryFormData) {
-    const { data } = await axiosInstance.post(API_STORIES_URL, storyData);
-    return data;
-  }
-
-  // Получить мои истории (требует авторизации)
-  // GET /api/stories/my/stories
-  static async getMyStories() {
-    const { data } = await axiosInstance.get(`${API_STORIES_URL}/my/stories`);
-    return data;
-  }
-}
-
-// STORY_THUNK_NAMES - Уникальные идентификаторы для действий (actions) в Redux store.
-// Эти имена используются Redux для:
-// 1. Автоматическое создания типов трех типов действий (начало, успех, ошибка)
-// 2. Отслеживания в Redux DevTools
-// 3. Организации логики в редьюсерах
-const STORY_THUNK_NAMES = {
+// Уникальные имена thunk'ов
+export const STORY_THUNK_NAMES = {
+  // Story
   GET_ALL_STORIES: "story/getAllStories",
   GET_STORY_BY_ID: "story/getStoryById",
   GET_STORY_FULL: "story/getStoryFull",
   CREATE_STORY: "story/createStory",
   GET_MY_STORIES: "story/getMyStories",
+  UPDATE_STORY: "story/updateStory",
+  DELETE_STORY: "story/deleteStory",
+  GET_STORY_CHOICES: "story/getStoryChoices",
+  
+  // Nodes
+  CREATE_NODE: "story/createNode",
+  UPDATE_NODE: "story/updateNode",
+  DELETE_NODE: "story/deleteNode",
+  
+  // Choices
+  CREATE_CHOICE: "story/createChoice",
+  UPDATE_CHOICE: "story/updateChoice",
+  DELETE_CHOICE: "story/deleteChoice",
 } as const;
 
-// STORY_API_URL - URL эндпоинты для API запросов
-const STORY_API_URL = {
-  GET_ALL: "/stories",
-  GET_BY_ID: (id: number) => `/stories/${id}`,
-  GET_FULL: (id: number) => `/stories/${id}/full`,
-  CREATE: "/stories",
-  GET_MY_STORIES: "/stories/my/stories",
-} as const;
+// Вспомогательная функция для обработки ошибок
+const handleApiError = (error: unknown, defaultMessage: string): string => {
+  const axiosError = error as AxiosError<ServerResponseType<null>>;
+  return axiosError.response?.data?.message ||
+         axiosError.message ||
+         defaultMessage;
+};
 
-// getAllStoriesThunk - Thunk для получения списка всех историй
-// Может принимать опциональный authorId для фильтрации по автору
-export const getAllStoriesThunk = createAsyncThunk<
-  StoryData[], // Тип возвращаемого значения (массив историй)
-  number | undefined, // Тип параметра (authorId или undefined)
-  { rejectValue: string } // Тип ошибки
->(STORY_THUNK_NAMES.GET_ALL_STORIES, async (authorId, { rejectWithValue }) => {
-  try {
-    // Формируем URL с query параметром, если передан authorId
+// Класс StoryApi - содержит статические методы для работы с API историй
+export default class StoryApi {
+  // Получить все истории (публичный эндпоинт)
+  static async getAllStories(authorId?: number): Promise<StoryData[]> {
     const url = authorId
-      ? `${STORY_API_URL.GET_ALL}?author=${authorId}`
-      : STORY_API_URL.GET_ALL;
-
-    const response =
-      await axiosInstance.get<ServerResponseType<StoryData[]>>(url);
-
-    // Возвращаем массив историй из ответа сервера
-    return (response.data.data || []) as StoryData[];
-  } catch (error) {
-    // Обрабатываем ошибку и возвращаем сообщение об ошибке
-    const axiosError = error as AxiosError<ServerResponseType<null>>;
-    const errorMessage =
-      axiosError.response?.data?.message ||
-      axiosError.message ||
-      "Unknown error";
-    return rejectWithValue(errorMessage);
+      ? `${API_STORIES_URL}?author=${authorId}`
+      : API_STORIES_URL;
+    const response = await axiosInstance.get<ServerResponseType<StoryData[]>>(url);
+    return response.data.data || [];
   }
-});
 
-// getStoryByIdThunk - Thunk для получения истории по ID
-export const getStoryByIdThunk = createAsyncThunk<
-  StoryData, // Тип возвращаемого значения (одна история)
-  number, // Тип параметра (ID истории)
-  { rejectValue: string }
->(STORY_THUNK_NAMES.GET_STORY_BY_ID, async (storyId, { rejectWithValue }) => {
-  try {
+  // Получить историю по ID (публичный эндпоинт)
+  static async getStoryById(storyId: number): Promise<StoryData> {
     const response = await axiosInstance.get<ServerResponseType<StoryData>>(
-      STORY_API_URL.GET_BY_ID(storyId),
+      `${API_STORIES_URL}/${storyId}`
     );
-
-    // Возвращаем историю из ответа сервера
     return response.data.data as StoryData;
-  } catch (error) {
-    const axiosError = error as AxiosError<ServerResponseType<null>>;
-    const errorMessage =
-      axiosError.response?.data?.message ||
-      axiosError.message ||
-      "Unknown error";
-    return rejectWithValue(errorMessage);
   }
-});
 
-// getStoryFullThunk - полная история с узлами и выборами для игры
+  // Получить полную историю с узлами и выборами (публичный эндпоинт)
+  static async getStoryFull(storyId: number): Promise<StoryFullData> {
+    const response = await axiosInstance.get<ServerResponseType<StoryFullData>>(
+      `${API_STORIES_URL}/${storyId}/full`
+    );
+    return response.data.data as StoryFullData;
+  }
+
+  // Создать новую историю (требует авторизации)
+  static async createStory(storyData: CreateStoryFormData): Promise<StoryData> {
+    const response = await axiosInstance.post<ServerResponseType<StoryData>>(
+      API_STORIES_URL,
+      storyData
+    );
+    return response.data.data as StoryData;
+  }
+
+  // Получить мои истории (требует авторизации)
+  static async getMyStories(): Promise<StoryData[]> {
+    const response = await axiosInstance.get<ServerResponseType<StoryData[]>>(
+      `${API_STORIES_URL}/my/stories`
+    );
+    return response.data.data || [];
+  }
+
+  // Дополнительные методы из dev-ветки
+  static async getFullStory(storyId: number): Promise<StoryWithNodes> {
+    const response = await axiosInstance.get<ServerResponseType<StoryWithNodes>>(
+      `${API_STORIES_URL}/${storyId}/full`
+    );
+    return response.data.data as StoryWithNodes;
+  }
+
+  static async getStoryChoices(storyId: number): Promise<Choice[]> {
+    const response = await axiosInstance.get<ServerResponseType<Choice[]>>(
+      `${API_CHOICES_URL}/story/${storyId}`
+    );
+    return response.data.data as Choice[];
+  }
+
+  static async updateStory(storyId: number, updates: Partial<Story>): Promise<Story> {
+    const response = await axiosInstance.put<ServerResponseType<Story>>(
+      `${API_STORIES_URL}/${storyId}`,
+      updates
+    );
+    return response.data.data as Story;
+  }
+
+  static async createNode(nodeData: {
+    storyId: number;
+    title: string;
+    content: string;
+    picture?: string;
+    isStart?: boolean;
+    isEnd?: boolean;
+    position_x: number;
+    position_y: number;
+  }): Promise<StoryNode> {
+    const response = await axiosInstance.post<ServerResponseType<StoryNode>>(
+      API_NODES_URL,
+      nodeData
+    );
+    return response.data.data as StoryNode;
+  }
+
+  static async updateNode(nodeId: number, updates: UpdateNodeFormData): Promise<StoryNode> {
+    const response = await axiosInstance.put<ServerResponseType<StoryNode>>(
+      `${API_NODES_URL}/${nodeId}`,
+      updates
+    );
+    return response.data.data as StoryNode;
+  }
+
+  static async deleteNode(nodeId: number): Promise<void> {
+    await axiosInstance.delete(`${API_NODES_URL}/${nodeId}`);
+  }
+
+  static async createChoice(choiceData: CreateChoiceFormData): Promise<Choice> {
+    const response = await axiosInstance.post<ServerResponseType<Choice>>(
+      API_CHOICES_URL,
+      choiceData
+    );
+    return response.data.data as Choice;
+  }
+
+  static async updateChoice(choiceId: number, choiceText: string): Promise<Choice> {
+    const response = await axiosInstance.put<ServerResponseType<Choice>>(
+      `${API_CHOICES_URL}/${choiceId}`,
+      { choiceText }
+    );
+    return response.data.data as Choice;
+  }
+
+  static async deleteChoice(choiceId: number): Promise<void> {
+    await axiosInstance.delete(`${API_CHOICES_URL}/${choiceId}`);
+  }
+}
+
+// ==================== THUNK'И ДЛЯ REDUX ====================
+
+/**
+ * Получение списка всех историй
+ */
+export const getAllStoriesThunk = createAsyncThunk<
+  StoryData[],
+  number | undefined,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.GET_ALL_STORIES,
+  async (authorId, { rejectWithValue }) => {
+    try {
+      return await StoryApi.getAllStories(authorId);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось загрузить истории");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Получение истории по ID
+ */
+export const getStoryByIdThunk = createAsyncThunk<
+  StoryData,
+  number,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.GET_STORY_BY_ID,
+  async (storyId, { rejectWithValue }) => {
+    try {
+      return await StoryApi.getStoryById(storyId);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось загрузить историю");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Получение полной истории с узлами и выборами
+ */
 export const getStoryFullThunk = createAsyncThunk<
   StoryFullData,
   number,
   { rejectValue: string }
->(STORY_THUNK_NAMES.GET_STORY_FULL, async (storyId, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get<ServerResponseType<StoryFullData>>(
-      STORY_API_URL.GET_FULL(storyId),
-    );
-    return response.data.data as StoryFullData;
-  } catch (error) {
-    const axiosError = error as AxiosError<ServerResponseType<null>>;
-    const errorMessage =
-      axiosError.response?.data?.message ||
-      axiosError.message ||
-      "Unknown error";
-    return rejectWithValue(errorMessage);
+>(
+  STORY_THUNK_NAMES.GET_STORY_FULL,
+  async (storyId, { rejectWithValue }) => {
+    try {
+      return await StoryApi.getStoryFull(storyId);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось загрузить полную историю");
+      return rejectWithValue(errorMessage);
+    }
   }
-});
+);
 
-// санка для новой истории
+/**
+ * Создание новой истории
+ */
 export const createStoryThunk = createAsyncThunk<
-  StoryData, // Тип возвращаемого значения (созданная история)
-  CreateStoryFormData, // Тип параметра (данные для создания истории)
+  StoryData,
+  CreateStoryFormData,
   { rejectValue: string }
->(STORY_THUNK_NAMES.CREATE_STORY, async (storyData, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post<ServerResponseType<StoryData>>(
-      STORY_API_URL.CREATE,
-      storyData,
-    );
-    return response.data.data as StoryData;
-  } catch (error) {
-    const axiosError = error as AxiosError<ServerResponseType<null>>;
-    const errorMessage =
-      axiosError.response?.data?.message ||
-      axiosError.message ||
-      "Unknown error";
-    return rejectWithValue(errorMessage);
+>(
+  STORY_THUNK_NAMES.CREATE_STORY,
+  async (storyData, { rejectWithValue }) => {
+    try {
+      return await StoryApi.createStory(storyData);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось создать историю");
+      return rejectWithValue(errorMessage);
+    }
   }
-});
+);
 
-// санка для получения историй текущего пользователя (для профиля)
+/**
+ * Получение историй текущего пользователя
+ */
 export const getMyStoriesThunk = createAsyncThunk<
-  StoryData[], // Тип возвращаемого значения (массив историй пользователя)
-  void, 
+  StoryData[],
+  void,
   { rejectValue: string }
->(STORY_THUNK_NAMES.GET_MY_STORIES, async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get<ServerResponseType<StoryData[]>>(
-      STORY_API_URL.GET_MY_STORIES,
-    );
-
-    return (response.data.data || []) as StoryData[];
-  } catch (error) {
-    const axiosError = error as AxiosError<ServerResponseType<null>>;
-    const errorMessage =
-      axiosError.response?.data?.message ||
-      axiosError.message ||
-      "Unknown error";
-    return rejectWithValue(errorMessage);
+>(
+  STORY_THUNK_NAMES.GET_MY_STORIES,
+  async (_, { rejectWithValue }) => {
+    try {
+      return await StoryApi.getMyStories();
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось загрузить ваши истории");
+      return rejectWithValue(errorMessage);
+    }
   }
-});
+);
+
+/**
+ * Получение истории с узлами и выборами (для редактора)
+ */
+export const getFullStoryThunk = createAsyncThunk<
+  StoryWithNodes,
+  number,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.GET_FULL_STORY,
+  async (storyId, { rejectWithValue }) => {
+    try {
+      return await StoryApi.getFullStory(storyId);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось загрузить историю");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Получение всех выборов для истории
+ */
+export const getStoryChoicesThunk = createAsyncThunk<
+  Choice[],
+  number,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.GET_STORY_CHOICES,
+  async (storyId, { rejectWithValue }) => {
+    try {
+      return await StoryApi.getStoryChoices(storyId);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось загрузить выборы истории");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Обновление истории
+ */
+export const updateStoryThunk = createAsyncThunk<
+  Story,
+  { storyId: number; updates: Partial<Story> },
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.UPDATE_STORY,
+  async ({ storyId, updates }, { rejectWithValue }) => {
+    try {
+      return await StoryApi.updateStory(storyId, updates);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось обновить историю");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Создание нового узла
+ */
+export const createNodeThunk = createAsyncThunk<
+  StoryNode,
+  {
+    storyId: number;
+    title: string;
+    content: string;
+    picture?: string;
+    isStart?: boolean;
+    isEnd?: boolean;
+    position_x: number;
+    position_y: number;
+  },
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.CREATE_NODE,
+  async (nodeData, { rejectWithValue }) => {
+    try {
+      return await StoryApi.createNode(nodeData);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось создать узел");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Обновление узла
+ */
+export const updateNodeThunk = createAsyncThunk<
+  StoryNode,
+  { nodeId: number; updates: UpdateNodeFormData },
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.UPDATE_NODE,
+  async ({ nodeId, updates }, { rejectWithValue }) => {
+    try {
+      return await StoryApi.updateNode(nodeId, updates);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось обновить узел");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Удаление узла
+ */
+export const deleteNodeThunk = createAsyncThunk<
+  number,
+  number,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.DELETE_NODE,
+  async (nodeId, { rejectWithValue }) => {
+    try {
+      await StoryApi.deleteNode(nodeId);
+      return nodeId;
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось удалить узел");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Создание выбора
+ */
+export const createChoiceThunk = createAsyncThunk<
+  Choice,
+  CreateChoiceFormData,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.CREATE_CHOICE,
+  async (choiceData, { rejectWithValue }) => {
+    try {
+      return await StoryApi.createChoice(choiceData);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось создать выбор");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
+ * Обновление текста выбора
+ */
+export const updateChoiceThunk = createAsyncThunk<
+  Choice,
+  { choiceId: number; choiceText: string },
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.UPDATE_CHOICE,
+  async ({ choiceId, choiceText }, { rejectWithValue }) => {
+    try {
+      return await StoryApi.updateChoice(choiceId, choiceText);
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось обновить выбор");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const deleteChoiceThunk = createAsyncThunk<
+  number,
+  number,
+  { rejectValue: string }
+>(
+  STORY_THUNK_NAMES.DELETE_CHOICE,
+  async (choiceId, { rejectWithValue }) => {
+    try {
+      await StoryApi.deleteChoice(choiceId);
+      return choiceId;
+    } catch (error) {
+      const errorMessage = handleApiError(error, "Не удалось удалить выбор");
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+ 
