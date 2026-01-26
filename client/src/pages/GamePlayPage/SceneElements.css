@@ -1,0 +1,409 @@
+.scene-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.scene-sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene-elements {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene-tree,
+.scene-path,
+.scene-water,
+.scene-bridge,
+.scene-cave,
+.scene-cave-glow,
+.scene-dragon-eyes,
+.scene-building,
+.scene-mist,
+.scene-victory-glow,
+.scene-defeat-void,
+.scene-escape-light,
+.scene-mystic-orb {
+  display: none;
+  position: absolute;
+}
+
+.scene-tree {
+  width: 10px;
+  height: 0;
+  bottom: 0;
+  background: linear-gradient(to top, #2d1f0f 0%, #4a3520 50%, #3d2a18 100%);
+  border-radius: 2px;
+  transform-origin: bottom center;
+}
+
+.scene-tree::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 45px;
+  border-radius: 50% 50% 45% 45%;
+  background: radial-gradient(ellipse 80% 70% at 50% 40%, #2a4d28 0%, #1a3518 50%, #0f2512 100%);
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 20, 5, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.scene-path {
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 28%;
+  background: linear-gradient(to top, #3d3525 0%, #4a4030 30%, #5a5040 100%);
+  clip-path: polygon(15% 100%, 85% 100%, 70% 0, 30% 0);
+  box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.scene-water {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32%;
+  background: linear-gradient(to top, #0a1625 0%, #0f2438 30%, #143550 60%, #1a4060 100%);
+  box-shadow: inset 0 -5px 30px rgba(30, 80, 120, 0.3);
+}
+
+.scene-water::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(180deg, rgba(60, 120, 160, 0.25) 0%, transparent 100%);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+.scene-water::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(80, 140, 180, 0.15) 20%,
+    transparent 40%,
+    rgba(60, 120, 160, 0.1) 60%,
+    transparent 80%
+  );
+  animation: water-shine 4s ease-in-out infinite;
+}
+
+@keyframes water-shine {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.scene-bridge {
+  bottom: 32%;
+  left: 10%;
+  right: 10%;
+  height: 14px;
+  z-index: 1;
+  background: linear-gradient(to bottom, #4a4035 0%, #3d352a 30%, #2d251c 100%);
+  border-radius: 4px;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.scene-bridge::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 35px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(40, 35, 30, 0.6) 100%);
+  clip-path: ellipse 50% 100% at 50% 0;
+}
+
+.scene-cave {
+  bottom: 0;
+  left: 15%;
+  right: 15%;
+  height: 55%;
+  background: linear-gradient(to top, #0a0505 0%, #150a0a 40%, #1a0d0d 100%);
+  clip-path: ellipse(45% 100% at 50% 100%);
+  box-shadow: inset -20px -20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.scene-cave-glow {
+  bottom: 25%;
+  left: 35%;
+  right: 35%;
+  height: 30%;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(180, 60, 30, 0.4) 0%, rgba(120, 30, 15, 0.15) 50%, transparent 70%);
+}
+
+.scene-dragon-eyes {
+  bottom: 38%;
+  left: 42%;
+  right: 42%;
+  height: 20px;
+}
+
+.scene-dragon-eyes::before,
+.scene-dragon-eyes::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ff8040, #cc3020);
+  box-shadow: 0 0 15px rgba(255, 100, 50, 0.8);
+}
+
+.scene-dragon-eyes::before {
+  left: 25%;
+}
+
+.scene-dragon-eyes::after {
+  right: 25%;
+  left: auto;
+}
+
+.scene-building {
+  bottom: 0;
+  width: 8%;
+  background: linear-gradient(to top, #1a0a25 0%, #251030 50%, #2a1540 100%);
+  box-shadow: inset -2px 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.scene-building::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 4px,
+    rgba(80, 40, 120, 0.5) 4px,
+    rgba(80, 40, 120, 0.5) 6px
+  );
+}
+
+.scene-building-1 { left: 5%; height: 65%; }
+.scene-building-2 { left: 18%; height: 80%; }
+.scene-building-3 { left: 31%; height: 55%; }
+.scene-building-4 { left: 68%; height: 70%; }
+.scene-building-5 { left: 82%; height: 45%; }
+
+.scene-mist {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(30, 45, 35, 0.5) 0%, transparent 70%);
+}
+
+.scene-victory-glow {
+  top: 25%;
+  left: 25%;
+  right: 25%;
+  height: 45%;
+  background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(255, 200, 80, 0.3) 0%, rgba(200, 150, 50, 0.1) 45%, transparent 70%);
+}
+
+.scene-defeat-void {
+  top: 30%;
+  left: 35%;
+  right: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 80% 100% at 50% 50%, rgba(25, 30, 40, 0.6) 0%, transparent 70%);
+  border: 1px solid rgba(60, 70, 90, 0.3);
+}
+
+.scene-escape-light {
+  top: 15%;
+  right: 5%;
+  width: 25%;
+  height: 50%;
+  background: radial-gradient(ellipse 60% 80% at 80% 30%, rgba(100, 150, 200, 0.35) 0%, rgba(60, 100, 140, 0.15) 50%, transparent 70%);
+}
+
+.scene-mystic-orb {
+  top: 30%;
+  left: 35%;
+  right: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(180, 120, 255, 0.25) 0%, rgba(100, 60, 150, 0.1) 50%, transparent 70%);
+  box-shadow: inset 0 0 40px rgba(120, 80, 180, 0.2);
+}
+
+.scene-background[data-theme="forest_entrance"] .scene-sky {
+  background: linear-gradient(to top, #0a1f0e 0%, #0d2812 25%, #14381a 50%, #1e4d28 75%, #2a6040 100%);
+}
+
+.scene-background[data-theme="forest_entrance"] .scene-tree {
+  display: block;
+  height: 140px;
+}
+
+.scene-background[data-theme="forest_entrance"] .scene-tree-1 { left: 8%; }
+.scene-background[data-theme="forest_entrance"] .scene-tree-2 { left: 22%; height: 120px; transform: scaleX(0.9); }
+.scene-background[data-theme="forest_entrance"] .scene-tree-3 { left: 38%; height: 155px; transform: scaleX(1.1); }
+.scene-background[data-theme="forest_entrance"] .scene-tree-4 { left: 55%; height: 130px; transform: scaleX(0.95); }
+.scene-background[data-theme="forest_entrance"] .scene-tree-5 { left: 72%; height: 145px; }
+.scene-background[data-theme="forest_entrance"] .scene-tree-6 { left: 86%; height: 110px; transform: scaleX(0.85); }
+.scene-background[data-theme="forest_entrance"] .scene-tree-7 { display: none; }
+
+.scene-background[data-theme="forest_entrance"] .scene-path {
+  display: block;
+}
+
+.scene-background[data-theme="forest"] .scene-sky {
+  background: linear-gradient(to top, #051007 0%, #0a1a0e 30%, #0f2515 60%, #15301c 100%);
+}
+
+.scene-background[data-theme="forest"] .scene-tree {
+  display: block;
+  height: 160px;
+}
+
+.scene-background[data-theme="forest"] .scene-tree::before {
+  width: 55px;
+  height: 50px;
+  background: radial-gradient(ellipse 80% 70% at 50% 40%, #1e3d1e 0%, #0f2512 50%, #081808 100%);
+}
+
+.scene-background[data-theme="forest"] .scene-tree-1 { left: 5%; height: 150px; }
+.scene-background[data-theme="forest"] .scene-tree-2 { left: 18%; height: 165px; transform: scaleX(1.05); }
+.scene-background[data-theme="forest"] .scene-tree-3 { left: 32%; height: 145px; transform: scaleX(0.9); }
+.scene-background[data-theme="forest"] .scene-tree-4 { left: 48%; height: 170px; transform: scaleX(1.1); }
+.scene-background[data-theme="forest"] .scene-tree-5 { left: 64%; height: 155px; transform: scaleX(0.95); }
+.scene-background[data-theme="forest"] .scene-tree-6 { left: 78%; height: 160px; }
+.scene-background[data-theme="forest"] .scene-tree-7 { left: 90%; height: 140px; transform: scaleX(0.85); }
+
+.scene-background[data-theme="forest"] .scene-mist {
+  display: block;
+}
+
+.scene-background[data-theme="river_bridge"] .scene-sky {
+  background: linear-gradient(to top, #0a1620 0%, #0f2435 30%, #143550 55%, #1e4a6e 80%, #2a5c80 100%);
+}
+
+.scene-background[data-theme="river_bridge"] .scene-water,
+.scene-background[data-theme="river_bridge"] .scene-bridge {
+  display: block;
+}
+
+.scene-background[data-theme="cave_dragon"] .scene-sky {
+  background: linear-gradient(to top, #0d0505 0%, #1a0a0a 40%, #2a1015 100%);
+}
+
+.scene-background[data-theme="cave_dragon"] .scene-cave,
+.scene-background[data-theme="cave_dragon"] .scene-cave-glow,
+.scene-background[data-theme="cave_dragon"] .scene-dragon-eyes {
+  display: block;
+}
+
+.scene-background[data-theme="victory"] .scene-sky {
+  background: linear-gradient(to top, #1a1505 0%, #2a2008 30%, #4a3510 60%, #6b4d18 100%);
+}
+
+.scene-background[data-theme="victory"] .scene-victory-glow {
+  display: block;
+}
+
+.scene-background[data-theme="defeat"] .scene-sky {
+  background: linear-gradient(160deg, #080a0d 0%, #0d1115 40%, #12181f 100%);
+}
+
+.scene-background[data-theme="defeat"] .scene-defeat-void {
+  display: block;
+}
+
+.scene-background[data-theme="neon_city"] .scene-sky {
+  background: linear-gradient(to top, #0d0515 0%, #1a0a25 35%, #2a1040 65%, #3d1560 100%);
+}
+
+.scene-background[data-theme="neon_city"] .scene-building {
+  display: block;
+}
+
+.scene-background[data-theme="neon_city"] .scene-building::after {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 4px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff50a0;
+  box-shadow: 0 0 10px #ff50a0;
+}
+
+.scene-background[data-theme="neon_city"] .scene-building-3::after {
+  left: 30%;
+  background: #60a0ff;
+  box-shadow: 0 0 10px #60a0ff;
+}
+
+.scene-background[data-theme="neon_city"] .scene-building-5::after {
+  left: 50%;
+  background: #a080ff;
+  box-shadow: 0 0 10px #a080ff;
+}
+
+.scene-background[data-theme="corp_server"] .scene-sky {
+  background: linear-gradient(180deg, #05080a 0%, #0a1015 50%, #0d151c 100%);
+}
+
+.scene-background[data-theme="corp_server"] .scene-building {
+  display: block;
+  width: 12%;
+  background: linear-gradient(to top, #0a0d12 0%, #0f1418 40%, #141a20 100%);
+}
+
+.scene-background[data-theme="corp_server"] .scene-building-1 { left: 10%; height: 50%; }
+.scene-background[data-theme="corp_server"] .scene-building-2 { left: 28%; height: 65%; }
+.scene-background[data-theme="corp_server"] .scene-building-3 { left: 46%; height: 55%; }
+.scene-background[data-theme="corp_server"] .scene-building-4 { left: 64%; height: 60%; }
+.scene-background[data-theme="corp_server"] .scene-building-5 { left: 82%; height: 48%; }
+
+.scene-background[data-theme="corp_server"] .scene-building::before {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 3px,
+    rgba(30, 50, 70, 0.4) 3px,
+    rgba(30, 50, 70, 0.4) 5px
+  );
+}
+
+.scene-background[data-theme="escape"] .scene-sky {
+  background: linear-gradient(to top, #050810 0%, #0a1218 40%, #0f1825 100%);
+}
+
+.scene-background[data-theme="escape"] .scene-escape-light {
+  display: block;
+}
+
+.scene-background[data-theme="mystic"] .scene-sky {
+  background: linear-gradient(160deg, #0f0a18 0%, #1a1025 40%, #251535 70%, #2e1845 100%);
+}
+
+.scene-background[data-theme="mystic"] .scene-mystic-orb {
+  display: block;
+}

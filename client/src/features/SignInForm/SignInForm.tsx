@@ -29,7 +29,7 @@ export default function SignInForm() {
     dispatch(signinThunk(inputs))
       .unwrap()
       .then(() => {
-        navigate(CLIENT_ROUTES.HOME);
+        navigate(CLIENT_ROUTES.ALLSTORIES);
       })
       .catch((error) => {
         alert(error || "Login failed");
@@ -38,39 +38,37 @@ export default function SignInForm() {
 
   return (
     <div className="login-container">
-  <div className="login-card">
-    <h2 className="login-title">Войти в аккаунт</h2>
-
-    <form onSubmit={loginUserHandler} className="space-y-6">
-      <input
-        name="email"
-        type="email"
-        value={inputs.email}
-        onChange={onChangeHandler}
-        placeholder="Email"
-        className="login-input"
-        required
-      />
-
-      <input
-        name="password"
-        type="password"
-        value={inputs.password}
-        onChange={onChangeHandler}
-        placeholder="Пароль"
-        className="login-input"
-        required
-      />
-
-      <button
-        type="submit"
-        disabled={!inputs.email || !inputs.password}
-        className="login-button"
-      >
-        Войти
-      </button>
-    </form>
-  </div>
-</div>
+      <div className="cosmic-bg" aria-hidden />
+      <div className="login-card">
+        <h2 className="login-title">Войти в аккаунт</h2>
+        <form onSubmit={loginUserHandler}>
+          <input
+            name="email"
+            type="email"
+            value={inputs.email}
+            onChange={onChangeHandler}
+            placeholder="Email"
+            className="login-input input-base"
+            required
+          />
+          <input
+            name="password"
+            type="password"
+            value={inputs.password}
+            onChange={onChangeHandler}
+            placeholder="Password"
+            className="login-input input-base"
+            required
+          />
+          <button
+            type="submit"
+            disabled={!inputs.email || !inputs.password}
+            className="login-button"
+          >
+            Войти
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

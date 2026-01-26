@@ -8,37 +8,42 @@ export default function Nav() {
   const isLoggedIn = !!user;
 
   return (
-    <>
-      <nav className="nav">
-        {/* Главная - всегда видна */}
-        <NavLink to={CLIENT_ROUTES.HOME} className="nav-link">
-          Главная
-        </NavLink>
-
-        {/* Авторизация: Выход или Вход/Регистрация */}
+    <nav className="nav">
+      <div className="nav-left">
         {isLoggedIn ? (
           <>
-            {/* Для зарегистрированного пользователя */}
-
-            <NavLink to={CLIENT_ROUTES.SIGN_OUT} className="nav-link">
-              Выход
+            <NavLink to={CLIENT_ROUTES.HOME} className="nav-link">
+              Главная
+            </NavLink>
+            <NavLink to={CLIENT_ROUTES.ALLSTORIES} className="nav-link">
+              Все истории
             </NavLink>
             <NavLink to={CLIENT_ROUTES.PROFILE} className="nav-link">
               Профиль
             </NavLink>
           </>
         ) : (
+          <NavLink to={CLIENT_ROUTES.HOME} className="nav-link">
+            Главная
+          </NavLink>
+        )}
+      </div>
+      <div className="nav-right">
+        {isLoggedIn ? (
+          <NavLink to={CLIENT_ROUTES.SIGN_OUT} className="nav-link">
+            Выход
+          </NavLink>
+        ) : (
           <>
-            {/* Для незарегистрированного пользователя */}
-            <NavLink to={CLIENT_ROUTES.SIGN_UP} className="nav-link">
-              Регистрация
-            </NavLink>
             <NavLink to={CLIENT_ROUTES.SIGN_IN} className="nav-link">
               Вход
             </NavLink>
+            <NavLink to={CLIENT_ROUTES.SIGN_UP} className="nav-link">
+              Регистрация
+            </NavLink>
           </>
         )}
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppSelector } from "../../shared/hooks/reduxHooks";
-import { UserRole, type UserData } from "@/entities/user/model";
+import { UserRole, type UserData } from "../../entities/user/model";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAppSelector((state) => state.user);

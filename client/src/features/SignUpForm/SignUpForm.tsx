@@ -32,7 +32,7 @@ export default function SignUpForm() {
     dispatch(signupThunk(inputs))
       .unwrap()
       .then(() => {
-        navigate(CLIENT_ROUTES.HOME);
+        navigate(CLIENT_ROUTES.ALLSTORIES);
       })
       .catch((error) => {
         alert(error || "Registration failed");
@@ -41,6 +41,7 @@ export default function SignUpForm() {
 
   return (
     <div className="register-container">
+      <div className="cosmic-bg" aria-hidden />
       <div className="register-card">
         <h2 className="register-title">Создать аккаунт</h2>
 
@@ -50,31 +51,28 @@ export default function SignUpForm() {
             name="username"
             type="text"
             value={inputs.username}
-            placeholder="Ваше имя"
-            className="register-input"
+            placeholder="Name"
+            className="register-input input-base"
             required
           />
-
           <input
             onChange={onChangeHandler}
             name="email"
             type="email"
             value={inputs.email}
             placeholder="Email"
-            className="register-input"
+            className="register-input input-base"
             required
           />
-
           <input
             onChange={onChangeHandler}
             name="password"
             type="password"
             value={inputs.password}
-            placeholder="Пароль"
-            className="register-input"
+            placeholder="Password"
+            className="register-input input-base"
             required
           />
-
           <select
             onChange={(e) => {
               setInputs((prevState) => ({
@@ -83,13 +81,12 @@ export default function SignUpForm() {
               }));
             }}
             value={inputs.role}
-            className="register-input"
+            className="register-input input-base"
             required
           >
             <option value={UserRole.USER}>Игрок</option>
             <option value={UserRole.AUTHOR}>Автор</option>
           </select>
-
           <button type="submit" className="register-button">
             Зарегистрироваться
           </button>

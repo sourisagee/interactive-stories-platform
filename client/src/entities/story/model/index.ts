@@ -1,5 +1,6 @@
 import type { User } from "../../user/model";
 
+// Базовый интерфейс истории
 export interface Story {
   id: number;
   cover: string;
@@ -10,8 +11,8 @@ export interface Story {
   isPublished: boolean;
   authorId: number;
   author?: User;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface StoryNode {
@@ -40,7 +41,7 @@ export interface Choice {
 export interface Playthrough {
   id: number;
   isCompleted: boolean;
-  variables?: null; // если будем добавлять -- поменять тип
+  variables?: null;
   userId: number;
   storyId: number;
   currentNodeId: number;
@@ -49,91 +50,41 @@ export interface Playthrough {
   completedAt?: string | null;
 }
 
-// типы для React Flow
-
-// узел для флоу
-// наследует, но вместо position_x + position_y использует position
+// Типы для React Flow
 export interface FlowNode extends Omit<StoryNode, "position_x" | "position_y"> {
   position: { x: number; y: number };
   type?: "start" | "normal" | "end" | "custom";
 }
 
-// связь для флоу (в бд -- Choice)
 export interface FlowEdge {
-  id: string; //  string для React Flow (edge-{choice.id})
-  source: string; // ID узла как строка
-  target: string; // ID узла как строка
+  id: string;
+  source: string;
+  target: string;
   label?: string;
   data: {
-    choiceId?: number; // ID из БД, если сохранен
+    choiceId?: number;
     choiceText: string;
-    isTemporary?: boolean; // временная связь
+    isTemporary?: boolean;
   };
 }
 
-// для api ответов
+// Типы для API ответов
 export interface StoryWithNodes {
   story: Story;
   nodes: StoryNode[];
   choices: Choice[];
 }
 
-// для состояния редактора
+// История с узлами для страницы игры (GET /stories/:id/full)
+export type StoryFullData = Story & { nodes: StoryNode[] };
 
-export interface StoryEditorState {
-  // Данные
-  currentStory: Story | null;
-  nodes: FlowNode[];
-  edges: FlowEdge[];
-
-  // Состояние UI
-  selectedNodeId: number | null;
-  selectedEdgeId: string | null;
-
-  // Загрузка/сохранение
-  isLoading: boolean;
-  isSaving: boolean;
-  error: string | null;
-
-  // Панель свойств
-  isPropertiesPanelOpen: boolean;
-
-  // Масштаб и положение канваса
-  viewport: {
-    x: number;
-    y: number;
-    zoom: number;
-  };
-}
-
-export const initialStoryEditorState: StoryEditorState = {
-  currentStory: null,
-  nodes: [],
-  edges: [],
-  
-  selectedNodeId: null,
-  selectedEdgeId: null,
-  
-  isLoading: false,
-  isSaving: false,
-  error: null,
-  
-  isPropertiesPanelOpen: true,
-  
-  viewport: {
-    x: 0,
-    y: 0,
-    zoom: 1,
-  },
-};
-
-// для форм
-
+// Типы для форм
 export interface CreateStoryFormData {
   title: string;
   genre: string;
   description: string;
   cover: string;
+  authorName: string;
 }
 
 export interface UpdateNodeFormData {
@@ -150,8 +101,86 @@ export interface CreateChoiceFormData {
   toNodeId: number;
 }
 
-// для событий флоу
+// Типы для состояний Redux
+export type StoriesListType = Story[];
 
+export type StoriesResponseType = {
+  stories: Story[];
+  total?: number;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
+};
+
+export type StoriesStateType = {
+  stories: Story[];
+  currentStory: Story | null;
+  isLoading: boolean;
+  error: string | null;
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export const initialStoriesState: StoriesStateType = {
+  stories: [],
+  currentStory: null,
+  isLoading: false,
+  error: null,
+  total: 0,
+  page: 1,
+  limit: 10,
+};
+
+// Состояние для одной истории
+export type StoryStateType = {
+  story: Story | null;
+  isLoading: boolean;
+  error: string | null;
+};
+
+export const initialStoryState: StoryStateType = {
+  story: null,
+  isLoading: false,
+  error: null,
+};
+
+// Состояние редактора
+export interface StoryEditorState {
+  currentStory: Story | null;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+  selectedNodeId: number | null;
+  selectedEdgeId: string | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  error: string | null;
+  isPropertiesPanelOpen: boolean;
+  viewport: {
+    x: number;
+    y: number;
+    zoom: number;
+  };
+}
+
+export const initialStoryEditorState: StoryEditorState = {
+  currentStory: null,
+  nodes: [],
+  edges: [],
+  selectedNodeId: null,
+  selectedEdgeId: null,
+  isLoading: false,
+  isSaving: false,
+  error: null,
+  isPropertiesPanelOpen: true,
+  viewport: {
+    x: 0,
+    y: 0,
+    zoom: 1,
+  },
+};
+
+// Типы для событий флоу
 export interface NodePositionUpdate {
   nodeId: number;
   position: { x: number; y: number };
