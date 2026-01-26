@@ -15,6 +15,9 @@ export interface Story {
   updatedAt: string;
 }
 
+// Алиас для совместимости
+export type StoryData = Story;
+
 export interface StoryNode {
   id: number;
   picture: string;
@@ -75,8 +78,13 @@ export interface StoryWithNodes {
   choices: Choice[];
 }
 
+// Узел с выборами для страницы игры
+export interface NodeWithChoices extends StoryNode {
+  fromChoices: Choice[];
+}
+
 // История с узлами для страницы игры (GET /stories/:id/full)
-export type StoryFullData = Story & { nodes: StoryNode[] };
+export type StoryFullData = Story & { nodes: NodeWithChoices[] };
 
 // Типы для форм
 export interface CreateStoryFormData {
