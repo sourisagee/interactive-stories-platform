@@ -206,15 +206,15 @@ const storyEditorSlice = createSlice({
       })
       .addCase(getFullStoryThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentStory = action.payload?.story ?? null;
+        state.currentStory = action.payload;
 
         // Конвертируем узлы из БД в FlowNode
         const rawNodes = action.payload?.nodes ?? [];
         state.nodes = rawNodes.map(convertToFlowNode);
 
         // Конвертируем выборы из БД в FlowEdge
-        const rawChoices = action.payload?.choices ?? [];
-        state.edges = rawChoices.map(convertToFlowEdge);
+        // state.edges = action.payload.choices.map(convertToFlowEdge);
+        console.log(action.payload);
 
         // Сбрасываем выбранные элементы
         state.selectedNodeId = null;
