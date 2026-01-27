@@ -20,20 +20,26 @@
 
 .nav-link {
   text-decoration: none;
-  color: var(--color-text-muted, rgba(232, 228, 240, 0.7));
-  font-weight: 500;
-  font-size: 0.95rem;
+  color: var(--color-text, #e8e4f0) !important;
+  font-family: 'Tupo Vyaz', serif !important;
+  font-weight: 800 !important;
+  font-size: 1.3rem !important;
+  letter-spacing: 0.15em !important;
+  line-height: 1.6 !important;
   padding: 0.45rem 0.85rem;
   border-radius: var(--radius-sm, 4px);
-  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  text-shadow: 0 0 20px var(--glow, rgba(139, 107, 184, 0.2)) !important;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, text-shadow 0.2s;
 }
 
 .nav-link:hover {
-  color: var(--color-text, #e8e4f0);
+  color: var(--color-text, #e8e4f0) !important;
   background: rgba(255, 255, 255, 0.06);
+  text-shadow: 0 0 25px var(--glow-strong, rgba(139, 107, 184, 0.4)) !important;
 }
 
 .nav-link.active {
-  color: var(--color-accent, #8b6bb8);
+  color: var(--color-accent, #8b6bb8) !important;
   background: rgba(139, 107, 184, 0.12);
+  text-shadow: 0 0 25px var(--glow-strong, rgba(139, 107, 184, 0.4)) !important;
 }

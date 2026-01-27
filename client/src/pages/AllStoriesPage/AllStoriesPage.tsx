@@ -82,20 +82,20 @@ function StoryCard({
                 averageRating={ratingInfo.averageRating}
                 totalRatings={ratingInfo.totalRatings}
               />
+              {canRate && (
+                <button
+                  type="button"
+                  className={`btn btn-rating ${hasRated ? "btn-rating-rated" : ""}`}
+                  onClick={() => setIsRatingModalOpen(true)}
+                  disabled={hasRated}
+                >
+                  {hasRated && ratingInfo?.userRating ? `✓ Оценено (${ratingInfo.userRating})` : "Оценить"}
+                </button>
+              )}
             </div>
           )}
         </div>
         <div className="story-actions">
-          {canRate && (
-            <button
-              type="button"
-              className={`btn btn-rating ${hasRated ? "btn-rating-rated" : ""}`}
-              onClick={() => setIsRatingModalOpen(true)}
-              disabled={hasRated}
-            >
-              {hasRated && ratingInfo?.userRating ? `✓ Оценено (${ratingInfo.userRating})` : "Оценить"}
-            </button>
-          )}
           {isPlayer && (
             <button type="button" className="btn btn-primary" onClick={() => onPlay(story.id)}>
               Играть

@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Tupo Vyaz';
+  src: url('/fonts/Forum/Tupo-VyazRegular.ottt/PT/PT/Tupo-Vyaz/tupo-vyaz_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
   --color-navy: #0d0f1a;
@@ -20,12 +28,19 @@
   --glow: rgba(139, 107, 184, 0.2);
   --glow-strong: rgba(139, 107, 184, 0.4);
   --radius-sm: 4px;
+  --font-tupo-vyaz: 'Tupo Vyaz', serif;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  font-family: 'Tupo Vyaz', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Tupo Vyaz', serif !important;
+  font-weight: 800 !important;
 }
 
 html {
@@ -36,8 +51,8 @@ body {
   margin: 0;
   display: block;
   min-height: 100vh;
-  font-family: 'Lora', 'Cormorant', serif;
   font-size: 1rem;
+  font-family: 'Tupo Vyaz', serif;
   color: var(--color-text);
   background-color: var(--color-navy);
   background-image:
@@ -46,12 +61,6 @@ body {
   animation: skyShift 25s ease-in-out infinite;
   position: relative;
   overflow-x: hidden;
-}
-
-/* MedievalSharp для всех заголовков */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'MedievalSharp', 'Uncial Antiqua', cursive;
-  font-weight: 400;
 }
 
 body::before {
@@ -108,14 +117,18 @@ body::after {
   min-height: 100vh;
 }
 
-.btn {
+.btn,
+button.btn,
+a.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  font-family: inherit;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.2rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.15em !important;
+  line-height: 1.8 !important;
+  font-family: 'Tupo Vyaz', serif !important;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-hover);
   cursor: pointer;
@@ -165,9 +178,11 @@ body::after {
 .input-base {
   width: 100%;
   padding: 0.85rem 1rem;
-  font-size: 1rem;
-  font-family: 'Lora', 'Cormorant', serif;
-  letter-spacing: 0.3px;
+  font-size: 1.1rem;
+  font-family: 'Tupo Vyaz', serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--color-border);
@@ -177,8 +192,9 @@ body::after {
 }
 
 .input-base::placeholder {
-  font-family: 'Lora', 'Cormorant', serif;
-  letter-spacing: 0.3px;
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
   color: var(--color-text-muted);
 }
 
@@ -200,8 +216,11 @@ select.input-base {
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 40px;
-  font-family: 'Lora', 'Cormorant', serif;
-  letter-spacing: 0.3px;
+  font-size: 1.1rem;
+  font-family: 'Tupo Vyaz', serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
   border: 1.5px solid rgba(139, 107, 184, 0.3);
   box-shadow: 
     inset 0 2px 4px rgba(0, 0, 0, 0.3),
@@ -234,8 +253,11 @@ select.input-base option {
   background: rgba(45, 31, 78, 0.98) !important;
   background-color: rgba(45, 31, 78, 0.98) !important;
   color: var(--color-text) !important;
-  font-family: 'Lora', 'Cormorant', serif !important;
-  letter-spacing: 0.3px !important;
+  font-size: 1.1rem !important;
+  font-family: 'Tupo Vyaz', serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em !important;
+  line-height: 1.8 !important;
   padding: 0.5rem !important;
 }
 
@@ -338,8 +360,41 @@ select.input-base option[selected] {
   padding: 2rem;
   color: var(--color-text-muted);
   font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
 }
 
 .signout-page p {
   margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+}
+
+/* Стили для страниц без отдельных CSS файлов */
+.profile {
+  padding: 2rem;
+  min-height: calc(100vh - 65px);
+  font-family: 'Tupo Vyaz', serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+}
+
+.profile h2,
+.profile h3 {
+  font-family: 'Tupo Vyaz', serif;
+  font-weight: 800 !important;
+  letter-spacing: 0.15em;
+  line-height: 1.6;
+  color: var(--color-text, #e8e4f0);
+}
+
+.profile p {
+  font-family: 'Tupo Vyaz', serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.7));
 }
