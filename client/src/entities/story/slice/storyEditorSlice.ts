@@ -206,13 +206,15 @@ const storyEditorSlice = createSlice({
       })
       .addCase(getFullStoryThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentStory = action.payload.story;
+        state.currentStory = action.payload?.story ?? null;
 
         // Конвертируем узлы из БД в FlowNode
-        state.nodes = action.payload.nodes.map(convertToFlowNode);
+        const rawNodes = action.payload?.nodes ?? [];
+        state.nodes = rawNodes.map(convertToFlowNode);
 
         // Конвертируем выборы из БД в FlowEdge
-        state.edges = action.payload.choices.map(convertToFlowEdge);
+        const rawChoices = action.payload?.choices ?? [];
+        state.edges = rawChoices.map(convertToFlowEdge);
 
         // Сбрасываем выбранные элементы
         state.selectedNodeId = null;
@@ -226,7 +228,8 @@ const storyEditorSlice = createSlice({
     // ---------- getStoryChoicesThunk ----------
     builder.addCase(getStoryChoicesThunk.fulfilled, (state, action) => {
       // Обновляем только связи, оставляя узлы без изменений
-      state.edges = action.payload.map(convertToFlowEdge);
+      const rawChoices = action.payload ?? [];
+      state.edges = rawChoices.map(convertToFlowEdge);
     });
 
     // ---------- createNodeThunk ----------

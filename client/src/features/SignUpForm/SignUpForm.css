@@ -85,7 +85,7 @@
   text-align: center;
   font-size: 1.8rem;
   font-weight: 800 !important;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'ChristmasReign', serif;
   letter-spacing: 0.15em;
   line-height: 1.6;
   color: var(--color-text, #e8e4f0);
@@ -120,7 +120,7 @@
 .register-input {
   margin-bottom: 0;
   font-size: 1.1rem;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.8;
@@ -150,7 +150,7 @@
 .register-card select.register-input,
 .register-card select.input-base {
   font-size: 1.1rem;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.8;
@@ -198,7 +198,7 @@
 .register-card select.register-input option,
 .register-card select.input-base option {
   font-size: 1.1rem !important;
-  font-family: 'Tupo Vyaz', serif !important;
+  font-family: 'ChristmasReign', serif !important;
   font-weight: 500 !important;
   letter-spacing: 0.1em !important;
   line-height: 1.8 !important;
@@ -227,12 +227,13 @@
 .register-button {
   width: 100%;
   margin-top: 0.5rem;
-  padding: 1.2rem 1.5rem;
-  font-size: 1.2rem;
+  padding: 1.25rem 1.6rem;
+  font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: 0.15em;
   line-height: 1.8;
-  color: var(--color-text, #e8e4f0);
+  font-family: 'ChristmasReign', serif;
+  color: #e8e4f0 !important;
   background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
   border: 2px solid rgba(139, 107, 184, 0.5);
   border-radius: 8px;

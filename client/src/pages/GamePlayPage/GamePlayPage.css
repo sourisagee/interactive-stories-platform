@@ -4,6 +4,32 @@
   overflow: hidden;
 }
 
+.game-play-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.02);
+}
+
+.game-play-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* затемняем центр, края чуть светлее */
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.55) 35%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0.25) 80%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+  pointer-events: none;
+}
+
 .game-play-fallback {
   background: linear-gradient(160deg, var(--color-navy, #0d0f1a) 0%, var(--color-navy-mid, #13172a) 40%, var(--color-purple, #2d1f4e) 100%);
   display: flex;
@@ -56,24 +82,26 @@
 
 .game-play-overlay {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
   z-index: 1;
-  padding: 1.5rem 1.5rem 2rem;
+  padding: 4.5rem 1.5rem 2rem;
   background: linear-gradient(to top, rgba(13, 15, 26, 0.97) 0%, rgba(45, 31, 78, 0.85) 35%, transparent 100%);
   color: var(--color-text, #e8e4f0);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  overflow-y: auto;
 }
 
 .game-play-scene-title {
   margin: 0 0 0.5rem;
   font-size: 1.7rem;
   font-weight: 800 !important;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'ChristmasReign', serif;
   letter-spacing: 0.15em;
   line-height: 1.6;
   color: var(--color-text, #e8e4f0);
@@ -154,7 +182,7 @@
 
 @media (max-width: 640px) {
   .game-play-overlay {
-    padding: 1.25rem 1rem 1.75rem;
+    padding: 3.75rem 1rem 1.75rem;
   }
   .game-play-scene-title {
     font-size: 1.25rem;

@@ -1,6 +1,14 @@
 @font-face {
-  font-family: 'Tupo Vyaz';
-  src: url('/fonts/Forum/Tupo-VyazRegular.ottt/PT/PT/Tupo-Vyaz/tupo-vyaz_regular.ttf') format('truetype');
+  font-family: 'Firlest';
+  src: url('/fonts/Forum/firlest (1)/Firlest-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ChristmasReign';
+  src: url('/fonts/Forum/christmas-reign-font/ChristmasReignPersonal-x39AR.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -28,18 +36,18 @@
   --glow: rgba(139, 107, 184, 0.2);
   --glow-strong: rgba(139, 107, 184, 0.4);
   --radius-sm: 4px;
-  --font-tupo-vyaz: 'Tupo Vyaz', serif;
+  --font-tupo-vyaz: 'ChristmasReign', serif;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Tupo Vyaz', serif !important;
+  font-family: 'ChristmasReign', serif !important;
   font-weight: 800 !important;
 }
 
@@ -52,7 +60,7 @@ body {
   display: block;
   min-height: 100vh;
   font-size: 1rem;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   color: var(--color-text);
   background-color: var(--color-navy);
   background-image:
@@ -128,7 +136,7 @@ a.btn {
   font-weight: 800 !important;
   letter-spacing: 0.15em !important;
   line-height: 1.8 !important;
-  font-family: 'Tupo Vyaz', serif !important;
+  font-family: 'ChristmasReign', serif !important;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-hover);
   cursor: pointer;
@@ -179,7 +187,7 @@ a.btn {
   width: 100%;
   padding: 0.85rem 1rem;
   font-size: 1.1rem;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.8;
@@ -217,7 +225,7 @@ select.input-base {
   background-position: right 14px center;
   padding-right: 40px;
   font-size: 1.1rem;
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.8;
@@ -254,7 +262,7 @@ select.input-base option {
   background-color: rgba(45, 31, 78, 0.98) !important;
   color: var(--color-text) !important;
   font-size: 1.1rem !important;
-  font-family: 'Tupo Vyaz', serif !important;
+  font-family: 'Firlest', serif !important;
   font-weight: 500 !important;
   letter-spacing: 0.1em !important;
   line-height: 1.8 !important;
@@ -376,7 +384,7 @@ select.input-base option[selected] {
 .profile {
   padding: 2rem;
   min-height: calc(100vh - 65px);
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.8;
@@ -384,7 +392,7 @@ select.input-base option[selected] {
 
 .profile h2,
 .profile h3 {
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'ChristmasReign', serif;
   font-weight: 800 !important;
   letter-spacing: 0.15em;
   line-height: 1.6;
@@ -392,7 +400,7 @@ select.input-base option[selected] {
 }
 
 .profile p {
-  font-family: 'Tupo Vyaz', serif;
+  font-family: 'Firlest', serif;
   font-weight: 500;
   letter-spacing: 0.1em;
   line-height: 1.8;

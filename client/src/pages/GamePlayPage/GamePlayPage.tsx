@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getStoryFullThunk } from "../../entities/story/api/StoryApi";
 import type { StoryFullData } from "../../entities/story/model";
 import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
-import SceneBackground from "./SceneBackground";
+import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
 import "./GamePlayPage.css";
 
 // Страница игры
@@ -103,9 +103,20 @@ export default function GamePlayPage() {
     );
   }
 
+  const backgroundUrl =
+    currentNode.picture && currentNode.picture.trim()
+      ? `${getServerBaseUrl()}/backgrounds/${currentNode.picture}`
+      : null;
+
   return (
     <div className="game-play-page game-play-viewport">
-      <SceneBackground title={currentNode.title} content={currentNode.content} />
+      {backgroundUrl && (
+        <div
+          className="game-play-background"
+          style={{ backgroundImage: `url(${backgroundUrl})` }}
+          aria-hidden
+        />
+      )}
       <button
         className="game-play-exit"
         onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}

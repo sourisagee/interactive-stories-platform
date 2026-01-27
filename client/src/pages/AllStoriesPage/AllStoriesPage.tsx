@@ -89,7 +89,7 @@ function StoryCard({
                   onClick={() => setIsRatingModalOpen(true)}
                   disabled={hasRated}
                 >
-                  {hasRated && ratingInfo?.userRating ? `✓ Оценено (${ratingInfo.userRating})` : "Оценить"}
+                  {hasRated ? "✓ Оценено" : "Оценить"}
                 </button>
               )}
             </div>
