@@ -5,6 +5,7 @@ import { getStoryFullThunk } from "../../entities/story/api/StoryApi";
 import type { StoryFullData } from "../../entities/story/model";
 import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
 import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
+import GamePlayStats from "./GamePlayStats";
 import "./GamePlayPage.css";
 
 // Страница игры
@@ -14,6 +15,7 @@ export default function GamePlayPage() {
   const dispatch = useAppDispatch();
   const { currentStory, isLoading, error } = useAppSelector((s) => s.stories);
   const [currentNodeId, setCurrentNodeId] = useState<number | null>(null); // Текущий узел
+  const [restartKey, setRestartKey] = useState<number>(0);
 
   const fullStory = currentStory as StoryFullData | null;
   const nodes = fullStory?.nodes ?? [];
@@ -32,6 +34,7 @@ export default function GamePlayPage() {
 
   useEffect(() => {
     setCurrentNodeId(null);
+    setRestartKey((prev) => prev + 1);
   }, [storyId]);
 
   useEffect(() => {
@@ -47,8 +50,15 @@ export default function GamePlayPage() {
     return null;
   }, [nodes, currentNodeId, startNode]);
 
-  const handleChoice = (toNodeId: number) => setCurrentNodeId(toNodeId);
-  const handleRestart = () => startNode && setCurrentNodeId(startNode.id);
+  const handleChoice = (toNodeId: number) => {
+    setCurrentNodeId(toNodeId);
+  };
+  const handleRestart = () => {
+    if (startNode) {
+      setCurrentNodeId(startNode.id);
+      setRestartKey((prev) => prev + 1);
+    }
+  };
 
   if (!validStoryId) {
     return (
@@ -117,35 +127,49 @@ export default function GamePlayPage() {
           aria-hidden
         />
       )}
-      <button
-        className="game-play-exit"
-        onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
-        type="button"
-      >
-        Выйти
-      </button>
       <div className="game-play-overlay">
-        <h2 className="game-play-scene-title">{currentNode.title}</h2>
-        <p className="game-play-scene-content">{currentNode.content}</p>
-        {currentNode.isEnd ? (
-          <div className="game-play-end">
-            <p className="game-play-end-text">История завершена.</p>
-            <button className="game-play-btn" onClick={handleRestart}>Начать заново</button>
+        <button
+          className="game-play-exit"
+          onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          type="button"
+        >
+          Выйти
+        </button>
+
+        <div className="game-play-layout">
+          <div className="game-play-sidebar">
+            <GamePlayStats
+              currentNode={currentNode}
+              restartKey={restartKey}
+            />
           </div>
-        ) : (
-          <div className="game-play-choices">
-            {currentNode.fromChoices.map((c) => (
-              <button
-                key={c.id}
-                className="game-play-choice"
-                onClick={() => handleChoice(c.toNodeId)}
-                type="button"
-              >
-                {c.choiceText}
-              </button>
-            ))}
+
+          <div className="game-play-main">
+            <h2 className="game-play-scene-title">{currentNode.title}</h2>
+            <p className="game-play-scene-content">{currentNode.content}</p>
+            {currentNode.isEnd ? (
+              <div className="game-play-end">
+                <p className="game-play-end-text">История завершена.</p>
+                <button className="game-play-btn" onClick={handleRestart}>
+                  Начать заново
+                </button>
+              </div>
+            ) : (
+              <div className="game-play-choices">
+                {currentNode.fromChoices.map((c) => (
+                  <button
+                    key={c.id}
+                    className="game-play-choice"
+                    onClick={() => handleChoice(c.toNodeId)}
+                    type="button"
+                  >
+                    {c.choiceText}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
