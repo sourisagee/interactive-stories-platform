@@ -1,0 +1,64 @@
+.profile {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.profile h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-content {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.profile-info,
+.profile-statistics {
+  flex: 1;
+  max-width: 500px;
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error {
+  color: #dc3545;
+  background: #f8d7da;
+  padding: 1rem;
+  border-radius: 4px;
+}
