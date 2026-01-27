@@ -10,6 +10,7 @@ import AllStoriesPage from "../pages/AllStoriesPage/AllStoriesPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import StoryDetailPage from "../pages/StoryDetailPage/StoryDetailPage";
 import GamePlayPage from "../pages/GamePlayPage/GamePlayPage";
+import StoryEditorPage from "@/pages/StoryEditorPage/StoryEditorPage";
 import { useAppDispatch } from "../shared/hooks/reduxHooks";
 import { refreshThunk } from "../entities/user/api/UserApi";
 import { CLIENT_ROUTES } from "../shared/enam/clientRouter";
@@ -35,6 +36,7 @@ export default function App() {
             <Route path={CLIENT_ROUTES.SIGN_UP} element={<SignUpPage />} />
             <Route path={CLIENT_ROUTES.SIGN_IN} element={<SignInPage />} />
             <Route path={CLIENT_ROUTES.SIGN_OUT} element={<SignOutPage />} />
+            <Route path='/story/edit/:storyId' element={<StoryEditorPage />} />
           </Routes>
         </main>
       </div>
