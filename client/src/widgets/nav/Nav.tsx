@@ -2,10 +2,12 @@ import { NavLink } from "react-router";
 import "./Nav.css";
 import { useAppSelector } from "../../shared/hooks/reduxHooks";
 import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
+import { editStoryPath } from "../../shared/enam/clientRouter";
 
 export default function Nav() {
   const user = useAppSelector((state) => state.user.user);
   const isLoggedIn = !!user;
+  const isAuthor = user?.role === "AUTHOR";
 
   return (
     <nav className="nav">
@@ -25,6 +27,12 @@ export default function Nav() {
         ) : (
           <NavLink to={CLIENT_ROUTES.HOME} className="nav-link">
             Главная
+          </NavLink>
+        )}
+
+        {isLoggedIn && isAuthor && (
+          <NavLink to={editStoryPath(0)} className="nav-link">
+            Панель редактора 
           </NavLink>
         )}
       </div>
