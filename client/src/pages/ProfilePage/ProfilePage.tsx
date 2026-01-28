@@ -2,44 +2,37 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../shared/hooks/reduxHooks";
 import { UserRole } from "@/entities/user/model";
-import { gamePlayPath, storyDetailPath } from "../../shared/enam/clientRouter";
+import { gamePlayPath } from "../../shared/enam/clientRouter";
 import {
-  statsApi,
-  type UserStatsResponse,
+  profileApi,
+  type UserProfileResponse,
   type GameInfo,
   type AuthorStory,
-} from "../../entities/user/api/StatsApi";
+} from "../../entities/user/api/ProfileApi";
 import "./ProfilePage.css";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAppSelector((state) => state.user);
-  const [stats, setStats] = useState<UserStatsResponse | null>(null);
-  const [statsLoading, setStatsLoading] = useState(false);
-  const [statsError, setStatsError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<UserProfileResponse | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
-      loadStats();
+      loadProfile();
     }
   }, [user]);
 
-  const loadStats = async () => {
+  const loadProfile = async () => {
     try {
-      setStatsLoading(true);
-      setStatsError(null);
-
-      // ВРЕМЕННО: для тестирования автора
-      if (user?.role === UserRole.AUTHOR) {
-        const testData = statsApi.getAuthorTestData();
-        setStats(testData);
-      } else {
-        const statsData = await statsApi.getMyStats();
-        setStats(statsData);
-      }
+      setProfileLoading(true);
+      setProfileError(null);
+      const profileData = await profileApi.getMyProfile();
+      setProfile(profileData);
     } catch (error) {
-      setStatsError(`Ошибка загрузки статистики: ${error}`);
+      setProfileError(`Ошибка загрузки профиля: ${error}`);
     } finally {
-      setStatsLoading(false);
+      setProfileLoading(false);
     }
   };
 
@@ -85,7 +78,7 @@ export default function ProfilePage() {
         {isDraft && (
           <div className="story-actions">
             <Link
-              to={`/editor/${story.id}`} // Пока используем предполагаемый роут
+              to={`/story/edit/${story.id}`}
               className="story-action-btn btn-edit"
             >
               Редактировать
@@ -156,9 +149,9 @@ export default function ProfilePage() {
             <div className="games-section">
               <h3>Незавершенные игры</h3>
               <div className="games-list">
-                {stats?.games?.inProgress &&
-                stats.games.inProgress.length > 0 ? (
-                  stats.games.inProgress.map((game) =>
+                {profile?.games?.inProgress &&
+                profile.games.inProgress.length > 0 ? (
+                  profile.games.inProgress.map((game) =>
                     renderGameCard(game, "continue")
                   )
                 ) : (
@@ -176,9 +169,9 @@ export default function ProfilePage() {
             <div className="stories-section">
               <h3>Черновики</h3>
               <div className="stories-list">
-                {stats?.authorStories?.drafts &&
-                stats.authorStories.drafts.length > 0 ? (
-                  stats.authorStories.drafts.map((story) =>
+                {profile?.authorStories?.drafts &&
+                profile.authorStories.drafts.length > 0 ? (
+                  profile.authorStories.drafts.map((story) =>
                     renderAuthorStoryCard(story, true)
                   )
                 ) : (
@@ -196,51 +189,51 @@ export default function ProfilePage() {
           <div className="profile-statistics">
             <h3>Статистика</h3>
 
-            {statsLoading && (
+            {profileLoading && (
               <div className="loading">Загрузка статистики...</div>
             )}
 
-            {statsError && <div className="error">{statsError}</div>}
+            {profileError && <div className="error">{profileError}</div>}
 
-            {stats && !statsLoading && (
+            {profile && !profileLoading && (
               <>
-                {stats.user.role === "AUTHOR" && stats.authorStats ? (
+                {profile.user.role === "AUTHOR" && profile.authorStats ? (
                   <div className="author-stats">
                     <div className="stats-grid">
                       <div className="stat-item">
                         <span className="stat-number">
-                          {stats.authorStats.totalStories}
+                          {profile.authorStats.totalStories}
                         </span>
                         <span className="stat-label">Создано историй</span>
                       </div>
                       <div className="stat-item">
                         <span className="stat-number">
-                          {stats.authorStats.draftStories}
+                          {profile.authorStats.draftStories}
                         </span>
                         <span className="stat-label">В разработке</span>
                       </div>
                       <div className="stat-item">
                         <span className="stat-number">
                           {new Date(
-                            stats.authorStats.memberSince
+                            profile.authorStats.memberSince
                           ).toLocaleDateString("ru-RU")}
                         </span>
                         <span className="stat-label">Автор с</span>
                       </div>
                     </div>
                   </div>
-                ) : stats.user.role === "USER" && stats.playerStats ? (
+                ) : profile.user.role === "USER" && profile.playerStats ? (
                   <div className="player-stats">
                     <div className="stats-grid">
                       <div className="stat-item">
                         <span className="stat-number">
-                          {stats.playerStats.completedStories}
+                          {profile.playerStats.completedStories}
                         </span>
                         <span className="stat-label">Пройдено историй</span>
                       </div>
                       <div className="stat-item">
                         <span className="stat-number">
-                          {stats.playerStats.inProgressStories}
+                          {profile.playerStats.inProgressStories}
                         </span>
                         <span className="stat-label">
                           Незавершенные истории
@@ -249,7 +242,7 @@ export default function ProfilePage() {
                       <div className="stat-item">
                         <span className="stat-number">
                           {new Date(
-                            stats.playerStats.memberSince
+                            profile.playerStats.memberSince
                           ).toLocaleDateString("ru-RU")}
                         </span>
                         <span className="stat-label">В игре с</span>
@@ -268,8 +261,9 @@ export default function ProfilePage() {
             <div className="games-section">
               <h3>Завершенные игры</h3>
               <div className="games-list">
-                {stats?.games?.completed && stats.games.completed.length > 0 ? (
-                  stats.games.completed.map((game) =>
+                {profile?.games?.completed &&
+                profile.games.completed.length > 0 ? (
+                  profile.games.completed.map((game) =>
                     renderGameCard(game, "replay")
                   )
                 ) : (
@@ -289,9 +283,9 @@ export default function ProfilePage() {
             <div className="stories-section">
               <h3>Опубликованные истории</h3>
               <div className="stories-list">
-                {stats?.authorStories?.published &&
-                stats.authorStories.published.length > 0 ? (
-                  stats.authorStories.published.map((story) =>
+                {profile?.authorStories?.published &&
+                profile.authorStories.published.length > 0 ? (
+                  profile.authorStories.published.map((story) =>
                     renderAuthorStoryCard(story, false)
                   )
                 ) : (
