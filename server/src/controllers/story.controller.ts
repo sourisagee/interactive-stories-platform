@@ -214,7 +214,8 @@ export class StoryController {
         return;
       }
 
-      const { title, description, genre, authorName, cover } = req.body;
+      const { title, description, genre, authorName, cover, isPublished } =
+        req.body;
 
       // Валидация данных для обновления
       if (title !== undefined) {
@@ -324,6 +325,18 @@ export class StoryController {
         }
       }
 
+      // Валидация isPublished
+      if (isPublished !== undefined) {
+        if (typeof isPublished !== "boolean") {
+          res
+            .status(400)
+            .json(
+              formatResponse(400, "isPublished must be a boolean", null, null)
+            );
+          return;
+        }
+      }
+
       const updateData: UpdateStoryDto = {};
       if (title !== undefined) updateData.title = title.trim();
       if (description !== undefined)
@@ -331,6 +344,7 @@ export class StoryController {
       if (genre !== undefined) updateData.genre = genre.trim();
       if (authorName !== undefined) updateData.authorName = authorName.trim();
       if (cover !== undefined) updateData.cover = cover.trim();
+      if (isPublished !== undefined) updateData.isPublished = isPublished;
 
       const updatedStory = await storyService.updateStory(storyId, updateData);
 

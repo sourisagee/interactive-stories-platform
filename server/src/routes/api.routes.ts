@@ -6,7 +6,7 @@ import nodeRouter from "./node.routes";
 import playthroughRouter from "./playthrough.routes";
 import choiceRouter from "./choice.routes";
 import statsRouter from "./stats.routes";
-
+import profileRouter from "./profile.routes";
 
 const apiRouter = Router();
 
@@ -17,6 +17,6 @@ apiRouter.use("/nodes", nodeRouter);
 apiRouter.use("/playthroughs", playthroughRouter);
 apiRouter.use("/choices", choiceRouter);
 apiRouter.use("/stats", statsRouter);
-
+apiRouter.use("/profile", profileRouter);
 
 export default apiRouter;

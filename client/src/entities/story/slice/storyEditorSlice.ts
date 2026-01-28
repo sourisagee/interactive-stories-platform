@@ -49,7 +49,7 @@ const storyEditorSlice = createSlice({
      */
     updateNode: (
       state,
-      action: PayloadAction<{ id: number; updates: Partial<FlowNode> }>,
+      action: PayloadAction<{ id: number; updates: Partial<FlowNode> }>
     ) => {
       const node = state.nodes.find((n) => n.id === action.payload.id);
       if (node) {
@@ -66,7 +66,7 @@ const storyEditorSlice = createSlice({
       state.edges = state.edges.filter(
         (edge) =>
           edge.source !== action.payload.toString() &&
-          edge.target !== action.payload.toString(),
+          edge.target !== action.payload.toString()
       );
     },
 
@@ -82,7 +82,7 @@ const storyEditorSlice = createSlice({
      */
     updateEdge: (
       state,
-      action: PayloadAction<{ id: string; updates: Partial<FlowEdge> }>,
+      action: PayloadAction<{ id: string; updates: Partial<FlowEdge> }>
     ) => {
       const edge = state.edges.find((e) => e.id === action.payload.id);
       if (edge) {
@@ -118,7 +118,7 @@ const storyEditorSlice = createSlice({
      */
     updateNodePosition: (
       state,
-      action: PayloadAction<{ id: number; position: { x: number; y: number } }>,
+      action: PayloadAction<{ id: number; position: { x: number; y: number } }>
     ) => {
       const node = state.nodes.find((n) => n.id === action.payload.id);
       if (node) {
@@ -138,7 +138,7 @@ const storyEditorSlice = createSlice({
      */
     updateViewport: (
       state,
-      action: PayloadAction<{ x: number; y: number; zoom: number }>,
+      action: PayloadAction<{ x: number; y: number; zoom: number }>
     ) => {
       state.viewport = action.payload;
     },
@@ -158,14 +158,14 @@ const storyEditorSlice = createSlice({
       action: PayloadAction<{
         position: { x: number; y: number };
         title?: string;
-      }>,
+      }>
     ) => {
       if (!state.currentStory) return;
 
       const temporaryNode = createTemporaryNode(
         action.payload.position,
         state.currentStory.id,
-        action.payload.title,
+        action.payload.title
       );
 
       state.nodes.push(temporaryNode);
@@ -182,12 +182,12 @@ const storyEditorSlice = createSlice({
         sourceNodeId: number;
         targetNodeId: number;
         choiceText: string;
-      }>,
+      }>
     ) => {
       const temporaryEdge = createTemporaryEdge(
         action.payload.sourceNodeId,
         action.payload.targetNodeId,
-        action.payload.choiceText,
+        action.payload.choiceText
       );
 
       state.edges.push(temporaryEdge);
@@ -206,11 +206,17 @@ const storyEditorSlice = createSlice({
       })
       .addCase(getFullStoryThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentStory = action.payload
+        state.currentStory = action.payload;
 
-
-        const allChoices = action.payload.nodes.reduce((acc, currentNode) => acc.concat(currentNode.fromChoices, currentNode.toChoices), []);
-        const uniqueChoices = allChoices.filter((choice, index, self) => index === self.findIndex((t) => t.id === choice.id));
+        const allChoices = action.payload.nodes.reduce(
+          (acc, currentNode) =>
+            acc.concat(currentNode.fromChoices, currentNode.toChoices),
+          []
+        );
+        const uniqueChoices = allChoices.filter(
+          (choice, index, self) =>
+            index === self.findIndex((t) => t.id === choice.id)
+        );
 
         // Конвертируем узлы из БД в FlowNode
         state.nodes = action.payload.nodes.map(convertToFlowNode);
@@ -247,7 +253,7 @@ const storyEditorSlice = createSlice({
 
         // Ищем временный узел с negative ID
         const tempNodeIndex = state.nodes.findIndex((n) =>
-          isTemporaryNode(n.id),
+          isTemporaryNode(n.id)
         );
 
         if (tempNodeIndex !== -1) {
@@ -298,7 +304,7 @@ const storyEditorSlice = createSlice({
       state.edges = state.edges.filter(
         (edge) =>
           edge.source !== deletedNodeId.toString() &&
-          edge.target !== deletedNodeId.toString(),
+          edge.target !== deletedNodeId.toString()
       );
 
       // Сбрасываем выбор если удален выбранный узел
@@ -318,7 +324,7 @@ const storyEditorSlice = createSlice({
         // Находим временную связь и заменяем ее на сохраненную
         const savedChoice = action.payload;
         const tempEdgeIndex = state.edges.findIndex((e) =>
-          isTemporaryEdge(e.id),
+          isTemporaryEdge(e.id)
         );
 
         if (tempEdgeIndex !== -1) {
@@ -338,7 +344,7 @@ const storyEditorSlice = createSlice({
     builder.addCase(updateChoiceThunk.fulfilled, (state, action) => {
       const updatedChoice = action.payload;
       const edgeIndex = state.edges.findIndex(
-        (e) => e.data.choiceId === updatedChoice.id,
+        (e) => e.data.choiceId === updatedChoice.id
       );
 
       if (edgeIndex !== -1) {
@@ -352,7 +358,7 @@ const storyEditorSlice = createSlice({
 
       // Удаляем связь
       state.edges = state.edges.filter(
-        (edge) => edge.data.choiceId !== deletedChoiceId,
+        (edge) => edge.data.choiceId !== deletedChoiceId
       );
 
       // Сбрасываем выбор если удалена выбранная связь

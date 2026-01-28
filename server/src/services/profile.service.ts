@@ -13,7 +13,18 @@ export interface AuthorStats {
   memberSince: Date;
 }
 
-export class StatsService {
+export interface AuthorStory {
+  id: number;
+  title: string;
+  cover: string;
+  genre: string;
+  description: string;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export class ProfileService {
   // Получить статистику игрока
   static async getPlayerStats(userId: number): Promise<PlayerStats> {
     // Получаем пользователя для даты регистрации
@@ -60,8 +71,42 @@ export class StatsService {
     };
   }
 
-  // Получить статистику пользователя в зависимости от роли
-  static async getUserStats(userId: number) {
+  // Получить истории автора (черновики и опубликованные)
+  static async getAuthorStories(userId: number): Promise<{
+    drafts: AuthorStory[];
+    published: AuthorStory[];
+  }> {
+    const stories = await prisma.story.findMany({
+      where: { authorId: userId },
+      select: {
+        id: true,
+        title: true,
+        cover: true,
+        genre: true,
+        description: true,
+        isPublished: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    const drafts: AuthorStory[] = [];
+    const published: AuthorStory[] = [];
+
+    stories.forEach((story) => {
+      if (story.isPublished) {
+        published.push(story);
+      } else {
+        drafts.push(story);
+      }
+    });
+
+    return { drafts, published };
+  }
+
+  // Получить полную информацию профиля пользователя
+  static async getUserProfile(userId: number) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, username: true, email: true, role: true },
@@ -88,39 +133,5 @@ export class StatsService {
     }
 
     return { user };
-  }
-
-  // Получить истории автора (черновики и опубликованные)
-  static async getAuthorStories(userId: number): Promise<{
-    drafts: any[];
-    published: any[];
-  }> {
-    const stories = await prisma.story.findMany({
-      where: { authorId: userId },
-      select: {
-        id: true,
-        title: true,
-        cover: true,
-        genre: true,
-        description: true,
-        isPublished: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: { updatedAt: "desc" },
-    });
-
-    const drafts: any[] = [];
-    const published: any[] = [];
-
-    stories.forEach((story) => {
-      if (story.isPublished) {
-        published.push(story);
-      } else {
-        drafts.push(story);
-      }
-    });
-
-    return { drafts, published };
   }
 }
