@@ -31,7 +31,7 @@ export default function MainPage() {
             </div>
           ) : (
             <div className="hero-actions">
-              <Link to="/stories" className="btn btn-primary">
+              <Link to="/allStories" className="btn btn-primary">
                 Исследовать истории
               </Link>
               <Link to="/profile" className="btn btn-secondary">
