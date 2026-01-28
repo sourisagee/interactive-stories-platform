@@ -4,7 +4,10 @@ import { useParams } from "react-router";
 import { useStoryEditorActions } from "../../shared/hooks/storyEditorHooks";
 import StoryEditor from "../../features/StoryEditor/StoryEditor";
 import { useStoryEditorState } from "../../shared/hooks/storyEditorHooks";
-import { setCurrentStory } from "@/entities/story/slice/storyEditorSlice";
+import {
+  setCurrentStory,
+  resetEditor,
+} from "@/entities/story/slice/storyEditorSlice";
 
 const StoryEditorPage: React.FC = () => {
   const { storyId } = useParams<{ storyId: string }>();
@@ -18,7 +21,7 @@ const StoryEditorPage: React.FC = () => {
     if (storyId) {
       // Загружаем историю при монтировании
       actions.getFullStory(Number(storyId));
-    }
+    } 
   }, []);
 
   if (isLoading) {

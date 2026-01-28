@@ -6,12 +6,41 @@ import {
   type UserStatsResponse,
 } from "../../entities/user/api/StatsApi";
 import "./ProfilePage.css";
+import { editStoryPath } from "@/shared/enam/clientRouter";
+import { useNavigate } from "react-router";
+import { useStoryEditorActions } from "@/shared/hooks/storyEditorHooks";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAppSelector((state) => state.user);
   const [stats, setStats] = useState<UserStatsResponse | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  const { createStory } = useStoryEditorActions();
+
+  const handleCreateNewStory = async () => {
+    try {
+      const { payload } = await createStory({
+        title: "Новая история",
+        genre: "Новая история",
+        description: "Новая история",
+        cover: "Новая история",
+        authorName: user?.username || "",
+      });
+
+      if (payload && typeof payload === "object" && "id" in payload) {
+        navigate(editStoryPath(payload.id));
+      }
+
+      // if (response) {
+      //   navigate(storyEditorPath(response.id))
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -43,6 +72,7 @@ export default function ProfilePage() {
   return (
     <div className="profile">
       <h2>Профиль</h2>
+      <button onClick={handleCreateNewStory}>Создать историю</button>
 
       <div className="profile-content">
         <div className="profile-info">
@@ -81,23 +111,20 @@ export default function ProfilePage() {
                       <span className="stat-number">
                         {stats.authorStats.totalStories}
                       </span>
-                      
                     </div>
                     <div className="stat-item">
                       <span className="stat-number">
                         <p className="stat-label">В разработке</p>
                         {stats.authorStats.draftStories}
                       </span>
-                     
                     </div>
                     <div className="stat-item">
                       <span className="stat-label">Автор с</span>
                       <span className="stat-number">
                         {new Date(
-                          stats.authorStats.memberSince
+                          stats.authorStats.memberSince,
                         ).toLocaleDateString("ru-RU")}
                       </span>
-                      
                     </div>
                   </div>
                 </div>
@@ -109,23 +136,20 @@ export default function ProfilePage() {
                       <span className="stat-number">
                         {stats.playerStats.completedStories}
                       </span>
-                      
                     </div>
                     <div className="stat-item">
                       <span className="stat-number">
                         <p className="stat-label">Незавершенные истории</p>
                         {stats.playerStats.inProgressStories}
                       </span>
-                      
                     </div>
                     <div className="stat-item">
                       <span className="stat-number">
                         <p className="stat-label">В игре с</p>
                         {new Date(
-                          stats.playerStats.memberSince
+                          stats.playerStats.memberSince,
                         ).toLocaleDateString("ru-RU")}
                       </span>
-                      
                     </div>
                   </div>
                 </div>
