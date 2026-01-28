@@ -2,46 +2,95 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getStoryFullThunk } from "../../entities/story/api/StoryApi";
+import { playthroughApi } from "../../entities/story/api/PlaythroughApi";
+import { UserRole } from "../../entities/user/model";
 import type { StoryFullData } from "../../entities/story/model";
 import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
 import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
 import GamePlayStats from "./GamePlayStats";
 import "./GamePlayPage.css";
 
-// Страница игры
+// Страница игры: для игрока прогресс сохраняется на сервере и восстанавливается при перезагрузке
 export default function GamePlayPage() {
   const { storyId } = useParams<{ storyId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentStory, isLoading, error } = useAppSelector((s) => s.stories);
-  const [currentNodeId, setCurrentNodeId] = useState<number | null>(null); // Текущий узел
+  const { user } = useAppSelector((s) => s.user);
+  const [currentNodeId, setCurrentNodeId] = useState<number | null>(null);
+  const [playthroughId, setPlaythroughId] = useState<number | null>(null);
   const [restartKey, setRestartKey] = useState<number>(0);
+  // Пока true — ждём загрузки/восстановления прохождения (только для игрока)
+  const [playthroughInitLoading, setPlaythroughInitLoading] = useState(false);
+  const [playthroughInitDone, setPlaythroughInitDone] = useState(false);
 
   const fullStory = currentStory as StoryFullData | null;
   const nodes = fullStory?.nodes ?? [];
 
-  const startNode = useMemo( // Поиск стартового узла
+  const startNode = useMemo(
     () => nodes.find((n) => n.isStart) ?? null,
     [nodes],
   );
 
   const numStoryId = storyId ? Number(storyId) : NaN;
   const validStoryId = !Number.isNaN(numStoryId) && numStoryId > 0;
+  const isPlayer = user?.role === UserRole.USER;
 
-  useEffect(() => { // Загружает полную историю с узлами через Redux
+  useEffect(() => {
     if (validStoryId) dispatch(getStoryFullThunk(numStoryId));
   }, [validStoryId, numStoryId, dispatch]);
 
+  // При смене истории сбрасываем узел и прохождение
   useEffect(() => {
+    setPlaythroughInitDone(false);
+    setPlaythroughId(null);
     setCurrentNodeId(null);
     setRestartKey((prev) => prev + 1);
   }, [storyId]);
 
+  // После загрузки истории: восстановить прохождение (игрок) или поставить стартовый узел (гость/автор)
   useEffect(() => {
-    if (!startNode || !fullStory) return;
-    const valid = nodes.some((n) => n.id === currentNodeId);
-    if (currentNodeId === null || !valid) setCurrentNodeId(startNode.id);
-  }, [startNode, fullStory, nodes, currentNodeId]);
+    if (!fullStory || !startNode || !validStoryId) return;
+
+    if (!isPlayer) {
+      setCurrentNodeId(startNode.id);
+      setPlaythroughInitDone(true);
+      return;
+    }
+
+    let cancelled = false;
+    setPlaythroughInitLoading(true);
+
+    (async () => {
+      try {
+        const existing = await playthroughApi.getCurrentPlaythrough(numStoryId);
+        if (cancelled) return;
+        if (existing && !existing.isCompleted) {
+          setPlaythroughId(existing.id);
+          setCurrentNodeId(existing.currentNode.id);
+        } else {
+          const started = await playthroughApi.startPlaythrough(numStoryId);
+          if (cancelled) return;
+          setPlaythroughId(started.id);
+          setCurrentNodeId(started.currentNode.id);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          console.error("Ошибка инициализации прохождения", e);
+          setCurrentNodeId(startNode.id);
+        }
+      } finally {
+        if (!cancelled) {
+          setPlaythroughInitLoading(false);
+          setPlaythroughInitDone(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fullStory, startNode, validStoryId, numStoryId, isPlayer]);
 
   const currentNode = useMemo(() => {
     const n = nodes.find((nd) => nd.id === currentNodeId);
@@ -50,9 +99,20 @@ export default function GamePlayPage() {
     return null;
   }, [nodes, currentNodeId, startNode]);
 
-  const handleChoice = (toNodeId: number) => {
-    setCurrentNodeId(toNodeId);
+  const handleChoice = async (choiceId: number, toNodeId: number) => {
+    if (playthroughId !== null) {
+      try {
+        const next = await playthroughApi.makeChoice(playthroughId, choiceId);
+        setCurrentNodeId(next.currentNode.id);
+      } catch (e) {
+        console.error("Ошибка выбора", e);
+        setCurrentNodeId(toNodeId);
+      }
+    } else {
+      setCurrentNodeId(toNodeId);
+    }
   };
+
   const handleRestart = () => {
     if (startNode) {
       setCurrentNodeId(startNode.id);
@@ -71,7 +131,7 @@ export default function GamePlayPage() {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || (isPlayer && fullStory && !playthroughInitDone)) {
     return (
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
@@ -160,7 +220,7 @@ export default function GamePlayPage() {
                   <button
                     key={c.id}
                     className="game-play-choice"
-                    onClick={() => handleChoice(c.toNodeId)}
+                    onClick={() => handleChoice(c.id, c.toNodeId)}
                     type="button"
                   >
                     {c.choiceText}

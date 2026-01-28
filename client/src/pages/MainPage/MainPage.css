@@ -23,7 +23,8 @@
 }
 
 .hero-title {
-  font-size: 2.4rem;
+  /* Размер как у заголовка "О проекте" */
+  font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 0.18em;
   line-height: 1.5;
@@ -37,6 +38,18 @@
 
 .hero-title .highlight {
   color: var(--color-accent, #8b6bb8);
+}
+
+.hero-subtitle {
+  margin: -0.3rem 0 2rem;
+  font-size: 2.4rem; /* ещё крупнее, чем "ПЛАТФОРМА" */
+  font-weight: 900;
+  text-transform: uppercase; /* WISP заглавными */
+  letter-spacing: 0.4em; /* ещё больше интервал между буквами */
+  color: var(--color-accent, #8b6bb8);
+  text-shadow:
+    0 0 18px rgba(139, 107, 184, 0.9),
+    0 0 30px rgba(200, 180, 255, 0.8);
 }
 
 .hero-description {
@@ -153,6 +166,21 @@
   margin-bottom: 3rem;
 }
 
+.user-types-title-centered {
+  text-align: center;
+}
+
+.user-types-player-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.user-types-grid-centered {
+  justify-content: center;
+}
+
 .user-types-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
@@ -237,6 +265,12 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.user-types-cta-centered {
+  max-width: 520px;
+  text-align: center;
+  align-items: center;
 }
 
 .user-types-cta h3 {

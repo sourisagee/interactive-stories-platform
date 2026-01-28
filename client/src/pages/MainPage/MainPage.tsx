@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../shared/hooks/reduxHooks";
+import { UserRole } from "../../entities/user/model";
 import "./MainPage.css";
 
 export default function MainPage() {
@@ -12,8 +13,11 @@ export default function MainPage() {
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
-            Платформа <span className="highlight">интерактивных новелл</span>
+            ПЛАТФОРМА <span className="highlight">интерактивных новелл</span>
           </h1>
+          <h2 className="hero-subtitle">
+            WISP
+          </h2>
           <p className="hero-description">
             Современная платформа для создания и чтения интерактивных историй с
             разветвленным сюжетом. Здесь каждый может стать автором
@@ -80,12 +84,14 @@ export default function MainPage() {
       {/* User Types Section */}
       <section className="user-types">
         <div className="container">
-          <h2 className="section-title">Выберите свою роль</h2>
+          <h2 className="section-title user-types-title-centered">
+            Выберите свою роль
+          </h2>
 
-          {user ? (
-            <div className="user-types-layout">
-              <div className="user-types-grid">
-                <div className="user-type-card">
+          {user && user.role === UserRole.USER ? (
+            <div className="user-types-player-layout">
+              <div className="user-types-grid user-types-grid-centered">
+                <div className="user-type-card featured">
                   <div className="user-type-icon">🧙‍♂️</div>
                   <h3>Читатель </h3>
                   <div className="user-type-description">
@@ -122,7 +128,7 @@ export default function MainPage() {
                 </div>
               </div>
 
-              <aside className="user-types-cta">
+              <div className="user-types-cta user-types-cta-centered">
                 <h3>Продолжайте своё приключение</h3>
                 <p>
                   Перейдите к библиотеке историй или откройте профиль, чтобы посмотреть
@@ -136,11 +142,11 @@ export default function MainPage() {
                     Профиль
                   </Link>
                 </div>
-              </aside>
+              </div>
             </div>
           ) : (
             <div className="user-types-grid">
-              <div className="user-type-card">
+              <div className="user-type-card featured">
                 <div className="user-type-icon">🧙‍♂️</div>
                 <h3>Читатель </h3>
                 <div className="user-type-description">

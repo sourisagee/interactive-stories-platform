@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../lib/prisma";
 import {
   Variables,
@@ -9,15 +8,18 @@ import {
 } from "../types/playthrough";
 
 export default class PlaythroughService {
+  // проверяет, что история существует и опубликована;
+  // проверяет, нет ли уже прохождения playthrough для { userId, storyId };
+  // находит стартовый узел и создаёт новое прохождение с currentNodeId = startNode.id, isCompleted = false.
   static async startPlaythrough(
     userId: number,
     storyId: number,
   ): Promise<PlaythroughResponse> {
     const story = await prisma.story.findUnique({
-      where: { id: storyId, isPublished: true },
+      where: { id: storyId },
     });
 
-    if (!story) {
+    if (!story || !story.isPublished) {
       throw new Error("История не найдена или не опубликована");
     }
 
@@ -70,6 +72,7 @@ export default class PlaythroughService {
     };
   }
 
+  // находит существующее прохождение для { userId, storyId } и возвращает его вместе с текущим узлом.
   static async getCurrentPlaythrough(
     userId: number,
     storyId: number,
@@ -103,6 +106,10 @@ export default class PlaythroughService {
     };
   }
 
+  // проверяет, что прохождение существует и ещё не завершено;
+  // проверяет, что выбор (choiceId) доступен из текущего узла;
+  // обновляет currentNodeId, isCompleted, completedAt по тому, куда ведёт выбор;
+  // возвращает обновлённое playthrough с новым currentNode.
   static async makeChoice(
     playthroughId: number,
     choiceId: number,
@@ -137,9 +144,7 @@ export default class PlaythroughService {
       where: { id: playthroughId },
       data: {
         currentNodeId: choice.toNodeId,
-        variables: (variables ?? playthrough.variables) as
-          | Prisma.InputJsonValue
-          | Prisma.NullableJsonNullValueInput,
+        variables: (variables ?? playthrough.variables),
         isCompleted: targetNode.isEnd,
         completedAt: targetNode.isEnd ? new Date() : null,
       },
@@ -197,6 +202,7 @@ export default class PlaythroughService {
     }));
   }
 
+  // возвращает все прохождения пользователя
   static async getUserPlaythroughs(
     userId: number,
   ): Promise<PlaythroughResponse[]> {
@@ -316,7 +322,7 @@ export default class PlaythroughService {
       where: { id: playthroughId },
       data: {
         currentNodeId: startNode.id,
-        variables: {} as Prisma.InputJsonValue,
+        variables: {},
         isCompleted: false,
         completedAt: null,
       },

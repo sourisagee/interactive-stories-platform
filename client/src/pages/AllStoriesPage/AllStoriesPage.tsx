@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getAllStoriesThunk } from "../../entities/story/api/StoryApi";
+import { playthroughApi, type UserPlaythrough } from "../../entities/story/api/PlaythroughApi";
 import {
   getPopularStoriesThunk,
   getStoryRatingThunk,
@@ -25,6 +26,8 @@ type StoryCardProps = {
   ratingInfo?: StoryRatingInfo;
   isPopular?: boolean;
   showPopularBadge?: boolean; // Показывать ли значок популярности
+  // Флаг: есть ли у текущего игрока незавершённое прохождение этой истории
+  isInProgress?: boolean;
   onPlay: (id: number) => void;
   onDetails: (id: number) => void;
   onSignIn: () => void;
@@ -38,6 +41,7 @@ function StoryCard({
   ratingInfo,
   isPopular = false,
   showPopularBadge = false,
+  isInProgress = false,
   onPlay,
   onDetails,
   onSignIn,
@@ -63,6 +67,13 @@ function StoryCard({
   return (
     <>
       <div className={`story-card ${showPopularBadge ? "story-card-popular" : ""}`}>
+        {/* Закладка "Продолжить чтение" для историй с незавершённым прохождением */}
+        {isPlayer && isInProgress && (
+          <div className="story-badge-continue">
+            Продолжить чтение
+          </div>
+        )}
+
         {showPopularBadge && (
           <div className="story-card-popular-badge" aria-label="Популярная история">
             <span className="popular-icon">✦</span>
@@ -136,6 +147,8 @@ export default function AllStoriesPage() {
     Record<number, StoryRatingInfo>
   >({});
   const [isLoadingPopular, setIsLoadingPopular] = useState(false);
+  // Список всех прохождений пользователя (нужен, чтобы понять, какие истории "в процессе")
+  const [userPlaythroughs, setUserPlaythroughs] = useState<UserPlaythrough[]>([]);
 
   const { stories, isLoading, error } = useAppSelector((state) => state.stories);
   const { user } = useAppSelector((state) => state.user);
@@ -144,6 +157,29 @@ export default function AllStoriesPage() {
   useEffect(() => {
     dispatch(getAllStoriesThunk());
   }, [dispatch]);
+
+  // Загрузка всех прохождений текущего пользователя
+  // Нужна, чтобы определить, какие истории были начаты, но ещё не завершены
+  useEffect(() => {
+    // Если пользователь не авторизован или это автор, прохождения не загружаем
+    if (!user || user.role !== UserRole.USER) {
+      setUserPlaythroughs([]);
+      return;
+    }
+
+    const loadPlaythroughs = async () => {
+      try {
+        const playthroughs = await playthroughApi.getMyPlaythroughs();
+        setUserPlaythroughs(playthroughs);
+      } catch (e) {
+        // В случае ошибки просто не показываем закладки "Продолжить чтение"
+        console.error("Ошибка загрузки прохождений пользователя", e);
+        setUserPlaythroughs([]);
+      }
+    };
+
+    loadPlaythroughs();
+  }, [user]);
 
   // Загрузка популярных историй
   useEffect(() => {
@@ -283,6 +319,25 @@ export default function AllStoriesPage() {
     );
   };
 
+  // Множество id историй, у которых есть незавершённое прохождение
+  // isCompleted === false => историю можно "продолжить"
+  const inProgressStoryIds = useMemo(() => {
+    const ids = new Set<number>();
+
+    // Защита от случаев, когда по ошибке в состоянии окажется не массив
+    const list: UserPlaythrough[] = Array.isArray(userPlaythroughs)
+      ? userPlaythroughs
+      : [];
+
+    list.forEach((p) => {
+      if (!p.isCompleted) {
+        ids.add(p.story.id);
+      }
+    });
+
+    return ids;
+  }, [userPlaythroughs]);
+
   // Получаем ID популярных историй для проверки
   const popularStoryIds = useMemo(
     () => new Set(popularStories.map((s) => s.id)),
@@ -384,6 +439,8 @@ export default function AllStoriesPage() {
                     ratingInfo={storyRatings[story.id]}
                     isPopular={true}
                     showPopularBadge={true}
+                    // если по этой истории есть незавершённое прохождение — показываем закладку
+                    isInProgress={inProgressStoryIds.has(story.id)}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
                     onSignIn={goToSignIn}
@@ -415,6 +472,8 @@ export default function AllStoriesPage() {
                     ratingInfo={storyRatings[story.id]}
                     isPopular={popularStoryIds.has(story.id)}
                     showPopularBadge={false}
+                    // если по этой истории есть незавершённое прохождение — показываем закладку
+                    isInProgress={inProgressStoryIds.has(story.id)}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
                     onSignIn={goToSignIn}
@@ -426,6 +485,27 @@ export default function AllStoriesPage() {
           )}
         </main>
       </div>
+
+      {/* Footer */}
+      <footer className="main-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>Интерактивные новеллы</h4>
+              <p>
+                Платформа для создания и чтения интерактивных историй нового
+                поколения.
+              </p>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>
+              &copy; 2026 Интерактивные новеллы. Создано с ❤️ для любителей
+              хороших историй.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
