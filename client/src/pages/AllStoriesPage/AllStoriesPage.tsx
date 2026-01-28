@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getAllStoriesThunk } from "../../entities/story/api/StoryApi";
 import { playthroughApi, type UserPlaythrough } from "../../entities/story/api/PlaythroughApi";
@@ -87,12 +87,14 @@ function StoryCard({
           <p className="story-author">Автор: {story.authorName}</p>
           <p className="story-genre">Жанр: {story.genre}</p>
           <p className="story-description">{description}</p>
-          {ratingInfo && (
+          {(ratingInfo || canRate) && (
             <div className="story-rating">
-              <StarRating
-                averageRating={ratingInfo.averageRating}
-                totalRatings={ratingInfo.totalRatings}
-              />
+              {ratingInfo && (
+                <StarRating
+                  averageRating={ratingInfo.averageRating}
+                  totalRatings={ratingInfo.totalRatings}
+                />
+              )}
               {canRate && (
                 <button
                   type="button"
@@ -140,6 +142,7 @@ function StoryCard({
 export default function AllStoriesPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [popularStories, setPopularStories] = useState<PopularStory[]>([]);
@@ -161,8 +164,12 @@ export default function AllStoriesPage() {
   // Загрузка всех прохождений текущего пользователя
   // Нужна, чтобы определить, какие истории были начаты, но ещё не завершены
   useEffect(() => {
-    // Если пользователь не авторизован или это автор, прохождения не загружаем
-    if (!user || user.role !== UserRole.USER) {
+    if (!user) {
+      setUserPlaythroughs([]);
+      return;
+    }
+    // Загружаем прохождения для игроков (USER); при необходимости можно расширить
+    if (user.role !== UserRole.USER) {
       setUserPlaythroughs([]);
       return;
     }
@@ -170,16 +177,16 @@ export default function AllStoriesPage() {
     const loadPlaythroughs = async () => {
       try {
         const playthroughs = await playthroughApi.getMyPlaythroughs();
-        setUserPlaythroughs(playthroughs);
+        setUserPlaythroughs(Array.isArray(playthroughs) ? playthroughs : []);
       } catch (e) {
-        // В случае ошибки просто не показываем закладки "Продолжить чтение"
         console.error("Ошибка загрузки прохождений пользователя", e);
         setUserPlaythroughs([]);
       }
     };
 
     loadPlaythroughs();
-  }, [user]);
+    // Перезагружаем при возврате на страницу списка (чтобы закладка «Продолжить чтение» обновилась)
+  }, [user, location.pathname]);
 
   // Загрузка популярных историй
   useEffect(() => {

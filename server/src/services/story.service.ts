@@ -7,9 +7,6 @@ import {
   StoryFull,
 } from "../types/story";
 
-
-
-
 export class StoryService {
   // Создать новую историю
 
@@ -48,9 +45,9 @@ export class StoryService {
     });
   }
 
-  // Обновить историю (только если не опубликована)
+  // Обновить историю
   async updateStory(storyId: number, data: UpdateStoryDto): Promise<Story> {
-    // Сначала проверяем, существует ли история и опубликована ли она
+    // Сначала проверяем, существует ли история
     const existingStory = await prisma.story.findUnique({
       where: { id: storyId },
       select: { id: true, isPublished: true },
@@ -60,8 +57,21 @@ export class StoryService {
       throw new Error("История не найдена");
     }
 
+    // Если история уже опубликована, разрешаем только изменение isPublished на false (снятие с публикации)
+    // или другие административные действия, но запрещаем изменение контента
     if (existingStory.isPublished) {
-      throw new Error("Нельзя редактировать опубликованную историю");
+      // Если пытаемся изменить что-то кроме isPublished, запрещаем
+      const hasContentChanges =
+        data.title ||
+        data.description ||
+        data.genre ||
+        data.cover ||
+        data.authorName;
+      if (hasContentChanges) {
+        throw new Error(
+          "Нельзя редактировать содержимое опубликованной истории"
+        );
+      }
     }
 
     return await prisma.story.update({

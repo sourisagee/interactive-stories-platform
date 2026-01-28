@@ -10,7 +10,6 @@ import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
 import GamePlayStats from "./GamePlayStats";
 import "./GamePlayPage.css";
 
-// Страница игры: для игрока прогресс сохраняется на сервере и восстанавливается при перезагрузке
 export default function GamePlayPage() {
   const { storyId } = useParams<{ storyId: string }>();
   const navigate = useNavigate();
@@ -20,7 +19,6 @@ export default function GamePlayPage() {
   const [currentNodeId, setCurrentNodeId] = useState<number | null>(null);
   const [playthroughId, setPlaythroughId] = useState<number | null>(null);
   const [restartKey, setRestartKey] = useState<number>(0);
-  // Пока true — ждём загрузки/восстановления прохождения (только для игрока)
   const [playthroughInitLoading, setPlaythroughInitLoading] = useState(false);
   const [playthroughInitDone, setPlaythroughInitDone] = useState(false);
 
@@ -40,7 +38,6 @@ export default function GamePlayPage() {
     if (validStoryId) dispatch(getStoryFullThunk(numStoryId));
   }, [validStoryId, numStoryId, dispatch]);
 
-  // При смене истории сбрасываем узел и прохождение
   useEffect(() => {
     setPlaythroughInitDone(false);
     setPlaythroughId(null);
@@ -48,7 +45,6 @@ export default function GamePlayPage() {
     setRestartKey((prev) => prev + 1);
   }, [storyId]);
 
-  // После загрузки истории: восстановить прохождение (игрок) или поставить стартовый узел (гость/автор)
   useEffect(() => {
     if (!fullStory || !startNode || !validStoryId) return;
 
@@ -65,6 +61,7 @@ export default function GamePlayPage() {
       try {
         const existing = await playthroughApi.getCurrentPlaythrough(numStoryId);
         if (cancelled) return;
+
         if (existing && !existing.isCompleted) {
           setPlaythroughId(existing.id);
           setCurrentNodeId(existing.currentNode.id);
@@ -125,7 +122,12 @@ export default function GamePlayPage() {
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
           <p className="game-play-error">История не найдена</p>
-          <button className="game-play-btn" onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}>К списку</button>
+          <button
+            className="game-play-btn"
+            onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          >
+            К списку
+          </button>
         </div>
       </div>
     );
@@ -146,7 +148,12 @@ export default function GamePlayPage() {
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
           <p className="game-play-error">{error || "История не найдена"}</p>
-          <button className="game-play-btn" onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}>К списку</button>
+          <button
+            className="game-play-btn"
+            onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          >
+            К списку
+          </button>
         </div>
       </div>
     );
@@ -157,7 +164,12 @@ export default function GamePlayPage() {
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
           <p className="game-play-error">Нет стартового узла</p>
-          <button className="game-play-btn" onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}>К списку</button>
+          <button
+            className="game-play-btn"
+            onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          >
+            К списку
+          </button>
         </div>
       </div>
     );
@@ -179,29 +191,24 @@ export default function GamePlayPage() {
       : null;
 
   return (
-    <div className="game-play-page game-play-viewport">
+    <div className="game-play-page game-play-viewport" key={restartKey}>
       {backgroundUrl && (
         <div
           className="game-play-background"
           style={{ backgroundImage: `url(${backgroundUrl})` }}
-          aria-hidden
         />
       )}
+      <button
+        className="game-play-exit"
+        onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+        type="button"
+      >
+        Выйти
+      </button>
       <div className="game-play-overlay">
-        <button
-          className="game-play-exit"
-          onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
-          type="button"
-        >
-          Выйти
-        </button>
-
         <div className="game-play-layout">
           <div className="game-play-sidebar">
-            <GamePlayStats
-              currentNode={currentNode}
-              restartKey={restartKey}
-            />
+            <GamePlayStats currentNode={currentNode} restartKey={restartKey} />
           </div>
 
           <div className="game-play-main">

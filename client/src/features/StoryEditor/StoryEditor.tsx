@@ -74,6 +74,7 @@ function StoryEditorInner() {
     [edgesState],
   );
 
+
   const handleNodeClick: NodeMouseHandler = (_, node) => {
     const data = node.data as unknown as FlowNode;
     selectNode(data.id);
@@ -167,8 +168,8 @@ function StoryEditorInner() {
           style={{
             flex: 1,
             // minWidth: 0,
-            width: '500px',
-            height: "500px",
+            width: "70vw",
+            height: "80vh",
           }}
         >
           <ReactFlow

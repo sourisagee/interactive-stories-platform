@@ -1,64 +1,574 @@
-.profile {
+/* Страница профиля */
+.profile-page {
+  min-height: 100vh;
+  padding: 4.5rem 1.25rem 2rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-page > .cosmic-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.profile-page > .profile {
+  position: relative;
+  z-index: 1;
+  flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
 }
 
-.profile h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.profile-content {
+/* Шапка профиля */
+.profile-header {
   display: flex;
-  gap: 2rem;
-  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border, rgba(139, 107, 184, 0.3));
 }
 
-.profile-info,
-.profile-statistics {
+.profile-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800 !important;
+  font-family: 'ChristmasReign', serif;
+  letter-spacing: 0.15em;
+  color: var(--color-text, #e8e4f0);
+  text-shadow: 0 0 20px var(--glow, rgba(139, 107, 184, 0.2));
+}
+
+.profile-create-btn {
+  flex-shrink: 0;
+}
+
+/* Контент: две колонки */
+.profile-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .profile-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-left,
+.profile-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Карточка информации о пользователе */
+.profile-info {
+  padding: 1.5rem 1.75rem;
+  background:
+    radial-gradient(circle at top, rgba(139, 107, 184, 0.15) 0%, transparent 50%),
+    linear-gradient(145deg, rgba(45, 31, 78, 0.5) 0%, rgba(61, 24, 40, 0.5) 100%),
+    rgba(13, 15, 26, 0.7);
+  border: 1px solid rgba(139, 107, 184, 0.25);
+  border-radius: var(--radius-sm, 8px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(139, 107, 184, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Заголовки секций: тот же шрифт, что и «Информация о пользователе» */
+.profile-info h3,
+.games-section h3,
+.stories-section h3,
+.profile-statistics h3 {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 800 !important;
+  font-family: 'ChristmasReign', serif;
+  letter-spacing: 0.12em;
+  color: var(--color-text, #e8e4f0);
+  text-shadow: 0 0 12px var(--glow, rgba(139, 107, 184, 0.2));
+}
+
+/* В блоке статистики числа и подписи — обычный шрифт, не заголовочный */
+.profile-statistics .stat-number,
+.profile-statistics .stat-label {
+  font-family: 'Firlest', serif !important;
+}
+
+.profile-info p {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.85));
+}
+
+.profile-info p:last-child {
+  margin-bottom: 0;
+}
+
+.profile-info strong {
+  color: var(--color-text, #e8e4f0);
+  margin-right: 0.35rem;
+}
+
+/* Секции игр и историй */
+.games-section,
+.stories-section {
+  padding: 1.25rem 1.5rem;
+  background:
+    radial-gradient(circle at top, rgba(139, 107, 184, 0.12) 0%, transparent 55%),
+    linear-gradient(145deg, rgba(45, 31, 78, 0.4) 0%, rgba(61, 24, 40, 0.4) 100%),
+    rgba(13, 15, 26, 0.6);
+  border: 1px solid rgba(139, 107, 184, 0.2);
+  border-radius: var(--radius-sm, 8px);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.25),
+    0 0 16px rgba(139, 107, 184, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.games-list,
+.stories-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+  justify-items: stretch;
+}
+
+@media (max-width: 768px) {
+  .profile-page .games-list,
+  .profile-page .stories-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Карточки игр в профиле — как на странице «Все истории» */
+.profile-game-card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(139, 107, 184, 0.2) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(45, 31, 78, 0.45) 0%, rgba(61, 24, 40, 0.45) 100%),
+    rgba(13, 15, 26, 0.7);
+  border: 1px solid rgba(200, 180, 255, 0.15);
+  border-radius: var(--radius-sm, 4px);
+  overflow: hidden;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 107, 184, 0.1),
+    inset 0 0 40px rgba(139, 107, 184, 0.05),
+    inset 0 2px 4px rgba(255, 255, 255, 0.08);
+}
+
+.profile-game-card:hover {
+  border-color: var(--color-border-hover, rgba(139, 107, 184, 0.5));
+  box-shadow:
+    0 16px 40px var(--glow, rgba(139, 107, 184, 0.3)),
+    0 0 20px rgba(139, 107, 184, 0.2);
+  transform: translateY(-6px) scale(1.02);
+}
+
+.profile-game-cover {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
+}
+
+.profile-game-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.profile-game-card:hover .profile-game-cover img {
+  transform: scale(1.06);
+}
+
+.profile-game-content {
+  padding: 0.75rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  position: relative;
+  z-index: 2;
+}
+
+.profile-game-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800 !important;
+  font-family: 'ChristmasReign', serif;
+  color: #ffffff;
+  line-height: 1.8;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.12em;
+}
+
+.profile-game-author,
+.profile-game-genre,
+.profile-game-updated {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.profile-game-actions {
+  padding: 0.75rem 1.15rem 0.85rem;
+  border-top: 1px solid var(--color-border, rgba(139, 107, 184, 0.2));
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.profile-game-actions .btn {
+  width: 100%;
+}
+
+.profile-page .story-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800 !important;
+  font-family: 'ChristmasReign', serif;
+  letter-spacing: 0.1em;
+  color: var(--color-text, #e8e4f0);
+  line-height: 1.4;
+}
+
+.profile-page .story-genre,
+.profile-page .story-updated {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.8));
+  line-height: 1.4;
+}
+
+.profile-page .story-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.85));
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Карточки историй (профиль) */
+.profile-page .story-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(139, 107, 184, 0.2);
+  border-radius: var(--radius-sm, 6px);
+  transition: all 0.25s ease;
+}
+
+.profile-page .story-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(139, 107, 184, 0.35);
+  box-shadow: 0 4px 16px rgba(139, 107, 184, 0.15);
+}
+
+.profile-page .story-cover {
+  width: 100px;
+  min-width: 100px;
+  height: 130px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
+}
+
+.profile-page .story-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-page .story-info {
   flex: 1;
-  max-width: 500px;
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.profile-page .story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.profile-page .story-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-family: 'ChristmasReign', serif;
+  border-radius: var(--radius-sm, 4px);
+  text-decoration: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.profile-page .story-action-btn.btn-edit,
+.profile-page .story-action-btn.btn-details {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text, #e8e4f0);
+  border-color: rgba(139, 107, 184, 0.4);
+}
+
+.profile-page .story-action-btn.btn-edit:hover,
+.profile-page .story-action-btn.btn-details:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(139, 107, 184, 0.6);
+  box-shadow: 0 4px 12px rgba(139, 107, 184, 0.2);
+}
+
+.profile-page .story-action-btn.btn-publish {
+  background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
+  color: #e8e4f0;
+  border-color: rgba(139, 107, 184, 0.5);
+}
+
+.profile-page .story-action-btn.btn-publish:hover {
+  background: linear-gradient(135deg, var(--color-purple-light, #6b4a8a) 0%, var(--color-burgundy-light, #8b3a52) 100%);
+  border-color: rgba(139, 107, 184, 0.8);
+  box-shadow: 0 4px 16px rgba(139, 107, 184, 0.3);
+}
+
+.profile-page .story-action-btn.btn-delete {
+  background: rgba(180, 60, 60, 0.25);
+  color: #e8a0a0;
+  border-color: rgba(180, 80, 80, 0.5);
+}
+
+.profile-page .story-action-btn.btn-delete:hover {
+  background: rgba(180, 60, 60, 0.4);
+  border-color: rgba(200, 80, 80, 0.7);
+  box-shadow: 0 4px 12px rgba(180, 60, 60, 0.2);
+}
+
+/* Статистика */
+.profile-statistics {
+  padding: 1.5rem 1.75rem;
+  background:
+    radial-gradient(circle at top, rgba(139, 107, 184, 0.2) 0%, transparent 55%),
+    linear-gradient(145deg, rgba(45, 31, 78, 0.5) 0%, rgba(61, 24, 40, 0.5) 100%),
+    rgba(13, 15, 26, 0.75);
+  border: 1px solid rgba(139, 107, 184, 0.35);
+  border-radius: var(--radius-sm, 8px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 22px rgba(139, 107, 184, 0.2),
+    inset 0 0 20px rgba(20, 18, 44, 0.5);
+}
+
+.profile-statistics .loading,
+.profile-statistics .error {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.8));
+}
+
+.profile-statistics .error {
+  color: #e8a0a0;
 }
 
 .stats-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 1rem;
+  margin-top: 0.75rem;
 }
 
 .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(139, 107, 184, 0.2);
+  border-radius: var(--radius-sm, 6px);
   text-align: center;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 6px;
 }
 
 .stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Firlest', serif;
+  color: var(--color-text, #e8e4f0);
+  text-shadow: 0 0 12px var(--glow, rgba(139, 107, 184, 0.3));
   display: block;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #007bff;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .stat-label {
-  display: block;
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: 'Firlest', serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.8));
+  line-height: 1.3;
 }
 
-.loading {
+/* «В игре с» — сначала подпись, затем дата */
+.profile-statistics .stat-item-date {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.profile-statistics .stat-item-date .stat-label {
+  order: 1;
+  margin-bottom: 0;
+}
+
+.profile-statistics .stat-item-date .stat-number {
+  order: 2;
+  font-size: 1.1rem;
+}
+
+/* Пустые состояния */
+.no-games-message,
+.no-stories-message {
+  padding: 1.5rem 1rem;
   text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(139, 107, 184, 0.25);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.no-games-message p,
+.no-stories-message p {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.8));
+  line-height: 1.5;
+}
+
+.no-games-message p:last-child,
+.no-stories-message p:last-child {
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Состояния загрузки и ошибки (полная страница) */
+.profile-loading,
+.profile-error {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
   padding: 2rem;
 }
 
-.error {
-  color: #dc3545;
-  background: #f8d7da;
-  padding: 1rem;
-  border-radius: 4px;
+.profile-page .profile-loading .loading,
+.profile-page .profile-error .error {
+  margin: 0;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--color-text, #e8e4f0);
+}
+
+.profile-page .profile-error .error {
+  color: #e8a0a0;
+}
+
+/* Футер (как на остальных страницах) */
+.profile-page .main-footer {
+  border-top: 1px solid var(--color-border, rgba(139, 107, 184, 0.3));
+  padding-top: 2rem;
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-page .main-footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.profile-page .footer-content {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-page .footer-section h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  line-height: 1.6;
+  color: var(--color-text, #e8e4f0);
+}
+
+.profile-page .footer-section p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.8));
+}
+
+.profile-page .footer-bottom {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.7));
+}
+
+.profile-page .footer-bottom p {
+  margin: 0;
 }
