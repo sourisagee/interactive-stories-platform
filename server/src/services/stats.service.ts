@@ -62,14 +62,10 @@ export class StatsService {
 
   // Получить статистику пользователя в зависимости от роли
   static async getUserStats(userId: number) {
-    console.log("Getting stats for user:", userId);
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, username: true, email: true, role: true },
     });
-
-    console.log("Found user:", user);
 
     if (!user) {
       throw new Error("Пользователь не найден");
@@ -77,20 +73,54 @@ export class StatsService {
 
     if (user.role === UserRole.USER) {
       const playerStats = await this.getPlayerStats(userId);
-      console.log("Player stats:", playerStats);
       return {
         user,
         playerStats,
       };
     } else if (user.role === UserRole.AUTHOR) {
       const authorStats = await this.getAuthorStats(userId);
-      console.log("Author stats:", authorStats);
+      const authorStories = await this.getAuthorStories(userId);
       return {
         user,
         authorStats,
+        authorStories,
       };
     }
 
     return { user };
+  }
+
+  // Получить истории автора (черновики и опубликованные)
+  static async getAuthorStories(userId: number): Promise<{
+    drafts: any[];
+    published: any[];
+  }> {
+    const stories = await prisma.story.findMany({
+      where: { authorId: userId },
+      select: {
+        id: true,
+        title: true,
+        cover: true,
+        genre: true,
+        description: true,
+        isPublished: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    const drafts: any[] = [];
+    const published: any[] = [];
+
+    stories.forEach((story) => {
+      if (story.isPublished) {
+        published.push(story);
+      } else {
+        drafts.push(story);
+      }
+    });
+
+    return { drafts, published };
   }
 }
