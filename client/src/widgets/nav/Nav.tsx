@@ -31,7 +31,7 @@ export default function Nav() {
         )}
 
         {isLoggedIn && isAuthor && (
-          <NavLink to={editStoryPath(0)} className="nav-link">
+          <NavLink to={CLIENT_ROUTES.NEW_STORY_EDITOR} className="nav-link">
             Панель редактора 
           </NavLink>
         )}
