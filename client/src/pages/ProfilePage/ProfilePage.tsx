@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../../shared/hooks/reduxHooks";
+import { useAppSelector, useAppDispatch } from "../../shared/hooks/reduxHooks";
 import { UserRole } from "@/entities/user/model";
-import { gamePlayPath } from "../../shared/enam/clientRouter";
+import { gamePlayPath, storyDetailPath } from "../../shared/enam/clientRouter";
 import {
   profileApi,
   type UserProfileResponse,
@@ -10,12 +10,31 @@ import {
   type AuthorStory,
 } from "../../entities/user/api/ProfileApi";
 import "./ProfilePage.css";
+import { editStoryPath } from "@/shared/enam/clientRouter";
+import { useNavigate } from "react-router";
+import CreateStoryModal from "../../shared/components/CreateStoryModal/CreateStoryModal";
+import axiosInstance from "@/shared/lib/axiosInstance";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const [profile, setProfile] = useState<UserProfileResponse | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleCreateNewStory = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleStoryCreated = (newStory: { id: number }) => {
+    // Перенаправляем в редактор новой истории
+    navigate(editStoryPath(newStory.id));
+    // Обновляем профиль, чтобы новая история появилась в списке черновиков
+    loadProfile();
+  };
 
   useEffect(() => {
     if (user) {
@@ -30,6 +49,7 @@ export default function ProfilePage() {
       const profileData = await profileApi.getMyProfile();
       setProfile(profileData);
     } catch (error) {
+      console.error("Ошибка загрузки профиля:", error);
       setProfileError(`Ошибка загрузки профиля: ${error}`);
     } finally {
       setProfileLoading(false);
@@ -75,7 +95,7 @@ export default function ProfilePage() {
         <p className="story-updated">
           Обновлено: {new Date(story.updatedAt).toLocaleDateString("ru-RU")}
         </p>
-        {isDraft && (
+        {isDraft ? (
           <div className="story-actions">
             <Link
               to={`/story/edit/${story.id}`}
@@ -96,20 +116,62 @@ export default function ProfilePage() {
               Удалить
             </button>
           </div>
+        ) : (
+          <div className="story-actions">
+            <Link
+              to={storyDetailPath(story.id)}
+              className="story-action-btn btn-details"
+            >
+              Подробнее
+            </Link>
+          </div>
         )}
       </div>
     </div>
   );
 
-  const handlePublishStory = (storyId: number) => {
-    console.log("Опубликовать историю:", storyId);
-    // TODO: Реализовать публикацию истории
+  const handlePublishStory = async (storyId: number) => {
+    try {
+      // Импортируем updateStoryThunk динамически
+      const { updateStoryThunk } = await import(
+        "../../entities/story/api/StoryApi"
+      );
+
+      await dispatch(
+        updateStoryThunk({
+          storyId,
+          updates: { isPublished: true },
+        })
+      ).unwrap();
+
+      // Обновляем профиль, чтобы история переместилась из черновиков в опубликованные
+      await loadProfile();
+    } catch (error) {
+      console.error("Ошибка при публикации истории:", error);
+      alert("Не удалось опубликовать историю. Попробуйте еще раз.");
+    }
   };
 
-  const handleDeleteStory = (storyId: number) => {
-    if (confirm("Вы уверены, что хотите удалить эту историю?")) {
-      console.log("Удалить историю:", storyId);
-      // TODO: Реализовать удаление истории
+  const handleDeleteStory = async (storyId: number) => {
+    if (
+      !confirm(
+        "Вы уверены, что хотите удалить эту историю? Это действие нельзя отменить."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Нужно создать deleteStoryThunk, так как его нет в API
+      const response = await axiosInstance.delete(`/stories/${storyId}`);
+
+      if (response.status === 200) {
+        // Обновляем профиль, чтобы удаленная история исчезла из списка
+        loadProfile();
+      }
+    } catch (error) {
+      console.error("Ошибка при удалении истории:", error);
+      alert("Не удалось удалить историю. Попробуйте еще раз.");
     }
   };
 
@@ -124,6 +186,9 @@ export default function ProfilePage() {
   return (
     <div className="profile">
       <h2>Профиль</h2>
+      {user.role === UserRole.AUTHOR && (
+        <button onClick={handleCreateNewStory}>Создать историю</button>
+      )}
 
       <div className="profile-content">
         <div className="profile-left">
@@ -299,6 +364,16 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Модальное окно для создания истории */}
+      {user?.role === UserRole.AUTHOR && (
+        <CreateStoryModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onStoryCreated={handleStoryCreated}
+          authorName={user.username}
+        />
+      )}
     </div>
   );
 }

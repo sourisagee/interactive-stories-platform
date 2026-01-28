@@ -27,17 +27,19 @@ export default function StoryNode({ data, selected }: NodeProps) {
       }}
     >
       {/* Handle для входящих соединений (слева) - только если не стартовый узел */}
-      {!isStart && (
-        <Handle
-          type="target"
-          position={Position.Left}
-          style={{
-            background: "#555",
-            width: "10px",
-            height: "10px",
-          }}
-        />
-      )}
+
+      <Handle
+        type="target"
+        position={Position.Left}
+        isConnectable={!isStart}
+        style={{
+          background: "#555",
+          width: "10px",
+          height: "10px",
+          opacity: isStart ? 0 : 1, // optional: hide but keep DOM node
+          pointerEvents: isStart ? "none" : "auto",
+        }}
+      />
 
       {/* Заголовок узла */}
       <div
@@ -69,8 +71,8 @@ export default function StoryNode({ data, selected }: NodeProps) {
             backgroundColor: isStart
               ? "#1976d2"
               : isEnd
-              ? "#f57c00"
-              : "#757575",
+                ? "#f57c00"
+                : "#757575",
             color: "#fff",
             textTransform: "uppercase",
           }}
@@ -100,17 +102,19 @@ export default function StoryNode({ data, selected }: NodeProps) {
       )}
 
       {/* Handle для исходящих соединений (справа) - только если не конечный узел */}
-      {!isEnd && (
+
         <Handle
           type="source"
           position={Position.Right}
+          isConnectable={!isEnd}
           style={{
             background: "#555",
             width: "10px",
             height: "10px",
+            opacity: isEnd ? 0 : 1,       // optional: hide but keep DOM node
+            pointerEvents: isEnd ? "none" : "auto",
           }}
         />
-      )}
     </div>
   );
 }

@@ -145,64 +145,80 @@ export const profileApi = {
       }
     }
 
-    // Если это автор, добавляем тестовые истории для проверки UI
+    // Если это автор, получаем его истории из backend
     if (profileData.user.role === "AUTHOR") {
-      // ВРЕМЕННО: добавляем тестовые данные для авторов
-      const drafts: AuthorStory[] = [
-        {
-          id: 1,
-          title: "Тестовый черновик 1",
-          cover: "/default-cover.jpg",
-          genre: "Фантастика",
-          description: "Описание тестового черновика для проверки UI",
-          isPublished: false,
-          createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 дня назад
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          title: "Тестовый черновик 2",
-          cover: "/default-cover.jpg",
-          genre: "Приключения",
-          description: "Еще один тестовый черновик",
-          isPublished: false,
-          createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 дня назад
-          updatedAt: new Date(Date.now() - 86400000).toISOString(), // вчера
-        },
-      ];
+      console.log("Загружаем истории автора...");
+      try {
+        // Используем существующий метод из StoryApi
+        const { default: StoryApi } = await import(
+          "../../../entities/story/api/StoryApi"
+        );
+        const stories = await StoryApi.getMyStories();
 
-      const published: AuthorStory[] = [
-        {
-          id: 3,
-          title: "Опубликованная история 1",
-          cover: "/default-cover.jpg",
-          genre: "Детектив",
-          description: "Тестовая опубликованная история",
-          isPublished: true,
-          createdAt: new Date(Date.now() - 604800000).toISOString(), // неделю назад
-          updatedAt: new Date(Date.now() - 432000000).toISOString(), // 5 дней назад
-        },
-        {
-          id: 4,
-          title: "Опубликованная история 2",
-          cover: "/default-cover.jpg",
-          genre: "Романтика",
-          description: "Еще одна опубликованная история",
-          isPublished: true,
-          createdAt: new Date(Date.now() - 1209600000).toISOString(), // 2 недели назад
-          updatedAt: new Date(Date.now() - 864000000).toISOString(), // 10 дней назад
-        },
-      ];
+        console.log("Обработанные истории:", stories);
+        console.log("Количество историй:", stories.length);
 
-      profileData.authorStories = { drafts, published };
+        const drafts: AuthorStory[] = [];
+        const published: AuthorStory[] = [];
 
-      // Также добавляем тестовую статистику для автора
-      if (!profileData.authorStats) {
-        profileData.authorStats = {
-          totalStories: drafts.length + published.length,
-          draftStories: drafts.length,
-          memberSince: new Date(Date.now() - 2592000000).toISOString(), // месяц назад
-        };
+        stories.forEach((story, index) => {
+          console.log(`Обрабатываем историю ${index + 1}:`, {
+            id: story.id,
+            title: story.title,
+            isPublished: story.isPublished,
+            typeof_isPublished: typeof story.isPublished,
+          });
+
+          const authorStory: AuthorStory = {
+            id: story.id,
+            title: story.title,
+            cover: story.cover || "/default-cover.jpg",
+            genre: story.genre,
+            description: story.description,
+            isPublished: story.isPublished,
+            createdAt: story.createdAt,
+            updatedAt: story.updatedAt,
+          };
+
+          console.log(
+            `История ${story.title} - опубликована: ${story.isPublished}`
+          );
+
+          if (story.isPublished) {
+            console.log(`Добавляем в опубликованные: ${story.title}`);
+            published.push(authorStory);
+          } else {
+            console.log(`Добавляем в черновики: ${story.title}`);
+            drafts.push(authorStory);
+          }
+        });
+
+        console.log("Черновики:", drafts);
+        console.log("Опубликованные:", published);
+        console.log("Количество черновиков:", drafts.length);
+        console.log("Количество опубликованных:", published.length);
+
+        profileData.authorStories = { drafts, published };
+
+        // Обновляем статистику на основе реальных данных
+        if (profileData.authorStats) {
+          profileData.authorStats.totalStories = stories.length;
+          profileData.authorStats.draftStories = drafts.length;
+        }
+      } catch (error) {
+        console.error("Error loading author stories:", error);
+        console.error("Детали ошибки:", error.response?.data || error.message);
+
+        // Временно не используем fallback, чтобы увидеть реальную ошибку
+        profileData.authorStories = { drafts: [], published: [] };
+
+        if (!profileData.authorStats) {
+          profileData.authorStats = {
+            totalStories: 0,
+            draftStories: 0,
+            memberSince: new Date(Date.now() - 2592000000).toISOString(),
+          };
+        }
       }
     }
 

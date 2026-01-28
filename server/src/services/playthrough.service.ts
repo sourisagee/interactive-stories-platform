@@ -11,7 +11,7 @@ import {
 export default class PlaythroughService {
   static async startPlaythrough(
     userId: number,
-    storyId: number,
+    storyId: number
   ): Promise<PlaythroughResponse> {
     const story = await prisma.story.findUnique({
       where: { id: storyId, isPublished: true },
@@ -72,7 +72,7 @@ export default class PlaythroughService {
 
   static async getCurrentPlaythrough(
     userId: number,
-    storyId: number,
+    storyId: number
   ): Promise<PlaythroughResponse | null> {
     const playthrough = await prisma.playthrough.findUnique({
       where: { userId_storyId: { userId, storyId } },
@@ -107,7 +107,7 @@ export default class PlaythroughService {
     playthroughId: number,
     choiceId: number,
     userId: number,
-    variables?: Variables,
+    variables?: Variables
   ): Promise<PlaythroughResponse> {
     const playthrough = await prisma.playthrough.findFirst({
       where: { id: playthroughId, userId, isCompleted: false },
@@ -170,7 +170,7 @@ export default class PlaythroughService {
 
   static async getAvailableChoices(
     playthroughId: number,
-    userId: number,
+    userId: number
   ): Promise<ChoiceResponse[]> {
     const playthrough = await prisma.playthrough.findFirst({
       where: { id: playthroughId, userId, isCompleted: false },
@@ -198,7 +198,7 @@ export default class PlaythroughService {
   }
 
   static async getUserPlaythroughs(
-    userId: number,
+    userId: number
   ): Promise<PlaythroughResponse[]> {
     const playthroughs = await prisma.playthrough.findMany({
       where: { userId },
@@ -230,7 +230,7 @@ export default class PlaythroughService {
 
   static async getPlaythroughProgress(
     playthroughId: number,
-    userId: number,
+    userId: number
   ): Promise<ProgressResponse> {
     const playthrough = await prisma.playthrough.findFirst({
       where: { id: playthroughId, userId },
@@ -286,7 +286,7 @@ export default class PlaythroughService {
 
   static async resetPlaythrough(
     playthroughId: number,
-    userId: number,
+    userId: number
   ): Promise<PlaythroughResponse> {
     const playthrough = await prisma.playthrough.findFirst({
       where: { id: playthroughId, userId },

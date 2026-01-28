@@ -18,15 +18,17 @@ export default function GamePlayPage() {
   const fullStory = currentStory as StoryFullData | null;
   const nodes = fullStory?.nodes ?? [];
 
-  const startNode = useMemo( // Поиск стартового узла
+  const startNode = useMemo(
+    // Поиск стартового узла
     () => nodes.find((n) => n.isStart) ?? null,
-    [nodes],
+    [nodes]
   );
 
   const numStoryId = storyId ? Number(storyId) : NaN;
   const validStoryId = !Number.isNaN(numStoryId) && numStoryId > 0;
 
-  useEffect(() => { // Загружает полную историю с узлами через Redux
+  useEffect(() => {
+    // Загружает полную историю с узлами через Redux
     if (validStoryId) dispatch(getStoryFullThunk(numStoryId));
   }, [validStoryId, numStoryId, dispatch]);
 
@@ -55,7 +57,12 @@ export default function GamePlayPage() {
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
           <p className="game-play-error">История не найдена</p>
-          <button className="game-play-btn" onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}>К списку</button>
+          <button
+            className="game-play-btn"
+            onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          >
+            К списку
+          </button>
         </div>
       </div>
     );
@@ -76,7 +83,12 @@ export default function GamePlayPage() {
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
           <p className="game-play-error">{error || "История не найдена"}</p>
-          <button className="game-play-btn" onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}>К списку</button>
+          <button
+            className="game-play-btn"
+            onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          >
+            К списку
+          </button>
         </div>
       </div>
     );
@@ -87,7 +99,12 @@ export default function GamePlayPage() {
       <div className="game-play-page game-play-fallback">
         <div className="game-play-message">
           <p className="game-play-error">Нет стартового узла</p>
-          <button className="game-play-btn" onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}>К списку</button>
+          <button
+            className="game-play-btn"
+            onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
+          >
+            К списку
+          </button>
         </div>
       </div>
     );
@@ -105,7 +122,10 @@ export default function GamePlayPage() {
 
   return (
     <div className="game-play-page game-play-viewport">
-      <SceneBackground title={currentNode.title} content={currentNode.content} />
+      <SceneBackground
+        title={currentNode.title}
+        content={currentNode.content}
+      />
       <button
         className="game-play-exit"
         onClick={() => navigate(CLIENT_ROUTES.ALLSTORIES)}
@@ -119,7 +139,9 @@ export default function GamePlayPage() {
         {currentNode.isEnd ? (
           <div className="game-play-end">
             <p className="game-play-end-text">История завершена.</p>
-            <button className="game-play-btn" onClick={handleRestart}>Начать заново</button>
+            <button className="game-play-btn" onClick={handleRestart}>
+              Начать заново
+            </button>
           </div>
         ) : (
           <div className="game-play-choices">

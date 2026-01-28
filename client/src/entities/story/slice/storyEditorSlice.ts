@@ -208,11 +208,21 @@ const storyEditorSlice = createSlice({
         state.isLoading = false;
         state.currentStory = action.payload;
 
+        const allChoices = action.payload.nodes.reduce(
+          (acc, currentNode) =>
+            acc.concat(currentNode.fromChoices, currentNode.toChoices),
+          []
+        );
+        const uniqueChoices = allChoices.filter(
+          (choice, index, self) =>
+            index === self.findIndex((t) => t.id === choice.id)
+        );
+
         // Конвертируем узлы из БД в FlowNode
         state.nodes = action.payload.nodes.map(convertToFlowNode);
 
         // Конвертируем выборы из БД в FlowEdge
-        state.edges = action.payload.choices.map(convertToFlowEdge);
+        state.edges = uniqueChoices.map(convertToFlowEdge);
 
         // Сбрасываем выбранные элементы
         state.selectedNodeId = null;
