@@ -14,6 +14,7 @@ import { editStoryPath } from "@/shared/enam/clientRouter";
 import { useNavigate } from "react-router";
 import CreateStoryModal from "../../shared/components/CreateStoryModal/CreateStoryModal";
 import axiosInstance from "@/shared/lib/axiosInstance";
+import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAppSelector((state) => state.user);
@@ -60,23 +61,20 @@ export default function ProfilePage() {
     game: GameInfo,
     actionType: "continue" | "replay"
   ) => (
-    <div key={game.id} className="game-card">
-      <div className="game-cover">
-        <img src={game.cover} alt={game.title} />
+    <div key={game.id} className="profile-game-card">
+      <div className="profile-game-cover">
+        <img src={`${getServerBaseUrl()}/${game.cover}`} alt={game.title} />
       </div>
-      <div className="game-info">
-        <h4 className="game-title">{game.title}</h4>
-        <p className="game-author">Автор: {game.authorName}</p>
-        <p className="game-genre">{game.genre}</p>
-        <p className="game-updated">
+      <div className="profile-game-content">
+        <h3 className="profile-game-title">{game.title}</h3>
+        <p className="profile-game-author">Автор: {game.authorName}</p>
+        <p className="profile-game-genre">{game.genre}</p>
+        <p className="profile-game-updated">
           Обновлено: {new Date(game.updatedAt).toLocaleDateString("ru-RU")}
         </p>
-        <Link
-          to={gamePlayPath(game.id)}
-          className={`game-action-btn ${
-            actionType === "continue" ? "btn-continue" : "btn-replay"
-          }`}
-        >
+      </div>
+      <div className="profile-game-actions">
+        <Link to={gamePlayPath(game.id)} className="btn btn-primary">
           {actionType === "continue" ? "Продолжить игру" : "Пройти еще раз"}
         </Link>
       </div>
@@ -86,7 +84,7 @@ export default function ProfilePage() {
   const renderAuthorStoryCard = (story: AuthorStory, isDraft: boolean) => (
     <div key={story.id} className="story-card">
       <div className="story-cover">
-        <img src={story.cover} alt={story.title} />
+        <img src={`${getServerBaseUrl()}/${story.cover}`} alt={story.title} />
       </div>
       <div className="story-info">
         <h4 className="story-title">{story.title}</h4>
@@ -176,41 +174,103 @@ export default function ProfilePage() {
   };
 
   if (isLoading) {
-    return <div className="loading">Загрузка...</div>;
+    return (
+      <div className="profile-page">
+        <div className="cosmic-bg" aria-hidden />
+        <div className="profile profile-loading">
+          <p className="loading">Загрузка...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
-    return <div className="error">Пользователь не найден</div>;
+    return (
+      <div className="profile-page">
+        <div className="cosmic-bg" aria-hidden />
+        <div className="profile profile-error">
+          <p className="error">Пользователь не найден</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="profile">
-      <h2>Профиль</h2>
-      {user.role === UserRole.AUTHOR && (
-        <button onClick={handleCreateNewStory}>Создать историю</button>
-      )}
+    <div className="profile-page">
+      <div className="cosmic-bg" aria-hidden />
+      <div className="profile">
+        {user.role === UserRole.AUTHOR && (
+          <header className="profile-header">
+            <h1 className="profile-title">Профиль</h1>
+            <button
+              type="button"
+              className="btn btn-primary profile-create-btn"
+              onClick={handleCreateNewStory}
+            >
+              Создать историю
+            </button>
+          </header>
+        )}
 
-      <div className="profile-content">
-        <div className="profile-left">
-          <div className="profile-info">
-            <h3>Информация о пользователе</h3>
-            <p>
-              <strong>ID:</strong> {user.id}
-            </p>
-            <p>
-              <strong>Имя:</strong> {user.username}
-            </p>
-            <p>
-              <strong>Email:</strong> {user.email}
-            </p>
-            <p>
-              <strong>Роль:</strong>{" "}
-              {user.role === UserRole.AUTHOR ? "Автор" : "Игрок"}
-            </p>
-          </div>
+        {user.role === UserRole.USER ? (
+          <div className="profile-content profile-content-player">
+            {/* Ряд 1: Информация о пользователе / Статистика */}
+            <div className="profile-info">
+              <h3>Информация о пользователе</h3>
+              <p>
+                <strong>ID:</strong> {user.id}
+              </p>
+              <p>
+                <strong>Имя:</strong> {user.username}
+              </p>
+              <p>
+                <strong>Email:</strong> {user.email}
+              </p>
+              <p>
+                <strong>Роль:</strong> Игрок
+              </p>
+            </div>
 
-          {/* Незавершенные игры для игроков */}
-          {user.role === UserRole.USER && (
+            <div className="profile-statistics">
+              <h3>Статистика</h3>
+
+              {profileLoading && (
+                <div className="loading">Загрузка статистики...</div>
+              )}
+
+              {profileError && <div className="error">{profileError}</div>}
+
+              {profile && !profileLoading && profile.playerStats ? (
+                <div className="player-stats">
+                  <div className="stats-grid">
+                    <div className="stat-item">
+                      <span className="stat-number">
+                        {profile.playerStats.completedStories}
+                      </span>
+                      <span className="stat-label">Пройдено историй</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number">
+                        {profile.playerStats.inProgressStories}
+                      </span>
+                      <span className="stat-label">Незавершенные истории</span>
+                    </div>
+                    <div className="stat-item stat-item-date">
+                      <span className="stat-label">В игре с</span>
+                      <span className="stat-number">
+                        {new Date(
+                          profile.playerStats.memberSince
+                        ).toLocaleDateString("ru-RU")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                !profileLoading && <div>Нет данных для отображения</div>
+              )}
+            </div>
+
+            {/* Ряд 2: Незавершенные игры / Завершенные игры */}
             <div className="games-section">
               <h3>Незавершенные игры</h3>
               <div className="games-list">
@@ -227,42 +287,75 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
-          )}
 
-          {/* Черновики для авторов */}
-          {user.role === UserRole.AUTHOR && (
-            <div className="stories-section">
-              <h3>Черновики</h3>
-              <div className="stories-list">
-                {profile?.authorStories?.drafts &&
-                profile.authorStories.drafts.length > 0 ? (
-                  profile.authorStories.drafts.map((story) =>
-                    renderAuthorStoryCard(story, true)
+            <div className="games-section">
+              <h3>Завершенные игры</h3>
+              <div className="games-list">
+                {profile?.games?.completed &&
+                profile.games.completed.length > 0 ? (
+                  profile.games.completed.map((game) =>
+                    renderGameCard(game, "replay")
                   )
                 ) : (
-                  <div className="no-stories-message">
-                    <p>Пока нет черновиков</p>
-                    <p>Создайте новую историю, чтобы она появилась здесь!</p>
+                  <div className="no-games-message">
+                    <p>Пока нет завершенных игр</p>
+                    <p>
+                      Завершите прохождение историй, чтобы они появились здесь!
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="profile-content">
+            <div className="profile-left">
+              <div className="profile-info">
+                <h3>Информация о пользователе</h3>
+                <p>
+                  <strong>ID:</strong> {user.id}
+                </p>
+                <p>
+                  <strong>Имя:</strong> {user.username}
+                </p>
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
+                <p>
+                  <strong>Роль:</strong> Автор
+                </p>
+              </div>
 
-        <div className="profile-right">
-          <div className="profile-statistics">
-            <h3>Статистика</h3>
+              {/* Черновики для авторов */}
+              <div className="stories-section">
+                <h3>Черновики</h3>
+                <div className="stories-list">
+                  {profile?.authorStories?.drafts &&
+                  profile.authorStories.drafts.length > 0 ? (
+                    profile.authorStories.drafts.map((story) =>
+                      renderAuthorStoryCard(story, true)
+                    )
+                  ) : (
+                    <div className="no-stories-message">
+                      <p>Пока нет черновиков</p>
+                      <p>Создайте новую историю, чтобы она появилась здесь!</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
-            {profileLoading && (
-              <div className="loading">Загрузка статистики...</div>
-            )}
+            <div className="profile-right">
+              <div className="profile-statistics">
+                <h3>Статистика</h3>
 
-            {profileError && <div className="error">{profileError}</div>}
+                {profileLoading && (
+                  <div className="loading">Загрузка статистики...</div>
+                )}
 
-            {profile && !profileLoading && (
-              <>
-                {profile.user.role === "AUTHOR" && profile.authorStats ? (
+                {profileError && <div className="error">{profileError}</div>}
+
+                {profile && !profileLoading && profile.authorStats ? (
                   <div className="author-stats">
                     <div className="stats-grid">
                       <div className="stat-item">
@@ -287,82 +380,31 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
-                ) : profile.user.role === "USER" && profile.playerStats ? (
-                  <div className="player-stats">
-                    <div className="stats-grid">
-                      <div className="stat-item">
-                        <span className="stat-number">
-                          {profile.playerStats.completedStories}
-                        </span>
-                        <span className="stat-label">Пройдено историй</span>
-                      </div>
-                      <div className="stat-item">
-                        <span className="stat-number">
-                          {profile.playerStats.inProgressStories}
-                        </span>
-                        <span className="stat-label">
-                          Незавершенные истории
-                        </span>
-                      </div>
-                      <div className="stat-item">
-                        <span className="stat-number">
-                          {new Date(
-                            profile.playerStats.memberSince
-                          ).toLocaleDateString("ru-RU")}
-                        </span>
-                        <span className="stat-label">В игре с</span>
-                      </div>
+                ) : (
+                  !profileLoading && <div>Нет данных для отображения</div>
+                )}
+              </div>
+
+              {/* Опубликованные истории для авторов */}
+              <div className="stories-section">
+                <h3>Опубликованные истории</h3>
+                <div className="stories-list">
+                  {profile?.authorStories?.published &&
+                  profile.authorStories.published.length > 0 ? (
+                    profile.authorStories.published.map((story) =>
+                      renderAuthorStoryCard(story, false)
+                    )
+                  ) : (
+                    <div className="no-stories-message">
+                      <p>Пока нет опубликованных историй</p>
+                      <p>Опубликуйте черновики, чтобы они появились здесь!</p>
                     </div>
-                  </div>
-                ) : (
-                  <div>Нет данных для отображения</div>
-                )}
-              </>
-            )}
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-
-          {/* Завершенные игры для игроков */}
-          {user.role === UserRole.USER && (
-            <div className="games-section">
-              <h3>Завершенные игры</h3>
-              <div className="games-list">
-                {profile?.games?.completed &&
-                profile.games.completed.length > 0 ? (
-                  profile.games.completed.map((game) =>
-                    renderGameCard(game, "replay")
-                  )
-                ) : (
-                  <div className="no-games-message">
-                    <p>Пока нет завершенных игр</p>
-                    <p>
-                      Завершите прохождение историй, чтобы они появились здесь!
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Опубликованные истории для авторов */}
-          {user.role === UserRole.AUTHOR && (
-            <div className="stories-section">
-              <h3>Опубликованные истории</h3>
-              <div className="stories-list">
-                {profile?.authorStories?.published &&
-                profile.authorStories.published.length > 0 ? (
-                  profile.authorStories.published.map((story) =>
-                    renderAuthorStoryCard(story, false)
-                  )
-                ) : (
-                  <div className="no-stories-message">
-                    <p>Пока нет опубликованных историй</p>
-                    <p>Опубликуйте черновики, чтобы они появились здесь!</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Модальное окно для создания истории */}
@@ -374,6 +416,26 @@ export default function ProfilePage() {
           authorName={user.username}
         />
       )}
+
+      <footer className="main-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>Интерактивные новеллы</h4>
+              <p>
+                Платформа для создания и чтения интерактивных историй нового
+                поколения.
+              </p>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>
+              &copy; 2026 Интерактивные новеллы. Создано с ❤️ для любителей
+              хороших историй.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

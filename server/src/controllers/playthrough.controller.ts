@@ -42,7 +42,7 @@ export default class PlaythroughController {
   ): Promise<void> {
     try {
       const userId = res.locals.user?.id;
-      const { storyId } = req.body;
+      const { storyId } = req.params;
 
       if (!userId) {
         res

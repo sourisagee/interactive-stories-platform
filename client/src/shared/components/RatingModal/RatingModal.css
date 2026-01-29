@@ -58,8 +58,10 @@
 
 .rating-modal-title {
   font-size: 1.4rem;
-  font-weight: 400;
-  font-family: 'MedievalSharp', 'Uncial Antiqua', cursive;
+  font-weight: 800 !important;
+  font-family: 'ChristmasReign', serif;
+  letter-spacing: 0.15em;
+  line-height: 1.6;
   color: var(--color-text, #e8e4f0);
   margin: 0;
   text-shadow: 0 0 20px var(--glow, rgba(139, 107, 184, 0.2));
@@ -98,6 +100,9 @@
 
 .rating-modal-story-title {
   font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
   color: var(--color-text-muted, rgba(232, 228, 240, 0.85));
   margin: 0;
   text-align: center;
@@ -153,7 +158,9 @@
   font-size: 0.9rem;
   color: var(--color-accent, #8b6bb8);
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.8;
   text-align: center;
 }
 
@@ -164,8 +171,7 @@
 }
 
 .rating-modal-actions .btn {
-  padding: 0.65rem 1.25rem;
-  font-size: 0.9rem;
+  width: 100%;
 }
 
 .rating-modal-actions .btn:disabled {
