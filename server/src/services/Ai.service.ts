@@ -3,9 +3,6 @@ import oAuth from "../utils/gigaChatAuth";
 import type { AiCompletionResponse } from "../types/ai";
 
 class AIService {
-  /** Сгенерировать ответ от AI по текстовому prompt.
-   *  Возвращает только текст ответа (message.content).
-   */
   static async generateResponse(prompt: string): Promise<string> {
     try {
       const { access_token } = await oAuth();

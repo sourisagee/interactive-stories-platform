@@ -25,15 +25,12 @@ export interface AuthorStory {
 }
 
 export class ProfileService {
-  // Получить статистику игрока
   static async getPlayerStats(userId: number): Promise<PlayerStats> {
-    // Получаем пользователя для даты регистрации
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { createdAt: true },
     });
 
-    // Получаем все прохождения пользователя
     const playthroughs = await prisma.playthrough.findMany({
       where: { userId },
     });
@@ -48,15 +45,12 @@ export class ProfileService {
     };
   }
 
-  // Получить статистику автора
   static async getAuthorStats(userId: number): Promise<AuthorStats> {
-    // Получаем пользователя для даты регистрации
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { createdAt: true },
     });
 
-    // Получаем все истории автора
     const stories = await prisma.story.findMany({
       where: { authorId: userId },
     });
@@ -71,7 +65,6 @@ export class ProfileService {
     };
   }
 
-  // Получить истории автора (черновики и опубликованные)
   static async getAuthorStories(userId: number): Promise<{
     drafts: AuthorStory[];
     published: AuthorStory[];
@@ -105,7 +98,6 @@ export class ProfileService {
     return { drafts, published };
   }
 
-  // Получить полную информацию профиля пользователя
   static async getUserProfile(userId: number) {
     const user = await prisma.user.findUnique({
       where: { id: userId },

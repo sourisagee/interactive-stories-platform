@@ -15,5 +15,5 @@ export interface RatingResponse {
 export interface StoryRatingInfo {
   averageRating: number;
   totalRatings: number;
-  userRating: number | null; // Оценка текущего пользователя, если есть
+  userRating: number | null; 
 }

@@ -1,6 +1,5 @@
 import { Story, Node, Choice, User } from "@prisma/client";
 
-// Базовые типы для создания и обновления Story
 export interface CreateStoryDto {
   title: string;
   genre: string;
@@ -19,7 +18,6 @@ export interface UpdateStoryDto {
   isPublished?: boolean;
 }
 
-// Расширенные типы с включенными связями
 export interface StoryWithAuthor extends Story {
   author: User;
 }

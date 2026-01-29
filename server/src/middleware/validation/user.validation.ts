@@ -4,8 +4,6 @@ import formatResponse from '../../utils/formatResponse';
 import type { SignInData, SignUpData, ValidationResult, UserRole } from '../../types';
 import type { TypedResponse } from '../../types';
 
-// --- Валидаторы ---
-
 function validateEmail(email: string): boolean {
   const emailPattern = /^[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,}$/;
   return emailPattern.test(email);
@@ -61,8 +59,6 @@ export function validateSignUpData(data: SignUpData): ValidationResult {
   return { isValid: true, error: null };
 }
 
-// --- Хук beforeCreate: хеш пароля, нормализация email и username ---
-
 export async function prepareUserForCreate(data: SignUpData): Promise<{
   username: string;
   email: string;
@@ -80,14 +76,10 @@ export async function prepareUserForCreate(data: SignUpData): Promise<{
   };
 }
 
-// --- Хук afterCreate: не отдавать пароль ---
-
 export function omitPassword<T extends { password?: string }>(user: T): Omit<T, 'password'> {
   const { password: _, ...rest } = user;
   return rest as Omit<T, 'password'>;
 }
-
-// --- Middleware ---
 
 export function validateSignIn(req: Request, res: TypedResponse, next: NextFunction): void {
   const result = validateSignInData(req.body as SignInData);

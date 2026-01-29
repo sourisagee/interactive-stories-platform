@@ -6,7 +6,6 @@ import type { TypedResponse } from "../types";
 
 const storyRouter = Router();
 
-
 storyRouter.get("/", (req, res) =>
   StoryController.getStories(req, res as TypedResponse),
 );

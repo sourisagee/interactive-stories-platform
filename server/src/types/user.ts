@@ -1,6 +1,4 @@
-import type { Response } from 'express';
-
-// --- User (Prisma) ---
+import type { Response } from "express";
 
 export interface UserAttributes {
   id: number;
@@ -12,9 +10,7 @@ export interface UserAttributes {
   updatedAt?: Date;
 }
 
-export type UserRole = 'USER' | 'AUTHOR';
-
-// --- Auth (SignIn / SignUp) ---
+export type UserRole = "USER" | "AUTHOR";
 
 export interface SignInData {
   email: string;
@@ -33,10 +29,8 @@ export interface ValidationResult {
   error: string | null;
 }
 
-// --- JWT ---
-
 export interface JwtPayload {
-  user: Omit<UserAttributes, 'password'>;
+  user: Omit<UserAttributes, "password">;
 }
 
 export interface JwtTokens {
@@ -52,23 +46,19 @@ export interface JwtConfig {
 export interface CookieConfig {
   httpOnly: boolean;
   maxAge: number;
-  sameSite?: 'strict' | 'lax' | 'none';
+  sameSite?: "strict" | "lax" | "none";
   secure?: boolean;
   path?: string;
   domain?: string;
 }
 
-// --- Express (locals) ---
-
 export interface CustomLocals {
-  user?: Omit<UserAttributes, 'password'>;
+  user?: Omit<UserAttributes, "password">;
 }
 
 export interface TypedResponse extends Response {
   locals: CustomLocals;
 }
-
-// --- Service (Create / Update) ---
 
 export interface CreateUserData {
   username: string;

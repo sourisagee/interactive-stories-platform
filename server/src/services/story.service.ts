@@ -8,15 +8,11 @@ import {
 } from "../types/story";
 
 export class StoryService {
-  // Создать новую историю
-
   async createStory(data: CreateStoryDto): Promise<Story> {
     return await prisma.story.create({
       data,
     });
   }
-
-  // Получить историю по ID с автором
 
   async getStoryById(storyId: number): Promise<StoryWithAuthor | null> {
     return await prisma.story.findUnique({
@@ -26,8 +22,6 @@ export class StoryService {
       },
     });
   }
-
-  // Получить полную историю с узлами и выборами
 
   async getStoryFull(storyId: number): Promise<StoryFull | null> {
     return await prisma.story.findUnique({
@@ -45,9 +39,7 @@ export class StoryService {
     });
   }
 
-  // Обновить историю
   async updateStory(storyId: number, data: UpdateStoryDto): Promise<Story> {
-    // Сначала проверяем, существует ли история
     const existingStory = await prisma.story.findUnique({
       where: { id: storyId },
       select: { id: true, isPublished: true },
@@ -57,10 +49,7 @@ export class StoryService {
       throw new Error("История не найдена");
     }
 
-    // Если история уже опубликована, разрешаем только изменение isPublished на false (снятие с публикации)
-    // или другие административные действия, но запрещаем изменение контента
     if (existingStory.isPublished) {
-      // Если пытаемся изменить что-то кроме isPublished, запрещаем
       const hasContentChanges =
         data.title ||
         data.description ||
@@ -80,10 +69,7 @@ export class StoryService {
     });
   }
 
-  //  Удалить историю (только если не опубликована)
-
   async deleteStory(storyId: number): Promise<Story> {
-    // Сначала проверяем, существует ли история и опубликована ли она
     const existingStory = await prisma.story.findUnique({
       where: { id: storyId },
       select: { id: true, isPublished: true },
@@ -102,15 +88,11 @@ export class StoryService {
     });
   }
 
-  // Получить все истории (authorName в модели Story, author не нужен для списка)
-
   async getAllStories(): Promise<Story[]> {
     return await prisma.story.findMany({
       orderBy: { createdAt: "desc" },
     });
   }
-
-  // Получить истории автора
 
   async getStoriesByAuthor(authorId: number): Promise<Story[]> {
     return await prisma.story.findMany({

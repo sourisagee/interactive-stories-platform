@@ -5,10 +5,9 @@ import type { TypedResponse } from "../types";
 import prisma from "../lib/prisma";
 
 export class RatingController {
-  // Получить информацию о рейтинге истории GET /api/stories/:id/rating
   static async getStoryRating(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id); 
       const userId = res.locals.user?.id;
 
       if (isNaN(storyId) || storyId <= 0) {
@@ -18,7 +17,6 @@ export class RatingController {
         return;
       }
 
-      // Проверяем, существует ли история
       const story = await prisma.story.findUnique({
         where: { id: storyId },
         select: { id: true },
@@ -43,7 +41,6 @@ export class RatingController {
     }
   }
 
-  // Поставить оценку POST /api/stories/:id/rating (только один раз)
   static async createRating(
     req: Request,
     res: TypedResponse
@@ -55,7 +52,7 @@ export class RatingController {
         return;
       }
 
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id); 
       if (isNaN(storyId) || storyId <= 0) {
         res
           .status(400)
@@ -65,7 +62,6 @@ export class RatingController {
 
       const { rating } = req.body;
 
-      // Валидация оценки
       if (!rating || typeof rating !== "number") {
         res
           .status(400)
@@ -87,7 +83,6 @@ export class RatingController {
         return;
       }
 
-      // Проверяем, может ли пользователь оценить (включая проверку на существующую оценку)
       const canRate = await ratingService.canUserRateStory(userId, storyId);
       if (!canRate.canRate) {
         const statusCode = canRate.reason?.includes("уже проголосовали") ? 409 : 403;
@@ -99,7 +94,6 @@ export class RatingController {
 
       await ratingService.createRating(userId, storyId, rating);
 
-      // Возвращаем обновленную информацию о рейтинге
       const ratingInfo = await ratingService.getStoryRatingInfo(
         storyId,
         userId
@@ -110,7 +104,6 @@ export class RatingController {
       );
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Internal server error";
-      // Если ошибка о том, что уже проголосовал
       if (msg.includes("уже проголосовал")) {
         res.status(409).json(formatResponse(409, msg, null, msg));
         return;
@@ -119,7 +112,6 @@ export class RatingController {
     }
   }
 
-  // Удалить оценку DELETE /api/stories/:id/rating
   static async deleteRating(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -128,7 +120,7 @@ export class RatingController {
         return;
       }
 
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id); 
       if (isNaN(storyId) || storyId <= 0) {
         res
           .status(400)
@@ -138,7 +130,6 @@ export class RatingController {
 
       await ratingService.deleteRating(userId, storyId);
 
-      // Возвращаем обновленную информацию о рейтинге
       const ratingInfo = await ratingService.getStoryRatingInfo(
         storyId,
         userId
@@ -151,7 +142,6 @@ export class RatingController {
     }
   }
 
-  // Получить популярные истории GET /api/stories/popular
   static async getPopularStories(
     req: Request,
     res: TypedResponse
@@ -160,7 +150,6 @@ export class RatingController {
       const limit = Number(req.query.limit) || 4;
       const popularStories = await ratingService.getPopularStories(limit);
 
-      // Получаем полную информацию об историях
       const storyIds = popularStories.map((ps) => ps.storyId);
       
       if (storyIds.length === 0) {
@@ -175,7 +164,6 @@ export class RatingController {
         },
       });
 
-      // Объединяем истории с рейтингами, сохраняя порядок популярности
       const storiesWithRatings = popularStories
         .map((ratingInfo) => {
           const story = stories.find((s) => s.id === ratingInfo.storyId);

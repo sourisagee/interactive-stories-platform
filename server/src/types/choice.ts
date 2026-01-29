@@ -1,5 +1,3 @@
-// import { Choice, Node, Story } from "@prisma/client";
-
 export interface CreateChoiceData {
   choiceText: string;
   fromNodeId: number;

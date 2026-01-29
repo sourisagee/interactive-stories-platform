@@ -4,7 +4,6 @@ import formatResponse from "../utils/formatResponse";
 import { ProfileService } from "../services/profile.service";
 
 export default class ProfileController {
-  // Получить профиль текущего пользователя
   static async getMyProfile(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -28,7 +27,6 @@ export default class ProfileController {
     }
   }
 
-  // Получить профиль пользователя по ID
   static async getUserProfile(req: Request, res: TypedResponse): Promise<void> {
     try {
       const { userId } = req.params;

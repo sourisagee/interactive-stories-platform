@@ -5,7 +5,6 @@ import type { TypedResponse } from "../types";
 
 const nodeRouter = Router();
 
-// Публичные роуты 
 nodeRouter.get("/", (req, res) =>
   NodeController.getNodes(req, res as TypedResponse)
 );
@@ -13,7 +12,6 @@ nodeRouter.get("/:nodeId", (req, res) =>
   NodeController.getNodeById(req, res as TypedResponse)
 );
 
-// Приватные роуты 
 nodeRouter.post("/", verifyAccessToken, (req, res) =>
   NodeController.createNode(req, res as TypedResponse)
 );

@@ -5,7 +5,6 @@ import { CreateNodeDto, UpdateNodeDto } from "../types/node";
 import type { TypedResponse } from "../types";
 
 export class NodeController {
-  // Создать новый узел POST /api/nodes
   static async createNode(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -17,7 +16,6 @@ export class NodeController {
       const { title, content, picture, position_x, position_y, storyId, isStart, isEnd } =
         req.body;
 
-      // Валидация обязательных полей
       if (!title || typeof title !== "string" || title.trim().length === 0) {
         res
           .status(400)
@@ -145,12 +143,10 @@ export class NodeController {
     }
   }
 
-  // Получить узел с выборами GET /api/nodes/:id
   static async getNodeById(req: Request, res: TypedResponse): Promise<void> {
     try {
       const nodeId = Number(req.params.nodeId);
 
-      // Валидация ID
       if (isNaN(nodeId) || nodeId <= 0) {
         res
           .status(400)
@@ -172,7 +168,6 @@ export class NodeController {
     }
   }
 
-  // Обновить узел PUT /api/nodes/:id
   static async updateNode(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -183,7 +178,6 @@ export class NodeController {
 
       const nodeId = Number(req.params.nodeId);
 
-      // Валидация ID
       if (isNaN(nodeId) || nodeId <= 0) {
         res
           .status(400)
@@ -193,7 +187,6 @@ export class NodeController {
 
       const { title, content, picture, position_x, position_y } = req.body;
 
-      // Валидация данных для обновления
       if (title !== undefined) {
         if (typeof title !== "string" || title.trim().length === 0) {
           res
@@ -254,7 +247,6 @@ export class NodeController {
           return;
         }
 
-        // Проверка на валидный URL
         try {
           new URL(picture.trim());
         } catch {
@@ -266,7 +258,6 @@ export class NodeController {
           return;
         }
 
-        // Проверка на формат изображения
         const imageExtensions = [
           ".jpg",
           ".jpeg",
@@ -325,7 +316,6 @@ export class NodeController {
     }
   }
 
-  // Удалить узел DELETE /api/nodes/:id
   static async deleteNode(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -336,7 +326,6 @@ export class NodeController {
 
       const nodeId = Number(req.params.nodeId);
 
-      // Валидация ID
       if (isNaN(nodeId) || nodeId <= 0) {
         res
           .status(400)
@@ -352,7 +341,6 @@ export class NodeController {
     }
   }
 
-  // Получить узлы истории GET /api/nodes?story=123
   static async getNodes(req: Request, res: TypedResponse): Promise<void> {
     try {
       const storyIdParam = req.query.story;

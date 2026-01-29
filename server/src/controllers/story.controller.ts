@@ -5,7 +5,6 @@ import { CreateStoryDto, UpdateStoryDto } from "../types/story";
 import type { TypedResponse } from "../types";
 
 export class StoryController {
-  // Создать новую историю POST /api/stories
   static async createStory(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -16,7 +15,6 @@ export class StoryController {
 
       const { title, description, genre, authorName, cover } = req.body;
 
-      // Валидация обязательных полей
       if (!title || typeof title !== "string" || title.trim().length === 0) {
         res
           .status(400)
@@ -137,12 +135,10 @@ export class StoryController {
     }
   }
 
-  // Получить историю с автором GET /api/stories/:id
   static async getStoryById(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id); 
 
-      // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
         res
           .status(400)
@@ -166,12 +162,10 @@ export class StoryController {
     }
   }
 
-  // Получить полную историю для игры GET /api/stories/:id/full
   static async getStoryFull(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id);
 
-      // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
         res
           .status(400)
@@ -195,7 +189,6 @@ export class StoryController {
     }
   }
 
-  // Обновить историю PUT /api/stories/:id
   static async updateStory(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -204,9 +197,8 @@ export class StoryController {
         return;
       }
 
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id); 
 
-      // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
         res
           .status(400)
@@ -217,7 +209,6 @@ export class StoryController {
       const { title, description, genre, authorName, cover, isPublished } =
         req.body;
 
-      // Валидация данных для обновления
       if (title !== undefined) {
         if (typeof title !== "string" || title.trim().length === 0) {
           res
@@ -325,7 +316,6 @@ export class StoryController {
         }
       }
 
-      // Валидация isPublished
       if (isPublished !== undefined) {
         if (typeof isPublished !== "boolean") {
           res
@@ -355,7 +345,6 @@ export class StoryController {
     }
   }
 
-  // Удалить историю DELETE /api/stories/:id
   static async deleteStory(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -364,9 +353,8 @@ export class StoryController {
         return;
       }
 
-      const storyId = Number(req.params.id); // id истории
+      const storyId = Number(req.params.id); 
 
-      // Валидация ID
       if (isNaN(storyId) || storyId <= 0) {
         res
           .status(400)
@@ -382,7 +370,6 @@ export class StoryController {
     }
   }
 
-  // Получить истории GET /api/stories?author=123
   static async getStories(req: Request, res: TypedResponse): Promise<void> {
     try {
       const authorIdParam = req.query.author;
@@ -412,7 +399,6 @@ export class StoryController {
     }
   }
 
-  // Получить мои истории GET /api/stories/my
   static async getMyStories(_req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;

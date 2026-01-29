@@ -5,7 +5,6 @@ import type { TypedResponse } from "../types";
 import type { AiPromptRequestBody } from "../types/ai";
 
 class AIController {
-  /** Сгенерировать ответ от AI по текстовому prompt. */
   static async generateText(
     req: Request<unknown, unknown, AiPromptRequestBody>,
     res: TypedResponse,

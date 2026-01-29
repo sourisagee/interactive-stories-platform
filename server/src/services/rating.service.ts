@@ -2,13 +2,11 @@ import prisma from "../lib/prisma";
 import type { CreateRatingDto, StoryRatingInfo } from "../types/rating";
 
 export class RatingService {
-  // Создать оценку (только один раз, без возможности обновления)
   async createRating(
     userId: number,
     storyId: number,
     rating: number
   ): Promise<void> {
-    // Проверяем, есть ли уже оценка от этого пользователя
     const existingRating = await prisma.rating.findUnique({
       where: {
         userId_storyId: {
@@ -22,7 +20,6 @@ export class RatingService {
       throw new Error("Пользователь уже проголосовал за эту историю");
     }
 
-    // Создаем новую оценку
     await prisma.rating.create({
       data: {
         userId,
@@ -32,7 +29,6 @@ export class RatingService {
     });
   }
 
-  // Получить информацию о рейтинге истории
   async getStoryRatingInfo(
     storyId: number,
     userId?: number
@@ -61,7 +57,6 @@ export class RatingService {
     };
   }
 
-  // Получить топ популярных историй (по среднему рейтингу и количеству оценок)
   async getPopularStories(limit: number = 4): Promise<
     Array<{
       storyId: number;
@@ -69,7 +64,6 @@ export class RatingService {
       totalRatings: number;
     }>
   > {
-    // Получаем все опубликованные истории с их рейтингами
     const stories = await prisma.story.findMany({
       where: { isPublished: true },
       select: { id: true },
@@ -86,15 +80,13 @@ export class RatingService {
       })
     );
 
-    // Сортируем: сначала по среднему рейтингу, потом по количеству оценок
     const sorted = storyRatings
-      .filter((sr) => sr.totalRatings > 0) // Только истории с оценками
+      .filter((sr) => sr.totalRatings > 0) 
       .sort((a, b) => {
-        // Сначала по среднему рейтингу (убывание)
         if (b.averageRating !== a.averageRating) {
           return b.averageRating - a.averageRating;
         }
-        // Потом по количеству оценок (убывание)
+
         return b.totalRatings - a.totalRatings;
       })
       .slice(0, limit);
@@ -102,7 +94,6 @@ export class RatingService {
     return sorted;
   }
 
-  // Удалить оценку пользователя
   async deleteRating(userId: number, storyId: number): Promise<void> {
     await prisma.rating.deleteMany({
       where: {
@@ -112,12 +103,10 @@ export class RatingService {
     });
   }
 
-  // Проверить, может ли пользователь оценить историю
   async canUserRateStory(
     userId: number,
     storyId: number
   ): Promise<{ canRate: boolean; reason?: string }> {
-    // Проверяем, является ли пользователь автором истории
     const story = await prisma.story.findUnique({
       where: { id: storyId },
       select: { authorId: true },
@@ -131,7 +120,6 @@ export class RatingService {
       return { canRate: false, reason: "Автор не может оценить свою историю" };
     }
 
-    // Проверяем, не проголосовал ли уже пользователь
     const existingRating = await prisma.rating.findUnique({
       where: {
         userId_storyId: {

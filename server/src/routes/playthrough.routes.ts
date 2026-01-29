@@ -2,7 +2,6 @@ import { Router } from "express";
 import verifyAccessToken from "../middleware/verifyAccessToken";
 import PlaythroughController from '../controllers/playthrough.controller'
 
-// отвечает за игровой процесс пользователя
 const playthroughRouter = Router();
 
 // создаем новое прохождение

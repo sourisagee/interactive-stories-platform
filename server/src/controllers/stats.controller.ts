@@ -4,7 +4,6 @@ import formatResponse from "../utils/formatResponse";
 import type { TypedResponse } from "../types";
 
 export class StatsController {
-  // Получить статистику текущего пользователя GET /api/stats/my
   static async getMyStats(_req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = res.locals.user?.id;
@@ -21,7 +20,6 @@ export class StatsController {
     }
   }
 
-  // Получить статистику пользователя по ID GET /api/stats/user/:id
   static async getUserStats(req: Request, res: TypedResponse): Promise<void> {
     try {
       const userId = Number(req.params.id);

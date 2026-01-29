@@ -4,12 +4,10 @@ import ProfileController from "../controllers/profile.controller";
 
 const profileRouter = Router();
 
-// Получить мой профиль
 profileRouter
   .route("/my")
   .get(verifyAccessToken, ProfileController.getMyProfile);
 
-// Получить профиль пользователя по ID
 profileRouter
   .route("/user/:userId")
   .get(verifyAccessToken, ProfileController.getUserProfile);
