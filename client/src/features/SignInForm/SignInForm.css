@@ -83,16 +83,17 @@
 
 .login-title {
   text-align: center;
-  font-size: 2rem;
-  font-weight: 400;
-  font-family: 'MedievalSharp', 'Uncial Antiqua', cursive;
+  font-size: 1.8rem;
+  font-weight: 800 !important;
+  font-family: 'ChristmasReign', serif;
+  letter-spacing: 0.15em;
+  line-height: 1.6;
   color: var(--color-text, #e8e4f0);
   margin: 0 0 2rem;
   text-shadow: 
     0 0 10px rgba(139, 107, 184, 0.5),
     0 0 20px rgba(139, 107, 184, 0.3),
     0 2px 4px rgba(0, 0, 0, 0.5);
-  letter-spacing: 1px;
   position: relative;
 }
 
@@ -118,9 +119,11 @@
 
 .login-input {
   margin-bottom: 0;
-  font-family: 'Lora', 'Cormorant', serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+  font-family: 'Firlest', serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
   background: rgba(13, 15, 26, 0.7);
   border: 1.5px solid rgba(139, 107, 184, 0.3);
   box-shadow: 
@@ -130,9 +133,8 @@
 }
 
 .login-input::placeholder {
-  font-family: 'Lora', 'Cormorant', serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
   color: var(--color-text-muted, rgba(232, 228, 240, 0.7));
 }
 
@@ -147,9 +149,11 @@
 
 .login-card select.login-input,
 .login-card select.input-base {
-  font-family: 'Lora', 'Cormorant', serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+  font-family: 'Firlest', serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.8;
   background-color: rgba(45, 31, 78, 0.7) !important;
   background: 
     linear-gradient(135deg, rgba(45, 31, 78, 0.7) 0%, rgba(61, 24, 40, 0.7) 100%),
@@ -193,9 +197,11 @@
 
 .login-card select.login-input option,
 .login-card select.input-base option {
-  font-family: 'Lora', 'Cormorant', serif !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.5px !important;
+  font-size: 1.1rem !important;
+  font-family: 'ChristmasReign', serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em !important;
+  line-height: 1.8 !important;
   background: rgba(45, 31, 78, 0.98) !important;
   background-color: rgba(45, 31, 78, 0.98) !important;
   color: var(--color-text, #e8e4f0) !important;
@@ -221,12 +227,13 @@
 .login-button {
   width: 100%;
   margin-top: 0.5rem;
-  padding: 1rem 1.5rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  font-family: 'Lora', 'Cormorant', serif;
-  letter-spacing: 1px;
-  color: var(--color-text, #e8e4f0);
+  padding: 1.25rem 1.6rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  line-height: 1.8;
+  font-family: 'ChristmasReign', serif;
+  color: #e8e4f0 !important;
   background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
   border: 2px solid rgba(139, 107, 184, 0.5);
   border-radius: 8px;
@@ -247,6 +254,7 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .login-button:hover:not(:disabled) {

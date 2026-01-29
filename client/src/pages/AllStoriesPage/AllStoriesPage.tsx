@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getAllStoriesThunk } from "../../entities/story/api/StoryApi";
+import { playthroughApi, type UserPlaythrough } from "../../entities/story/api/PlaythroughApi";
 import {
   getPopularStoriesThunk,
   getStoryRatingThunk,
@@ -25,6 +26,8 @@ type StoryCardProps = {
   ratingInfo?: StoryRatingInfo;
   isPopular?: boolean;
   showPopularBadge?: boolean; // Показывать ли значок популярности
+  // Флаг: есть ли у текущего игрока незавершённое прохождение этой истории
+  isInProgress?: boolean;
   onPlay: (id: number) => void;
   onDetails: (id: number) => void;
   onSignIn: () => void;
@@ -38,6 +41,7 @@ function StoryCard({
   ratingInfo,
   isPopular = false,
   showPopularBadge = false,
+  isInProgress = false,
   onPlay,
   onDetails,
   onSignIn,
@@ -63,6 +67,13 @@ function StoryCard({
   return (
     <>
       <div className={`story-card ${showPopularBadge ? "story-card-popular" : ""}`}>
+        {/* Закладка "Продолжить чтение" для историй с незавершённым прохождением */}
+        {isPlayer && isInProgress && (
+          <div className="story-badge-continue">
+            Продолжить чтение
+          </div>
+        )}
+
         {showPopularBadge && (
           <div className="story-card-popular-badge" aria-label="Популярная история">
             <span className="popular-icon">✦</span>
@@ -76,26 +87,28 @@ function StoryCard({
           <p className="story-author">Автор: {story.authorName}</p>
           <p className="story-genre">Жанр: {story.genre}</p>
           <p className="story-description">{description}</p>
-          {ratingInfo && (
+          {(ratingInfo || canRate) && (
             <div className="story-rating">
-              <StarRating
-                averageRating={ratingInfo.averageRating}
-                totalRatings={ratingInfo.totalRatings}
-              />
+              {ratingInfo && (
+                <StarRating
+                  averageRating={ratingInfo.averageRating}
+                  totalRatings={ratingInfo.totalRatings}
+                />
+              )}
+              {canRate && (
+                <button
+                  type="button"
+                  className={`btn btn-rating ${hasRated ? "btn-rating-rated" : ""}`}
+                  onClick={() => setIsRatingModalOpen(true)}
+                  disabled={hasRated}
+                >
+                  {hasRated ? "✓ Оценено" : "Оценить"}
+                </button>
+              )}
             </div>
           )}
         </div>
         <div className="story-actions">
-          {canRate && (
-            <button
-              type="button"
-              className={`btn btn-rating ${hasRated ? "btn-rating-rated" : ""}`}
-              onClick={() => setIsRatingModalOpen(true)}
-              disabled={hasRated}
-            >
-              {hasRated && ratingInfo?.userRating ? `✓ Оценено (${ratingInfo.userRating})` : "Оценить"}
-            </button>
-          )}
           {isPlayer && (
             <button type="button" className="btn btn-primary" onClick={() => onPlay(story.id)}>
               Играть
@@ -129,6 +142,7 @@ function StoryCard({
 export default function AllStoriesPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [popularStories, setPopularStories] = useState<PopularStory[]>([]);
@@ -136,6 +150,8 @@ export default function AllStoriesPage() {
     Record<number, StoryRatingInfo>
   >({});
   const [isLoadingPopular, setIsLoadingPopular] = useState(false);
+  // Список всех прохождений пользователя (нужен, чтобы понять, какие истории "в процессе")
+  const [userPlaythroughs, setUserPlaythroughs] = useState<UserPlaythrough[]>([]);
 
   const { stories, isLoading, error } = useAppSelector((state) => state.stories);
   const { user } = useAppSelector((state) => state.user);
@@ -144,6 +160,33 @@ export default function AllStoriesPage() {
   useEffect(() => {
     dispatch(getAllStoriesThunk());
   }, [dispatch]);
+
+  // Загрузка всех прохождений текущего пользователя
+  // Нужна, чтобы определить, какие истории были начаты, но ещё не завершены
+  useEffect(() => {
+    if (!user) {
+      setUserPlaythroughs([]);
+      return;
+    }
+    // Загружаем прохождения для игроков (USER); при необходимости можно расширить
+    if (user.role !== UserRole.USER) {
+      setUserPlaythroughs([]);
+      return;
+    }
+
+    const loadPlaythroughs = async () => {
+      try {
+        const playthroughs = await playthroughApi.getMyPlaythroughs();
+        setUserPlaythroughs(Array.isArray(playthroughs) ? playthroughs : []);
+      } catch (e) {
+        console.error("Ошибка загрузки прохождений пользователя", e);
+        setUserPlaythroughs([]);
+      }
+    };
+
+    loadPlaythroughs();
+    // Перезагружаем при возврате на страницу списка (чтобы закладка «Продолжить чтение» обновилась)
+  }, [user, location.pathname]);
 
   // Загрузка популярных историй
   useEffect(() => {
@@ -283,6 +326,25 @@ export default function AllStoriesPage() {
     );
   };
 
+  // Множество id историй, у которых есть незавершённое прохождение
+  // isCompleted === false => историю можно "продолжить"
+  const inProgressStoryIds = useMemo(() => {
+    const ids = new Set<number>();
+
+    // Защита от случаев, когда по ошибке в состоянии окажется не массив
+    const list: UserPlaythrough[] = Array.isArray(userPlaythroughs)
+      ? userPlaythroughs
+      : [];
+
+    list.forEach((p) => {
+      if (!p.isCompleted) {
+        ids.add(p.story.id);
+      }
+    });
+
+    return ids;
+  }, [userPlaythroughs]);
+
   // Получаем ID популярных историй для проверки
   const popularStoryIds = useMemo(
     () => new Set(popularStories.map((s) => s.id)),
@@ -384,6 +446,8 @@ export default function AllStoriesPage() {
                     ratingInfo={storyRatings[story.id]}
                     isPopular={true}
                     showPopularBadge={true}
+                    // если по этой истории есть незавершённое прохождение — показываем закладку
+                    isInProgress={inProgressStoryIds.has(story.id)}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
                     onSignIn={goToSignIn}
@@ -415,6 +479,8 @@ export default function AllStoriesPage() {
                     ratingInfo={storyRatings[story.id]}
                     isPopular={popularStoryIds.has(story.id)}
                     showPopularBadge={false}
+                    // если по этой истории есть незавершённое прохождение — показываем закладку
+                    isInProgress={inProgressStoryIds.has(story.id)}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
                     onSignIn={goToSignIn}
@@ -426,6 +492,27 @@ export default function AllStoriesPage() {
           )}
         </main>
       </div>
+
+      {/* Footer */}
+      <footer className="main-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>Интерактивные новеллы</h4>
+              <p>
+                Платформа для создания и чтения интерактивных историй нового
+                поколения.
+              </p>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>
+              &copy; 2026 Интерактивные новеллы. Создано с ❤️ для любителей
+              хороших историй.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

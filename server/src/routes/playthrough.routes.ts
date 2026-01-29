@@ -15,6 +15,11 @@ playthroughRouter
   .route("/current/:storyId")
   .get(verifyAccessToken, PlaythroughController.getCurrentPlaythrough);
 
+// получаем все прохождения пользователя (до :id-маршрутов, чтобы /user/all не матчился как :playthroughId)
+playthroughRouter
+  .route("/user/all")
+  .get(verifyAccessToken, PlaythroughController.getUserPlaythroughs);
+
 // делаем выбор в текущем узле
 playthroughRouter
   .route("/:playthroughId/choose")
@@ -24,11 +29,6 @@ playthroughRouter
 playthroughRouter
   .route("/:playthroughId/choices")
   .get(verifyAccessToken, PlaythroughController.getAvailableChoices);
-
-// получаем все прохождения пользователя
-playthroughRouter
-  .route("/user/all")
-  .get(verifyAccessToken, PlaythroughController.getUserPlaythroughs);
 
 // получаем прогресс по текущему прохождению
 playthroughRouter

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../shared/hooks/reduxHooks";
+import { UserRole } from "../../entities/user/model";
 import "./MainPage.css";
 
 export default function MainPage() {
@@ -7,11 +8,15 @@ export default function MainPage() {
 
   return (
     <div className="main-page">
+      <div className="cosmic-bg" aria-hidden />
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
+          <h2 className="hero-subtitle">
+            WISP
+          </h2>
           <h1 className="hero-title">
-            Платформа <span className="highlight">интерактивных новелл</span>
+            ПЛАТФОРМА <span className="highlight">интерактивных новелл</span>
           </h1>
           <p className="hero-description">
             Современная платформа для создания и чтения интерактивных историй с
@@ -19,26 +24,6 @@ export default function MainPage() {
             захватывающих приключений или погрузиться в мир, где ваши решения
             определяют судьбу героев.
           </p>
-
-          {!user ? (
-            <div className="hero-actions">
-              <Link to="/signUp" className="btn btn-primary">
-                Присоединиться
-              </Link>
-              <Link to="/signIn" className="btn btn-secondary">
-                Войти
-              </Link>
-            </div>
-          ) : (
-            <div className="hero-actions">
-              <Link to="/stories" className="btn btn-primary">
-                Исследовать истории
-              </Link>
-              <Link to="/profile" className="btn btn-secondary">
-                Мой профиль
-              </Link>
-            </div>
-          )}
         </div>
       </section>
 
@@ -54,11 +39,6 @@ export default function MainPage() {
                 читателей в единое сообщество, где каждый может найти что-то для
                 себя.
               </p>
-              <p>
-                Проект разработан с использованием современных технологий:
-                React, TypeScript, Node.js и PostgreSQL, что обеспечивает
-                быструю работу и надежность платформы.
-              </p>
             </div>
          
           </div>
@@ -72,7 +52,7 @@ export default function MainPage() {
 
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">📚</div>
+              <div className="feature-icon">📜</div>
               <h3>Библиотека историй</h3>
               <p>
                 Огромная коллекция интерактивных новелл различных жанров. От
@@ -81,16 +61,16 @@ export default function MainPage() {
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🎨</div>
+              <div className="feature-icon">🪄</div>
               <h3>Визуальный редактор</h3>
               <p>
-                Интуитивный редактор с drag-and-drop интерфейсом для создания
+                Интуитивный редактор узлов и переходов между сценами для создания
                 сложных разветвленных сюжетов без программирования.
               </p>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">💾</div>
+              <div className="feature-icon">⏳</div>
               <h3>Сохранение прогресса</h3>
               <p>
                 Ваш прогресс автоматически сохраняется. Продолжайте чтение с
@@ -104,47 +84,105 @@ export default function MainPage() {
       {/* User Types Section */}
       <section className="user-types">
         <div className="container">
-          <h2 className="section-title">Выберите свою роль</h2>
+          <h2 className="section-title user-types-title-centered">
+            Выберите свою роль
+          </h2>
 
-          <div className="user-types-grid">
-            <div className="user-type-card">
-              <div className="user-type-icon">👤</div>
-              <h3>Читатель </h3>
-              <div className="user-type-description">
-                <p>Для тех, кто любит погружаться в интерактивные истории</p>
-                <ul className="features-list">
-                  <li>✓ Чтение всех опубликованных историй</li>
-                  <li>✓ Сохранение прогресса прохождения</li>
-                  <li>✓ Персональная статистика</li>
-                  <li>✓ Система достижений</li>
-                  <li>✓ Оценка и комментирование историй</li>
-                  <li>✓ Закладки любимых произведений</li>
-                  <li>✓ Рекомендации на основе предпочтений</li>
-                </ul>
+          {user && user.role === UserRole.USER ? (
+            <div className="user-types-player-layout">
+              <div className="user-types-grid user-types-grid-centered">
+                <div className="user-type-card featured">
+                  <div className="user-type-icon">🧙‍♂️</div>
+                  <h3>Читатель </h3>
+                  <div className="user-type-description">
+                    <p>Для тех, кто любит погружаться в интерактивные истории</p>
+                    <ul className="features-list">
+                      <li>✓ Чтение историй</li>
+                      <li>✓ Сохранение прогресса прохождения</li>
+                      <li>✓ Персональная статистика</li>
+                      <li>✓ Система достижений</li>
+                      <li>✓ Оценка историй</li>
+                      <li>✓ Закладки любимых произведений</li>
+                      <li>✓ Рекомендации на основе предпочтений</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="user-type-card featured">
+                  <div className="user-type-icon">🖋️</div>
+                  <h3>Автор </h3>
+                  <div className="user-type-description">
+                    <p>
+                      Для творческих людей, желающих создавать интерактивные истории
+                    </p>
+                    <ul className="features-list">
+                      <li>✓ Все возможности читателя</li>
+                      <li>✓ Создание неограниченного количества историй</li>
+                      <li>✓ Управление узлами и выборами</li>
+                      <li>✓ Загрузка изображений для сцен</li>
+                      <li>✓ Система черновиков и публикации</li>
+                      <li>✓ Детальная аналитика произведений</li>
+                      <li>✓ Управление доступом к историям</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="user-type-card featured">
-              <div className="user-type-icon">✍️</div>
-              <h3>Автор </h3>
-              <div className="user-type-description">
+              <div className="user-types-cta user-types-cta-centered">
+                <h3>Продолжайте своё приключение</h3>
                 <p>
-                  Для творческих людей, желающих создавать интерактивные истории
+                  Перейдите к библиотеке историй или откройте профиль, чтобы посмотреть
+                  прогресс и управлять своими историями.
                 </p>
-                <ul className="features-list">
-                  <li>✓ Все возможности читателя</li>
-                  <li>✓ Создание неограниченного количества историй</li>
-                  <li>✓ Визуальный редактор с drag-and-drop</li>
-                  <li>✓ Управление узлами и выборами</li>
-                  <li>✓ Загрузка изображений для сцен</li>
-                  <li>✓ Система черновиков и публикации</li>
-                  <li>✓ Детальная аналитика произведений</li>
-                  <li>✓ Управление доступом к историям</li>
-                  <li>✓ Монетизация контента (в разработке)</li>
-                </ul>
+                <div className="user-types-cta-buttons">
+                  <Link to="/allStories" className="btn btn-primary">
+                    Все истории
+                  </Link>
+                  <Link to="/profile" className="btn btn-secondary">
+                    Профиль
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="user-types-grid">
+              <div className="user-type-card featured">
+                <div className="user-type-icon">🧙‍♂️</div>
+                <h3>Читатель </h3>
+                <div className="user-type-description">
+                  <p>Для тех, кто любит погружаться в интерактивные истории</p>
+                  <ul className="features-list">
+                    <li>✓ Чтение историй</li>
+                    <li>✓ Сохранение прогресса прохождения</li>
+                    <li>✓ Персональная статистика</li>
+                    <li>✓ Система достижений</li>
+                    <li>✓ Оценка историй</li>
+                    <li>✓ Закладки любимых произведений</li>
+                    <li>✓ Рекомендации на основе предпочтений</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="user-type-card featured">
+                <div className="user-type-icon">🖋️</div>
+                <h3>Автор </h3>
+                <div className="user-type-description">
+                  <p>
+                    Для творческих людей, желающих создавать интерактивные истории
+                  </p>
+                  <ul className="features-list">
+                    <li>✓ Все возможности читателя</li>
+                    <li>✓ Создание неограниченного количества историй</li>
+                    <li>✓ Управление узлами и выборами</li>
+                    <li>✓ Загрузка изображений для сцен</li>
+                    <li>✓ Система черновиков и публикации</li>
+                    <li>✓ Детальная аналитика произведений</li>
+                    <li>✓ Управление доступом к историям</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -159,7 +197,7 @@ export default function MainPage() {
                 <h3>Что вы получите сразу после регистрации:</h3>
                 <div className="benefits-grid">
                   <div className="benefit-card">
-                    <div className="benefit-icon">🔐</div>
+                    <div className="benefit-icon">🛡️</div>
                     <h4>Персональный аккаунт</h4>
                     <p>
                       Ваш личный профиль с настройками, статистикой и историей
@@ -168,7 +206,7 @@ export default function MainPage() {
                   </div>
 
                   <div className="benefit-card">
-                    <div className="benefit-icon">💾</div>
+                    <div className="benefit-icon">💎</div>
                     <h4>Облачное сохранение</h4>
                     <p>
                       Прогресс синхронизируется между устройствами. Читайте где
@@ -177,11 +215,11 @@ export default function MainPage() {
                   </div>
 
                   <div className="benefit-card">
-                    <div className="benefit-icon">🚀</div>
-                    <h4>Ранний доступ</h4>
+                    <div className="benefit-icon">✨</div>
+                    <h4>Новые истории и обновления</h4>
                     <p>
-                      Первыми узнавайте о новых функциях и получайте доступ к
-                      бета-версиям
+                      Получайте рекомендации новых историй и узнавайте об обновлениях
+                      платформы прямо в своем аккаунте
                     </p>
                   </div>
                 </div>
@@ -218,14 +256,6 @@ export default function MainPage() {
                 Платформа для создания и чтения интерактивных историй нового
                 поколения.
               </p>
-            </div>
-            <div className="footer-section">
-              <h4>Технологии</h4>
-              <p>React • TypeScript • Node.js • PostgreSQL • Express</p>
-            </div>
-            <div className="footer-section">
-              <h4>Контакты</h4>
-              <p>Есть вопросы? Свяжитесь с нами через форму обратной связи.</p>
             </div>
           </div>
           <div className="footer-bottom">

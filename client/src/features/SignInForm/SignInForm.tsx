@@ -37,38 +37,60 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="login-container">
-      <div className="cosmic-bg" aria-hidden />
-      <div className="login-card">
-        <h2 className="login-title">Войти в аккаунт</h2>
-        <form onSubmit={loginUserHandler}>
-          <input
-            name="email"
-            type="email"
-            value={inputs.email}
-            onChange={onChangeHandler}
-            placeholder="Email"
-            className="login-input input-base"
-            required
-          />
-          <input
-            name="password"
-            type="password"
-            value={inputs.password}
-            onChange={onChangeHandler}
-            placeholder="Password"
-            className="login-input input-base"
-            required
-          />
-          <button
-            type="submit"
-            disabled={!inputs.email || !inputs.password}
-            className="login-button"
-          >
-            Войти
-          </button>
-        </form>
+    <>
+      <div className="login-container">
+        <div className="cosmic-bg" aria-hidden />
+        <div className="login-card">
+          <h2 className="login-title">Войти в аккаунт</h2>
+          <form onSubmit={loginUserHandler}>
+            <input
+              name="email"
+              type="email"
+              value={inputs.email}
+              onChange={onChangeHandler}
+              placeholder="Email"
+              className="login-input input-base"
+              required
+            />
+            <input
+              name="password"
+              type="password"
+              value={inputs.password}
+              onChange={onChangeHandler}
+              placeholder="Password"
+              className="login-input input-base"
+              required
+            />
+            <button
+              type="submit"
+              disabled={!inputs.email || !inputs.password}
+              className="login-button"
+            >
+              Войти
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+
+      <footer className="main-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>Интерактивные новеллы</h4>
+              <p>
+                Платформа для создания и чтения интерактивных историй нового
+                поколения.
+              </p>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>
+              &copy; 2026 Интерактивные новеллы. Создано с ❤️ для любителей
+              хороших историй.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }
