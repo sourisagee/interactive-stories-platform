@@ -17,7 +17,6 @@ import StarRating from "../../shared/components/StarRating/StarRating";
 import RatingModal from "../../shared/components/RatingModal/RatingModal";
 import "./AllStoriesPage.css";
 
-/** Максимальная длина описания в карточке */
 const DESC_PREVIEW_LEN = 100;
 
 type StoryCardProps = {
@@ -25,8 +24,7 @@ type StoryCardProps = {
   user: UserData | null;
   ratingInfo?: StoryRatingInfo;
   isPopular?: boolean;
-  showPopularBadge?: boolean; // Показывать ли значок популярности
-  // Флаг: есть ли у текущего игрока незавершённое прохождение этой истории
+  showPopularBadge?: boolean; 
   isInProgress?: boolean;
   onPlay: (id: number) => void;
   onDetails: (id: number) => void;
@@ -34,7 +32,6 @@ type StoryCardProps = {
   onRatingChange?: (storyId: number, ratingInfo: StoryRatingInfo) => void;
 };
 
-/** Карточка одной истории: обложка, описание, рейтинг, кнопки Играть / Подробнее / Войти */
 function StoryCard({
   story,
   user,
@@ -49,7 +46,6 @@ function StoryCard({
 }: StoryCardProps) {
   const isAuthor = user?.role === UserRole.AUTHOR;
   const isPlayer = user?.role === UserRole.USER;
-  // Кнопка "Оценить" только для игроков (не авторов) и только если пользователь не автор истории
   const canRate = isPlayer && story.authorId !== user?.id;
   const hasRated = !!ratingInfo && ratingInfo.userRating !== null && ratingInfo.userRating !== undefined;
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -67,7 +63,6 @@ function StoryCard({
   return (
     <>
       <div className={`story-card ${showPopularBadge ? "story-card-popular" : ""}`}>
-        {/* Закладка "Продолжить чтение" для историй с незавершённым прохождением */}
         {isPlayer && isInProgress && (
           <div className="story-badge-continue">
             Продолжить чтение
@@ -150,25 +145,21 @@ export default function AllStoriesPage() {
     Record<number, StoryRatingInfo>
   >({});
   const [isLoadingPopular, setIsLoadingPopular] = useState(false);
-  // Список всех прохождений пользователя (нужен, чтобы понять, какие истории "в процессе")
   const [userPlaythroughs, setUserPlaythroughs] = useState<UserPlaythrough[]>([]);
 
   const { stories, isLoading, error } = useAppSelector((state) => state.stories);
   const { user } = useAppSelector((state) => state.user);
 
-  // Загрузка всех историй
   useEffect(() => {
     dispatch(getAllStoriesThunk());
   }, [dispatch]);
 
-  // Загрузка всех прохождений текущего пользователя
-  // Нужна, чтобы определить, какие истории были начаты, но ещё не завершены
   useEffect(() => {
     if (!user) {
       setUserPlaythroughs([]);
       return;
     }
-    // Загружаем прохождения для игроков (USER); при необходимости можно расширить
+
     if (user.role !== UserRole.USER) {
       setUserPlaythroughs([]);
       return;
@@ -185,17 +176,15 @@ export default function AllStoriesPage() {
     };
 
     loadPlaythroughs();
-    // Перезагружаем при возврате на страницу списка (чтобы закладка «Продолжить чтение» обновилась)
   }, [user, location.pathname]);
 
-  // Загрузка популярных историй
   useEffect(() => {
     const loadPopularStories = async () => {
       setIsLoadingPopular(true);
       try {
         const popular = await dispatch(getPopularStoriesThunk(4)).unwrap();
         setPopularStories(popular);
-        // Загружаем рейтинги для популярных историй
+
         const ratingPromises = popular.map((story) =>
           dispatch(getStoryRatingThunk(story.id))
             .unwrap()
@@ -220,14 +209,12 @@ export default function AllStoriesPage() {
     loadPopularStories();
   }, [dispatch]);
 
-  // Загрузка рейтингов для всех историй при изменении списка
   useEffect(() => {
     const loadRatings = async () => {
       const publishedIds = stories
         .filter((s) => s.isPublished)
         .map((s) => s.id);
       
-      // Загружаем рейтинги только для историй, у которых еще нет рейтинга
       const idsToLoad = publishedIds.filter((id) => !storyRatings[id]);
       
       if (idsToLoad.length === 0) return;
@@ -258,19 +245,16 @@ export default function AllStoriesPage() {
     }
   }, [stories, dispatch, storyRatings]);
 
-  /** Только опубликованные */
   const publishedStories = useMemo(
     () => stories.filter((s) => s.isPublished),
     [stories],
   );
 
-  /** Для жанров */
-  const genres = useMemo(() => { // рендер только при изменении publishedStories
+  const genres = useMemo(() => { 
     const set = new Set(publishedStories.map((s) => s.genre));
     return Array.from(set).sort();
   }, [publishedStories]);
 
-  /** Иконки для жанров в фэнтези-стиле */
   const getGenreIcon = (genre: string): string => {
     const genreLower = genre.toLowerCase();
     if (genreLower.includes("фэнтези") || genreLower.includes("фентези")) return "⚔️";
@@ -285,12 +269,10 @@ export default function AllStoriesPage() {
     return "✨";
   };
 
-  /** Подсчёт историй в каждом жанре */
   const getGenreCount = (genre: string): number => {
     return publishedStories.filter((s) => s.genre === genre).length;
   };
 
-  /** Строка поиска */
   const filteredStories = useMemo(() => {
     return publishedStories.filter((story) => {
       if (selectedGenre && story.genre !== selectedGenre) return false;
@@ -316,7 +298,6 @@ export default function AllStoriesPage() {
       ...prev,
       [storyId]: ratingInfo,
     }));
-    // Обновляем популярные истории, если изменился рейтинг
     setPopularStories((prev) =>
       prev.map((story) =>
         story.id === storyId
@@ -326,12 +307,9 @@ export default function AllStoriesPage() {
     );
   };
 
-  // Множество id историй, у которых есть незавершённое прохождение
-  // isCompleted === false => историю можно "продолжить"
   const inProgressStoryIds = useMemo(() => {
     const ids = new Set<number>();
 
-    // Защита от случаев, когда по ошибке в состоянии окажется не массив
     const list: UserPlaythrough[] = Array.isArray(userPlaythroughs)
       ? userPlaythroughs
       : [];
@@ -345,7 +323,6 @@ export default function AllStoriesPage() {
     return ids;
   }, [userPlaythroughs]);
 
-  // Получаем ID популярных историй для проверки
   const popularStoryIds = useMemo(
     () => new Set(popularStories.map((s) => s.id)),
     [popularStories]
@@ -416,7 +393,6 @@ export default function AllStoriesPage() {
           </div>
         </aside>
 
-        {/* Строка поиска */}
         <main className="stories-main">
           <div className="search-section">
             <div className="search-input-wrapper">
@@ -430,7 +406,6 @@ export default function AllStoriesPage() {
             </div>
           </div>
 
-          {/* Секция Популярное */}
           {popularStories.length > 0 && (
             <section className="popular-stories-section">
               <h2 className="section-title">
@@ -446,7 +421,6 @@ export default function AllStoriesPage() {
                     ratingInfo={storyRatings[story.id]}
                     isPopular={true}
                     showPopularBadge={true}
-                    // если по этой истории есть незавершённое прохождение — показываем закладку
                     isInProgress={inProgressStoryIds.has(story.id)}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
@@ -479,7 +453,6 @@ export default function AllStoriesPage() {
                     ratingInfo={storyRatings[story.id]}
                     isPopular={popularStoryIds.has(story.id)}
                     showPopularBadge={false}
-                    // если по этой истории есть незавершённое прохождение — показываем закладку
                     isInProgress={inProgressStoryIds.has(story.id)}
                     onPlay={handlePlay}
                     onDetails={handleDetails}
@@ -493,7 +466,6 @@ export default function AllStoriesPage() {
         </main>
       </div>
 
-      {/* Footer */}
       <footer className="main-footer">
         <div className="container">
           <div className="footer-content">

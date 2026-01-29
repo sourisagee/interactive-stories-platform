@@ -27,7 +27,6 @@ import type { FlowNode, FlowEdge } from "../../entities/story/model";
 import StoryNode from "./components/nodes/StoryNode";
 import { PropertiesPanel, Toolbar } from "./components/panels";
 
-// Маппинг типов узлов React Flow на наш кастомный компонент
 const nodeTypes = {
   start: StoryNode,
   normal: StoryNode,
@@ -55,10 +54,8 @@ function StoryEditorInner() {
     togglePropertiesPanel,
   } = useStoryEditorActions();
 
-  // Преобразуем наши FlowNode в формат, ожидаемый React Flow
   const rfNodes = useMemo(
     () => {
-      // Подгружаем сохранённые позиции узлов из localStorage (по storyId)
       let storedPositions: Record<string, { x: number; y: number }> | null =
         null;
 
@@ -94,7 +91,6 @@ function StoryEditorInner() {
     [nodesState, currentStory],
   );
 
-  // Преобразуем наши FlowEdge в формат React Flow
   const rfEdges = useMemo(
     () =>
       edgesState.map((edge: FlowEdge) => ({
@@ -156,8 +152,6 @@ function StoryEditorInner() {
     const data = node.data as FlowNode;
     updateNodePosition(data.id, node.position);
 
-    // Локально сохраняем новые координаты узла,
-    // чтобы после перезагрузки восстановить их из localStorage
     if (
       currentStory &&
       typeof window !== "undefined" &&
@@ -193,13 +187,11 @@ function StoryEditorInner() {
     const sourceNodeId = Number(connection.source);
     const targetNodeId = Number(connection.target);
 
-    // Если один из узлов ещё временный (id <= 0) — создаём только временную связь
     if (sourceNodeId <= 0 || targetNodeId <= 0) {
       addTemporaryEdge(sourceNodeId, targetNodeId, "Новый выбор");
       return;
     }
 
-    // Оба узла сохранены на сервере — сразу создаём выбор (связь) в API
     createChoiceThunk({
       choiceText: "Новый выбор",
       fromNodeId: sourceNodeId,

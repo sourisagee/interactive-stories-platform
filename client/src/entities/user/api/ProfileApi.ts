@@ -3,13 +3,13 @@ import axiosInstance from "@/shared/lib/axiosInstance";
 export interface PlayerStats {
   completedStories: number;
   inProgressStories: number;
-  memberSince: string; // ISO date string
+  memberSince: string; 
 }
 
 export interface AuthorStats {
   totalStories: number;
   draftStories: number;
-  memberSince: string; // ISO date string
+  memberSince: string; 
 }
 
 export interface AuthorStory {
@@ -31,7 +31,7 @@ export interface GameInfo {
   description: string;
   authorName: string;
   isCompleted: boolean;
-  updatedAt: string; // ISO date string
+  updatedAt: string;
 }
 
 export interface UserProfileResponse {
@@ -54,7 +54,6 @@ export interface UserProfileResponse {
 }
 
 export const profileApi = {
-  // Получить мой профиль
   getMyProfile: async (): Promise<UserProfileResponse> => {
     const response = await axiosInstance.get("/profile/my");
     let profileData;
@@ -67,7 +66,6 @@ export const profileApi = {
       throw new Error("No data in response");
     }
 
-    // Если это игрок, получаем также его прохождения
     if (profileData.user.role === "USER") {
       try {
         const playthroughsResponse = await axiosInstance.get(
@@ -87,7 +85,6 @@ export const profileApi = {
         const inProgress: GameInfo[] = [];
         const completed: GameInfo[] = [];
 
-        // Безопасная проверка на массив
         if (
           playthroughs &&
           Array.isArray(playthroughs) &&
@@ -115,9 +112,7 @@ export const profileApi = {
           }
         }
 
-        // ВРЕМЕННО: добавляем тестовые данные для проверки
         if (inProgress.length === 0 && completed.length === 0) {
-          // Тестовая незавершенная игра
           inProgress.push({
             id: 1,
             title: "Тестовая незавершенная история",
@@ -129,7 +124,6 @@ export const profileApi = {
             updatedAt: new Date().toISOString(),
           });
 
-          // Тестовая завершенная игра
           completed.push({
             id: 2,
             title: "Тестовая завершенная история",
@@ -149,11 +143,9 @@ export const profileApi = {
       }
     }
 
-    // Если это автор, получаем его истории из backend
     if (profileData.user.role === "AUTHOR") {
       console.log("Загружаем истории автора...");
       try {
-        // Используем существующий метод из StoryApi
         const { default: StoryApi } = await import(
           "../../../entities/story/api/StoryApi"
         );
@@ -204,7 +196,6 @@ export const profileApi = {
 
         profileData.authorStories = { drafts, published };
 
-        // Обновляем статистику на основе реальных данных
         if (profileData.authorStats) {
           profileData.authorStats.totalStories = stories.length;
           profileData.authorStats.draftStories = drafts.length;
@@ -213,7 +204,6 @@ export const profileApi = {
         console.error("Error loading author stories:", error);
         console.error("Детали ошибки:", error.response?.data || error.message);
 
-        // Временно не используем fallback, чтобы увидеть реальную ошибку
         profileData.authorStories = { drafts: [], published: [] };
 
         if (!profileData.authorStats) {
@@ -229,7 +219,6 @@ export const profileApi = {
     return profileData;
   },
 
-  // Получить профиль пользователя по ID
   getUserProfile: async (userId: number): Promise<UserProfileResponse> => {
     const response = await axiosInstance.get(`/profile/user/${userId}`);
 

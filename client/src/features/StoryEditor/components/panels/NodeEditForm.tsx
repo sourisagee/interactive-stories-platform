@@ -14,9 +14,6 @@ interface NodeEditFormProps {
   onClose?: () => void;
 }
 
-/**
- * Форма редактирования узла. Используется в панели свойств и в модальном окне (двойной клик по узлу).
- */
 export default function NodeEditForm({ onClose }: NodeEditFormProps) {
   const selectedNode = useSelectedNode();
   const nodes = useNodes();

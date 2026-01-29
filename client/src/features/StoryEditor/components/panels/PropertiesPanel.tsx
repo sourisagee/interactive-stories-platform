@@ -3,7 +3,6 @@ import {
   useSelectedNode,
   useSelectedEdge,
   useCurrentStory,
-  useEdges,
   useStoryEditorActions,
   useIsSaving,
 } from "../../../../shared/hooks/storyEditorHooks";
@@ -32,7 +31,7 @@ const panelInput = {
   border: "1px solid #ccc",
   fontSize: "14px",
 };
-/** Режим редактирования истории (когда ничего не выбрано) */
+
 function StoryFormSection({
   currentStory,
   onSave,
@@ -161,14 +160,10 @@ function StoryFormSection({
   );
 }
 
-/**
- * Панель свойств для редактирования выбранного узла или связи
- */
 export default function PropertiesPanel() {
   const selectedNode = useSelectedNode();
   const selectedEdge = useSelectedEdge();
   const currentStory = useCurrentStory();
-  const edges = useEdges();
   const {
     updateChoiceThunk,
     deleteChoiceThunk,
@@ -181,26 +176,21 @@ export default function PropertiesPanel() {
 
   const prevEdgeIdRef = useRef<string | null>(null);
 
-  // Состояние формы для связи
   const [edgeForm, setEdgeForm] = useState({
     choiceText: "",
   });
 
-  // Обновляем форму связи только при изменении ID выбранной связи
   useEffect(() => {
     if (selectedEdge && selectedEdge.id !== prevEdgeIdRef.current) {
       prevEdgeIdRef.current = selectedEdge.id;
-      // Синхронизация формы с выбранной связью - правильный паттерн для редактирования
       setEdgeForm({
         choiceText: selectedEdge.data.choiceText || "",
       });
     } else if (!selectedEdge) {
       prevEdgeIdRef.current = null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEdge?.id]);
 
-  // Обработчик сохранения связи (временная — создаём на сервере, иначе — обновляем)
   const handleSaveEdge = () => {
     if (!selectedEdge) return;
 
@@ -222,13 +212,10 @@ export default function PropertiesPanel() {
       }
     }
 
-    // Очищаем поле текста выбора и снимаем выделение,
-    // чтобы плейсхолдер снова отображался
     setEdgeForm({ choiceText: "" });
     selectEdge(null);
   };
 
-  // Обработчик удаления связи (временная — только из стейта, иначе — API)
   const handleDeleteEdge = () => {
     if (!selectedEdge) return;
     if (!confirm("Вы уверены, что хотите удалить эту связь?")) return;
@@ -242,7 +229,6 @@ export default function PropertiesPanel() {
     }
   };
 
-  // Режим редактирования истории (ничего не выбрано)
   if (!selectedNode && !selectedEdge) {
     return (
       <StoryFormSection
@@ -253,12 +239,10 @@ export default function PropertiesPanel() {
     );
   }
 
-  // Форма для редактирования узла
   if (selectedNode) {
     return <NodeEditForm />;
   }
 
-  // Форма для редактирования связи
   if (selectedEdge) {
     return (
       <div

@@ -3,13 +3,13 @@ import axiosInstance from "@/shared/lib/axiosInstance";
 export interface PlayerStats {
   completedStories: number;
   inProgressStories: number;
-  memberSince: string; // ISO date string
+  memberSince: string; 
 }
 
 export interface AuthorStats {
   totalStories: number;
   draftStories: number;
-  memberSince: string; // ISO date string
+  memberSince: string; 
 }
 
 export interface GameInfo {
@@ -19,7 +19,7 @@ export interface GameInfo {
   genre: string;
   authorName: string;
   isCompleted: boolean;
-  updatedAt: string; // ISO date string
+  updatedAt: string; 
 }
 
 export interface AuthorStory {
@@ -53,7 +53,6 @@ export interface UserStatsResponse {
 }
 
 export const statsApi = {
-  // Получить мою статистику
   getMyStats: async (): Promise<UserStatsResponse> => {
     const response = await axiosInstance.get("/stats/my");
     let statsData;
@@ -66,7 +65,6 @@ export const statsApi = {
       throw new Error("No data in response");
     }
 
-    // Если это игрок, получаем также его прохождения
     if (statsData.user.role === "USER") {
       try {
         const playthroughsResponse = await axiosInstance.get(
@@ -86,7 +84,6 @@ export const statsApi = {
         const inProgress: GameInfo[] = [];
         const completed: GameInfo[] = [];
 
-        // Безопасная проверка на массив
         if (
           playthroughs &&
           Array.isArray(playthroughs) &&
@@ -113,9 +110,7 @@ export const statsApi = {
           }
         }
 
-        // ВРЕМЕННО: добавляем тестовые данные для проверки
         if (inProgress.length === 0 && completed.length === 0) {
-          // Тестовая незавершенная игра
           inProgress.push({
             id: 1,
             title: "Тестовая незавершенная история",
@@ -126,7 +121,6 @@ export const statsApi = {
             updatedAt: new Date().toISOString(),
           });
 
-          // Тестовая завершенная игра
           completed.push({
             id: 2,
             title: "Тестовая завершенная история",
@@ -148,7 +142,6 @@ export const statsApi = {
     return statsData;
   },
 
-  // Получить статистику пользователя по ID
   getUserStats: async (userId: number): Promise<UserStatsResponse> => {
     const response = await axiosInstance.get(`/stats/user/${userId}`);
 

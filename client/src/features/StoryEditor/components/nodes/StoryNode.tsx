@@ -1,12 +1,7 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { FlowNode } from "../../../../entities/story/model";
 
-/**
- * Кастомный узел для React Flow
- * Отображает узел истории с возможностью соединения через Handle'ы
- */
 export default function StoryNode({ data, selected }: NodeProps) {
-  // Приводим data к типу FlowNode, так как React Flow передает данные в поле data
   const nodeData = data as unknown as FlowNode;
   const nodeType = nodeData.type || "normal";
   const isStart = nodeType === "start";
@@ -29,7 +24,6 @@ export default function StoryNode({ data, selected }: NodeProps) {
         cursor: "pointer",
       }}
     >
-      {/* Handle для входящих соединений (слева) - только если не стартовый узел */}
 
       <Handle
         type="target"
@@ -39,12 +33,11 @@ export default function StoryNode({ data, selected }: NodeProps) {
           background: "#555",
           width: "10px",
           height: "10px",
-          opacity: isStart ? 0 : 1, // optional: hide but keep DOM node
+          opacity: isStart ? 0 : 1, 
           pointerEvents: isStart ? "none" : "auto",
         }}
       />
 
-      {/* Заголовок узла */}
       <div
         style={{
           fontWeight: "bold",
@@ -57,7 +50,6 @@ export default function StoryNode({ data, selected }: NodeProps) {
         {nodeData.title || "Без названия"}
       </div>
 
-      {/* Бейдж типа узла: для Старт/Конец — цвета в стилистике проекта, для обычного узла — серый */}
       <div
         style={{
           display: "flex",
@@ -86,7 +78,6 @@ export default function StoryNode({ data, selected }: NodeProps) {
         </span>
       </div>
 
-      {/* Превью содержимого (первые 50 символов) */}
       {nodeData.content && (
         <div
           style={{
@@ -106,8 +97,6 @@ export default function StoryNode({ data, selected }: NodeProps) {
         </div>
       )}
 
-      {/* Handle для исходящих соединений (справа) - только если не конечный узел */}
-
       <Handle
         type="source"
         position={Position.Right}
@@ -116,7 +105,7 @@ export default function StoryNode({ data, selected }: NodeProps) {
           background: "#555",
           width: "10px",
           height: "10px",
-          opacity: isEnd ? 0 : 1, // optional: hide but keep DOM node
+          opacity: isEnd ? 0 : 1, 
           pointerEvents: isEnd ? "none" : "auto",
         }}
       />

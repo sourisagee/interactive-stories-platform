@@ -39,7 +39,6 @@ export function getSceneTheme(title: string, content: string): SceneTheme {
 
 type SceneBackgroundProps = { title: string; content: string };
 
-/** Полноэкранный фон: деревья, тропа, мост, вода, пещера и т.д. — нарисованы только CSS. */
 export default function SceneBackground({ title, content }: SceneBackgroundProps) {
   const theme = useMemo(() => getSceneTheme(title, content), [title, content]);
 

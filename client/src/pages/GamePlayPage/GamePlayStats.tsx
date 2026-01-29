@@ -15,7 +15,6 @@ export default function GamePlayStats({ currentNode, restartKey }: GamePlayStats
 
   const clampPercent = (value: number) => Math.max(0, Math.min(100, value));
 
-  // Сброс при рестарте
   useEffect(() => {
     setHealth(2);
     setCourage(0);
@@ -23,9 +22,7 @@ export default function GamePlayStats({ currentNode, restartKey }: GamePlayStats
     setRespect(0);
   }, [restartKey]);
 
-  // Обновление статусов при переходе в новый узел
   useEffect(() => {
-    // На стартовом узле показатели остаются базовыми (смелость/находчивость/уважение = 0)
     if (currentNode.isStart) return;
 
     const text = `${currentNode.title} ${currentNode.content}`.toLowerCase();

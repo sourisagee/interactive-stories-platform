@@ -8,11 +8,10 @@ import {
 import { initialUserState } from "../model";
 
 const userSlice = createSlice({
- // Создает "срез" (slice) состояния для пользователя
   name: "user", 
-  initialState: initialUserState, // Начальное состояние
-  reducers: {}, // Пусто - потому что все изменения состояния происходят через асинхронные thunk'
-  extraReducers: (builder) => {//  Здесь обрабатываются ВСЕ асинхронные actions от thunk'ов 
+  initialState: initialUserState, 
+  reducers: {}, 
+  extraReducers: (builder) => {
     builder.addCase(refreshThunk.pending, (state) => {
       state.isLoading = true;
     });
@@ -24,7 +23,6 @@ const userSlice = createSlice({
     });
     builder.addCase(refreshThunk.rejected, (state, action) => {
       state.isLoading = false;
-      // Не показываем ошибку при отсутствии токена - это нормальная ситуация для неавторизованных пользователей
       const errorMessage = action.payload as string;
       state.error = (errorMessage === "No refresh token" || 
                      errorMessage === "Invalid refresh token" || 

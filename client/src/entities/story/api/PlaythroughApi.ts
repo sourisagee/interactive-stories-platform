@@ -41,7 +41,6 @@ function getData<T>(response: { data?: { data?: T }; data?: T }): T | null {
 }
 
 export const playthroughApi = {
-  // Получить все прохождения текущего пользователя (URL с «s»: /playthroughs/)
   getMyPlaythroughs: async (): Promise<UserPlaythrough[]> => {
     const response = await axiosInstance.get("/playthroughs/user/all");
     const raw = getData<unknown>(response);
@@ -55,7 +54,6 @@ export const playthroughApi = {
     return [];
   },
 
-  // Текущее прохождение по storyId (для восстановления после перезагрузки)
   getCurrentPlaythrough: async (storyId: number): Promise<PlaythroughWithNode | null> => {
     try {
       const response = await axiosInstance.get(`/playthroughs/current/${storyId}`);
@@ -68,7 +66,6 @@ export const playthroughApi = {
     }
   },
 
-  // Начать новое прохождение (создаёт запись на сервере)
   startPlaythrough: async (storyId: number): Promise<PlaythroughWithNode> => {
     const response = await axiosInstance.post("/playthroughs/start", { storyId });
     const data = getData<PlaythroughWithNode>(response);
@@ -76,7 +73,6 @@ export const playthroughApi = {
     return data;
   },
 
-  // Сделать выбор в узле (сохраняет прогресс на сервере)
   makeChoice: async (playthroughId: number, choiceId: number): Promise<PlaythroughWithNode> => {
     const response = await axiosInstance.post(`/playthroughs/${playthroughId}/choose`, { choiceId });
     const data = getData<PlaythroughWithNode>(response);

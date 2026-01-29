@@ -30,25 +30,14 @@ const storyEditorSlice = createSlice({
   name: "storyEditor",
   initialState: initialStoryEditorState,
   reducers: {
-    // ==================== СИНХРОННЫЕ ДЕЙСТВИЯ ====================
-
-    /**
-     * Установка текущей истории (без загрузки данных)
-     */
     setCurrentStory: (state, action: PayloadAction<Story | null>) => {
       state.currentStory = action.payload;
     },
 
-    /**
-     * Синхронное добавление узла (для временных узлов)
-     */
     addNode: (state, action: PayloadAction<FlowNode>) => {
       state.nodes.push(action.payload);
     },
 
-    /**
-     * Синхронное обновление узла
-     */
     updateNode: (
       state,
       action: PayloadAction<{ id: number; updates: Partial<FlowNode> }>
@@ -59,12 +48,8 @@ const storyEditorSlice = createSlice({
       }
     },
 
-    /**
-     * Синхронное удаление узла
-     */
     deleteNode: (state, action: PayloadAction<number>) => {
       state.nodes = state.nodes.filter((node) => node.id !== action.payload);
-      // Удаляем связанные связи
       state.edges = state.edges.filter(
         (edge) =>
           edge.source !== action.payload.toString() &&
@@ -72,16 +57,10 @@ const storyEditorSlice = createSlice({
       );
     },
 
-    /**
-     * Синхронное добавление связи (для временных связей)
-     */
     addEdge: (state, action: PayloadAction<FlowEdge>) => {
       state.edges.push(action.payload);
     },
 
-    /**
-     * Синхронное обновление связи
-     */
     updateEdge: (
       state,
       action: PayloadAction<{ id: string; updates: Partial<FlowEdge> }>
@@ -92,32 +71,20 @@ const storyEditorSlice = createSlice({
       }
     },
 
-    /**
-     * Синхронное удаление связи
-     */
     deleteEdge: (state, action: PayloadAction<string>) => {
       state.edges = state.edges.filter((edge) => edge.id !== action.payload);
     },
 
-    /**
-     * Выбор узла (снимает выбор с связи)
-     */
     selectNode: (state, action: PayloadAction<number | null>) => {
       state.selectedNodeId = action.payload;
       state.selectedEdgeId = null;
     },
 
-    /**
-     * Выбор связи (снимает выбор с узла)
-     */
     selectEdge: (state, action: PayloadAction<string | null>) => {
       state.selectedEdgeId = action.payload;
       state.selectedNodeId = null;
     },
 
-    /**
-     * Обновление позиции узла
-     */
     updateNodePosition: (
       state,
       action: PayloadAction<{ id: number; position: { x: number; y: number } }>
@@ -128,16 +95,10 @@ const storyEditorSlice = createSlice({
       }
     },
 
-    /**
-     * Переключение панели свойств
-     */
     togglePropertiesPanel: (state) => {
       state.isPropertiesPanelOpen = !state.isPropertiesPanelOpen;
     },
 
-    /**
-     * Обновление viewport (масштаб и положение канваса)
-     */
     updateViewport: (
       state,
       action: PayloadAction<{ x: number; y: number; zoom: number }>
@@ -145,16 +106,10 @@ const storyEditorSlice = createSlice({
       state.viewport = action.payload;
     },
 
-    /**
-     * Сброс состояния редактора
-     */
     resetEditor: (state) => {
       Object.assign(state, initialStoryEditorState);
     },
 
-    /**
-     * Создание временного узла
-     */
     addTemporaryNode: (
       state,
       action: PayloadAction<{
@@ -175,9 +130,6 @@ const storyEditorSlice = createSlice({
       state.selectedEdgeId = null;
     },
 
-    /**
-     * Создание временной связи между узлами
-     */
     addTemporaryEdge: (
       state,
       action: PayloadAction<{
@@ -198,9 +150,6 @@ const storyEditorSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // ==================== ОБРАБОТКА АСИНХРОННЫХ ДЕЙСТВИЙ ====================
-
-    // ---------- getFullStoryThunk ----------
     builder
       .addCase(getFullStoryThunk.pending, (state) => {
         state.isLoading = true;
@@ -237,7 +186,6 @@ const storyEditorSlice = createSlice({
             FlowNode & { fromChoices?: Choice[] }
           >).flatMap((node) => node.fromChoices ?? []);
 
-          // Убираем дубликаты по id
           const uniqueById = new Map<number, Choice>();
           fromNested.forEach((ch) => {
             if (ch && typeof ch.id === "number" && !uniqueById.has(ch.id)) {
@@ -260,21 +208,17 @@ const storyEditorSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // ---------- getStoryChoicesThunk ----------
     builder.addCase(getStoryChoicesThunk.fulfilled, (state, action) => {
-      // Обновляем только связи, оставляя узлы без изменений
       const rawChoices = action.payload ?? [];
       state.edges = rawChoices.map(convertToFlowEdge);
     });
 
-    // ---------- updateStoryThunk ----------
     builder.addCase(updateStoryThunk.fulfilled, (state, action) => {
       if (state.currentStory?.id === action.payload.id) {
         state.currentStory = action.payload;
       }
     });
 
-    // ---------- createNodeThunk ----------
     builder
       .addCase(createNodeThunk.pending, (state) => {
         state.isSaving = true;
@@ -304,7 +248,6 @@ const storyEditorSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // ---------- updateNodeThunk ----------
     builder
       .addCase(updateNodeThunk.pending, (state) => {
         state.isSaving = true;
@@ -312,7 +255,6 @@ const storyEditorSlice = createSlice({
       .addCase(updateNodeThunk.fulfilled, (state, action) => {
         state.isSaving = false;
 
-        // Обновляем узел в состоянии
         const updatedNode = action.payload;
         const nodeIndex = state.nodes.findIndex((n) => n.id === updatedNode.id);
 
@@ -325,27 +267,22 @@ const storyEditorSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // ---------- deleteNodeThunk ----------
     builder.addCase(deleteNodeThunk.fulfilled, (state, action) => {
       const deletedNodeId = action.payload;
 
-      // Удаляем узел
       state.nodes = state.nodes.filter((node) => node.id !== deletedNodeId);
 
-      // Удаляем связанные связи
       state.edges = state.edges.filter(
         (edge) =>
           edge.source !== deletedNodeId.toString() &&
           edge.target !== deletedNodeId.toString()
       );
 
-      // Сбрасываем выбор если удален выбранный узел
       if (state.selectedNodeId === deletedNodeId) {
         state.selectedNodeId = null;
       }
     });
 
-    // ---------- createChoiceThunk ----------
     builder
       .addCase(createChoiceThunk.pending, (state) => {
         state.isSaving = true;
@@ -372,7 +309,6 @@ const storyEditorSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // ---------- updateChoiceThunk ----------
     builder.addCase(updateChoiceThunk.fulfilled, (state, action) => {
       const updatedChoice = action.payload;
       const edgeIndex = state.edges.findIndex(
@@ -384,16 +320,13 @@ const storyEditorSlice = createSlice({
       }
     });
 
-    // ---------- deleteChoiceThunk ----------
     builder.addCase(deleteChoiceThunk.fulfilled, (state, action) => {
       const deletedChoiceId = action.payload;
 
-      // Удаляем связь
       state.edges = state.edges.filter(
         (edge) => edge.data.choiceId !== deletedChoiceId
       );
 
-      // Сбрасываем выбор если удалена выбранная связь
       if (state.selectedEdgeId === `edge-${deletedChoiceId}`) {
         state.selectedEdgeId = null;
       }
@@ -401,9 +334,6 @@ const storyEditorSlice = createSlice({
   },
 });
 
-// ==================== ЭКСПОРТ ====================
-
-// Экспортируем actions
 export const {
   setCurrentStory,
   addNode,
@@ -422,8 +352,6 @@ export const {
   addTemporaryEdge,
 } = storyEditorSlice.actions;
 
-// Экспортируем reducer
 export const storyEditorReducer = storyEditorSlice.reducer;
 
-// Типы для экспорта
 export type StoryEditorActions = typeof storyEditorSlice.actions;

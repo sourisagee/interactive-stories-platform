@@ -10,9 +10,6 @@ import {
 import { isTemporaryEdge } from "../../../../entities/story/model/converters";
 import "./EditorPanels.css";
 
-/**
- * Панель инструментов редактора историй
- */
 export default function Toolbar() {
   const currentStory = useCurrentStory();
   const nodes = useNodes();
@@ -32,14 +29,12 @@ export default function Toolbar() {
     selectEdge,
   } = useStoryEditorActions();
 
-  // Обработчик добавления нового узла
   const handleAddNode = () => {
     if (!currentStory) {
       alert("Сначала выберите или создайте историю");
       return;
     }
 
-    // Простое авто-размещение: новые узлы идут «цепочкой» по оси X
     const index = nodes.length;
     const baseX = 200;
     const baseY = 150;
@@ -48,12 +43,9 @@ export default function Toolbar() {
     const position_x = baseX + index * offsetX;
     const position_y = baseY;
 
-    // Создаём временный узел только на клиенте; реальные данные и координаты
-    // сохраняются на сервере при нажатии «Сохранить» в панели свойств
     addTemporaryNode({ x: position_x, y: position_y }, "Новый узел");
   };
 
-  // Обработчик удаления выбранного элемента
   const handleDelete = async () => {
     if (selectedNode) {
       if (!confirm("Вы уверены, что хотите удалить этот узел?")) return;
@@ -72,10 +64,9 @@ export default function Toolbar() {
       const connectedEdges = edges.filter(
         (e) => e.source === nodeIdStr || e.target === nodeIdStr
       );
-      // Сразу убираем узел и его связи из состояния — UI обновляется мгновенно
       deleteNode(numId);
       selectNode(null);
-      // В фоне удаляем на сервере: сначала связи, затем узел
+
       try {
         for (const edge of connectedEdges) {
           if (edge.data.choiceId) {
@@ -105,7 +96,6 @@ export default function Toolbar() {
     }
   };
 
-  // Обработчик переключения панели свойств
   const handleTogglePropertiesPanel = () => {
     togglePropertiesPanel();
   };

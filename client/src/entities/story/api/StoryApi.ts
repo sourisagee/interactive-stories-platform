@@ -14,12 +14,10 @@ import type {
 import type { ServerResponseType } from "../../../shared/types";
 import type { AxiosError } from "axios";
 
-// Базовые URL для API
 const API_STORIES_URL = "/stories";
 const API_NODES_URL = "/nodes";
 const API_CHOICES_URL = "/choices";
 
-// Уникальные имена thunk'ов
 export const STORY_THUNK_NAMES = {
   // Story
   GET_ALL_STORIES: "story/getAllStories",
@@ -42,7 +40,6 @@ export const STORY_THUNK_NAMES = {
   DELETE_CHOICE: "story/deleteChoice",
 } as const;
 
-// Вспомогательная функция для обработки ошибок
 const handleApiError = (error: unknown, defaultMessage: string): string => {
   const axiosError = error as AxiosError<ServerResponseType<null>>;
   return axiosError.response?.data?.message ||
@@ -50,9 +47,7 @@ const handleApiError = (error: unknown, defaultMessage: string): string => {
          defaultMessage;
 };
 
-// Класс StoryApi - содержит статические методы для работы с API историй
 export default class StoryApi {
-  // Получить все истории (публичный эндпоинт)
   static async getAllStories(authorId?: number): Promise<StoryData[]> {
     const url = authorId
       ? `${API_STORIES_URL}?author=${authorId}`
@@ -61,7 +56,6 @@ export default class StoryApi {
     return response.data.data || [];
   }
 
-  // Получить историю по ID (публичный эндпоинт)
   static async getStoryById(storyId: number): Promise<StoryData> {
     const response = await axiosInstance.get<ServerResponseType<StoryData>>(
       `${API_STORIES_URL}/${storyId}`
@@ -69,7 +63,6 @@ export default class StoryApi {
     return response.data.data as StoryData;
   }
 
-  // Получить полную историю с узлами и выборами (публичный эндпоинт)
   static async getStoryFull(storyId: number): Promise<StoryFullData> {
     const response = await axiosInstance.get<ServerResponseType<StoryFullData>>(
       `${API_STORIES_URL}/${storyId}/full`
@@ -77,7 +70,6 @@ export default class StoryApi {
     return response.data.data as StoryFullData;
   }
 
-  // Создать новую историю (требует авторизации)
   static async createStory(storyData: CreateStoryFormData): Promise<StoryData> {
     const response = await axiosInstance.post<ServerResponseType<StoryData>>(
       API_STORIES_URL,
@@ -86,7 +78,6 @@ export default class StoryApi {
     return response.data.data as StoryData;
   }
 
-  // Получить мои истории (требует авторизации)
   static async getMyStories(): Promise<StoryData[]> {
     const response = await axiosInstance.get<ServerResponseType<StoryData[]>>(
       `${API_STORIES_URL}/my/stories`
@@ -94,7 +85,6 @@ export default class StoryApi {
     return response.data.data || [];
   }
 
-  // Дополнительные методы из dev-ветки
   static async getFullStory(storyId: number): Promise<StoryWithNodes> {
     const response = await axiosInstance.get<ServerResponseType<StoryWithNodes>>(
       `${API_STORIES_URL}/${storyId}/full`
@@ -167,11 +157,8 @@ export default class StoryApi {
   }
 }
 
-// ==================== THUNK'И ДЛЯ REDUX ====================
+// THUNK'И ДЛЯ REDUX
 
-/**
- * Получение списка всех историй
- */
 export const getAllStoriesThunk = createAsyncThunk<
   StoryData[],
   number | undefined,
@@ -188,9 +175,6 @@ export const getAllStoriesThunk = createAsyncThunk<
   }
 );
 
-/**
- * Получение истории по ID
- */
 export const getStoryByIdThunk = createAsyncThunk<
   StoryData,
   number,
@@ -207,9 +191,6 @@ export const getStoryByIdThunk = createAsyncThunk<
   }
 );
 
-/**
- * Получение полной истории с узлами и выборами
- */
 export const getStoryFullThunk = createAsyncThunk<
   StoryFullData,
   number,
@@ -226,9 +207,6 @@ export const getStoryFullThunk = createAsyncThunk<
   }
 );
 
-/**
- * Создание новой истории
- */
 export const createStoryThunk = createAsyncThunk<
   StoryData,
   CreateStoryFormData,
@@ -245,9 +223,6 @@ export const createStoryThunk = createAsyncThunk<
   }
 );
 
-/**
- * Получение историй текущего пользователя
- */
 export const getMyStoriesThunk = createAsyncThunk<
   StoryData[],
   void,
@@ -264,9 +239,6 @@ export const getMyStoriesThunk = createAsyncThunk<
   }
 );
 
-/**
- * Получение истории с узлами и выборами (для редактора)
- */
 export const getFullStoryThunk = createAsyncThunk<
   StoryWithNodes,
   number,
@@ -283,9 +255,6 @@ export const getFullStoryThunk = createAsyncThunk<
   }
 );
 
-/**
- * Получение всех выборов для истории
- */
 export const getStoryChoicesThunk = createAsyncThunk<
   Choice[],
   number,
@@ -302,9 +271,6 @@ export const getStoryChoicesThunk = createAsyncThunk<
   }
 );
 
-/**
- * Обновление истории
- */
 export const updateStoryThunk = createAsyncThunk<
   Story,
   { storyId: number; updates: Partial<Story> },
@@ -321,10 +287,6 @@ export const updateStoryThunk = createAsyncThunk<
   }
 );
 
-/**
- * Создание нового узла.
- * payload.nodeData — данные для API; payload.temporaryNodeId — id временного узла в стейте (чтобы заменить его после ответа).
- */
 export const createNodeThunk = createAsyncThunk<
   StoryNode,
   {
@@ -353,9 +315,6 @@ export const createNodeThunk = createAsyncThunk<
   }
 );
 
-/**
- * Обновление узла
- */
 export const updateNodeThunk = createAsyncThunk<
   StoryNode,
   { nodeId: number; updates: UpdateNodeFormData },
@@ -372,9 +331,6 @@ export const updateNodeThunk = createAsyncThunk<
   }
 );
 
-/**
- * Удаление узла
- */
 export const deleteNodeThunk = createAsyncThunk<
   number,
   number,
@@ -392,9 +348,6 @@ export const deleteNodeThunk = createAsyncThunk<
   }
 );
 
-/**
- * Создание выбора
- */
 export const createChoiceThunk = createAsyncThunk<
   Choice,
   CreateChoiceFormData,
@@ -411,9 +364,6 @@ export const createChoiceThunk = createAsyncThunk<
   }
 );
 
-/**
- * Обновление текста выбора
- */
 export const updateChoiceThunk = createAsyncThunk<
   Choice,
   { choiceId: number; choiceText: string },

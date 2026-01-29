@@ -28,7 +28,6 @@ function AIChat() {
   return (
     <div className="ai-chat">
       <form onSubmit={handleSubmit}>
-        {/* Поле, куда автор пишет запрос к AI (идею / задачу) */}
         <textarea
           className="ai-chat-input"
           value={prompt}

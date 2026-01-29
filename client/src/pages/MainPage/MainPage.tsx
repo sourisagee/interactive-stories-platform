@@ -9,7 +9,6 @@ export default function MainPage() {
   return (
     <div className="main-page">
       <div className="cosmic-bg" aria-hidden />
-      {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <h2 className="hero-subtitle">
@@ -27,7 +26,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* About Section */}
       <section className="about">
         <div className="container">
           <h2 className="section-title">О проекте</h2>
@@ -45,7 +43,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="features">
         <div className="container">
           <h2 className="section-title">Возможности платформы</h2>
@@ -81,7 +78,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* User Types Section */}
       <section className="user-types">
         <div className="container">
           <h2 className="section-title user-types-title-centered">
@@ -186,7 +182,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      {/* Registration Benefits */}
       {!user && (
         <section className="benefits">
           <div className="container">
@@ -246,7 +241,6 @@ export default function MainPage() {
         </section>
       )}
 
-      {/* Footer */}
       <footer className="main-footer">
         <div className="container">
           <div className="footer-content">

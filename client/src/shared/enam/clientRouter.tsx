@@ -8,7 +8,6 @@ export const CLIENT_ROUTES = {
   AI_ASSISTANT: "/ai",
 };
 
-/** Маршруты с :param — для кнопок играть и подробнее */
 export const storyDetailPath = (id: number) => `/story/${id}`;
 export const gamePlayPath = (storyId: number) => `/game/${storyId}`;
 export const editStoryPath = (storyId: number) => `/story/edit/${storyId}`;

@@ -31,9 +31,7 @@ export default function ProfilePage() {
   };
 
   const handleStoryCreated = (newStory: { id: number }) => {
-    // Перенаправляем в редактор новой истории
     navigate(editStoryPath(newStory.id));
-    // Обновляем профиль, чтобы новая история появилась в списке черновиков
     loadProfile();
   };
 
@@ -134,7 +132,6 @@ export default function ProfilePage() {
 
   const handlePublishStory = async (storyId: number) => {
     try {
-      // Импортируем updateStoryThunk динамически
       const { updateStoryThunk } = await import(
         "../../entities/story/api/StoryApi"
       );
@@ -146,7 +143,6 @@ export default function ProfilePage() {
         })
       ).unwrap();
 
-      // Обновляем профиль, чтобы история переместилась из черновиков в опубликованные
       await loadProfile();
     } catch (error) {
       console.error("Ошибка при публикации истории:", error);
@@ -164,11 +160,9 @@ export default function ProfilePage() {
     }
 
     try {
-      // Нужно создать deleteStoryThunk, так как его нет в API
       const response = await axiosInstance.delete(`/stories/${storyId}`);
 
       if (response.status === 200) {
-        // Обновляем профиль, чтобы удаленная история исчезла из списка
         loadProfile();
       }
     } catch (error) {
@@ -217,7 +211,6 @@ export default function ProfilePage() {
 
         {user.role === UserRole.USER ? (
           <div className="profile-content profile-content-player">
-            {/* Ряд 1: Информация о пользователе / Статистика */}
             <div className="profile-info">
               <h3>Информация о пользователе</h3>
               <p>
@@ -273,7 +266,6 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Ряд 2: Незавершенные игры / Завершенные игры */}
             <div className="games-section">
               <h3>Незавершенные игры</h3>
               <div className="games-list">
@@ -329,7 +321,6 @@ export default function ProfilePage() {
                 </p>
               </div>
 
-              {/* Черновики для авторов */}
               <div className="stories-section">
                 <h3>Черновики</h3>
                 <div className="stories-list">
@@ -388,7 +379,6 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Опубликованные истории для авторов */}
               <div className="stories-section">
                 <h3>Опубликованные истории</h3>
                 <div className="stories-list">
@@ -410,7 +400,6 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Модальное окно для создания истории */}
       {user?.role === UserRole.AUTHOR && (
         <CreateStoryModal
           isOpen={isCreateModalOpen}

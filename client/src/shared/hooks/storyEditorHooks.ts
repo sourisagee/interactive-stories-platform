@@ -39,36 +39,20 @@ import type {
   CreateChoiceFormData,
 } from "../../entities/story/model";
 
-// ==================== СЕЛЕКТОРЫ ====================
+// СЕЛЕКТОРЫ
 
-/**
- * Селектор для всего состояния story editor
- */
 export const useStoryEditorState = () =>
   useAppSelector((state: RootState) => state.storyEditor);
 
-/**
- * Селектор для текущей истории
- */
 export const useCurrentStory = () =>
   useAppSelector((state: RootState) => state.storyEditor.currentStory);
 
-/**
- * Селектор для узлов (FlowNode[])
- */
 export const useNodes = () =>
   useAppSelector((state: RootState) => state.storyEditor.nodes);
 
-/**
- * Селектор для связей (FlowEdge[])
- */
 export const useEdges = () =>
   useAppSelector((state: RootState) => state.storyEditor.edges);
 
-/**
- * Селектор для выбранного узла.
- * Сравнение по id через String(), чтобы выбранный узел находился даже при разном типе id (number/string).
- */
 export const useSelectedNode = () => {
   const { selectedNodeId, nodes } = useStoryEditorState();
   if (selectedNodeId == null) return null;
@@ -76,9 +60,6 @@ export const useSelectedNode = () => {
   return nodes.find((node) => String(node.id) === id) ?? null;
 };
 
-/**
- * Селектор для выбранной связи
- */
 export const useSelectedEdge = () => {
   const { selectedEdgeId, edges } = useStoryEditorState();
   return selectedEdgeId != null
@@ -86,46 +67,28 @@ export const useSelectedEdge = () => {
     : null;
 };
 
-/**
- * Селектор для состояния загрузки
- */
 export const useIsLoading = () =>
   useAppSelector((state: RootState) => state.storyEditor.isLoading);
 
-/**
- * Селектор для состояния сохранения
- */
 export const useIsSaving = () =>
   useAppSelector((state: RootState) => state.storyEditor.isSaving);
 
-/**
- * Селектор для ошибок
- */
 export const useError = () =>
   useAppSelector((state: RootState) => state.storyEditor.error);
 
-/**
- * Селектор для состояния панели свойств
- */
 export const useIsPropertiesPanelOpen = () =>
   useAppSelector((state: RootState) => state.storyEditor.isPropertiesPanelOpen);
 
-/**
- * Селектор для viewport (масштаб и положение)
- */
 export const useViewport = () =>
   useAppSelector((state: RootState) => state.storyEditor.viewport);
 
-// ==================== ДЕЙСТВИЯ ====================
+// ДЕЙСТВИЯ
 
-/**
- * Хук для получения dispatch и всех actions
- */
 export const useStoryEditorActions = () => {
   const dispatch = useAppDispatch();
 
   return {
-    // Синхронные actions
+    // Синхронные
     setCurrentStory: (story: Story | null) => dispatch(setCurrentStory(story)),
     addNode: (node: FlowNode) => dispatch(addNode(node)),
     updateNode: (id: number, updates: Partial<FlowNode>) =>
@@ -178,11 +141,8 @@ export const useStoryEditorActions = () => {
   };
 };
 
-// ==================== КОМБИНИРОВАННЫЕ ХУКИ ====================
+// КОМБИНИРОВАННЫЕ ХУКИ
 
-/**
- * Комплексный хук для редактора (состояние + actions)
- */
 export const useStoryEditor = () => {
   const state = useStoryEditorState();
   const actions = useStoryEditorActions();
@@ -199,9 +159,6 @@ export const useStoryEditor = () => {
   };
 };
 
-/**
- * Хук для работы с узлами
- */
 export const useNodesManager = () => {
   const nodes = useNodes();
   const { addNode, updateNode, deleteNode, createNodeThunk, updateNodeThunk } =
@@ -217,9 +174,6 @@ export const useNodesManager = () => {
   };
 };
 
-/**
- * Хук для работы со связями
- */
 export const useEdgesManager = () => {
   const edges = useEdges();
   const {
@@ -241,9 +195,7 @@ export const useEdgesManager = () => {
     deleteChoiceThunk,
   };
 };
-/**
- * Хук для работы с выбранными элементами
- */
+
 export const useSelection = () => {
   const selectedNode = useSelectedNode();
   const selectedEdge = useSelectedEdge();

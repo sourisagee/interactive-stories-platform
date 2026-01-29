@@ -6,7 +6,6 @@ import { getCoverImageSrc } from "../../shared/lib/getServerBaseUrl";
 import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
 import "./StoryDetailPage.css";
 
-/** Страница «Подробнее»: полная информация об игре (обложка, автор, жанр, описание). */
 export default function StoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

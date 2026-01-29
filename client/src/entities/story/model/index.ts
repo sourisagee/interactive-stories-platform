@@ -1,6 +1,5 @@
 import type { User } from "../../user/model";
 
-// Базовый интерфейс истории
 export interface Story {
   id: number;
   cover: string;
@@ -15,7 +14,6 @@ export interface Story {
   updatedAt: string;
 }
 
-// Алиас для совместимости
 export type StoryData = Story;
 
 export interface StoryNode {
@@ -83,7 +81,6 @@ export interface NodeWithChoices extends StoryNode {
   fromChoices: Choice[];
 }
 
-// История с узлами для страницы игры (GET /stories/:id/full)
 export type StoryFullData = Story & { nodes: NodeWithChoices[] };
 
 // Типы для форм

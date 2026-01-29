@@ -37,12 +37,6 @@ export default class UserApi {
   }
 }
 
-// USER_THUNK_NAMES - Уникальные идентификаторы для действий (actions) в Redux store.
-// Эти имена используются Redux для:
-// 1. Автоматическое создания типов трех типов действий (начало, успех, ошибка)
-// 2. Отслеживания в Redux DevTools
-// 3. Организации логики в редьюсерах
-
 const USER_THUNK_NAMES = {
   SIGNUP: "/user/signUp",
   SIGNIN: "/user/signIn",
@@ -56,8 +50,6 @@ const USER_API_URL = {
   SIGNOUT: "/auth/signOut",
   REFRESHTOKENS: "/auth/refreshTokens",
 } as const;
-
-// создаем санки
 
 export const refreshThunk = createAsyncThunk<
   UserData,  
@@ -74,7 +66,6 @@ export const refreshThunk = createAsyncThunk<
   } catch (error) {
     const axiosError = error as AxiosError<ServerResponseType<null>>;
     
-    // Если 401 - это нормально, просто нет валидного refresh token (пользователь не авторизован)
     if (axiosError.response?.status === 401) {
       setAccessToken("");
       return rejectWithValue("Not authenticated");

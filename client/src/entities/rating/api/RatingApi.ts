@@ -9,7 +9,6 @@ export interface StoryRatingInfo {
   userRating: number | null;
 }
 
-// Импортируем StoryData из модели историй
 import type { StoryData } from "../../story/model";
 
 export interface PopularStory extends StoryData {
@@ -17,10 +16,8 @@ export interface PopularStory extends StoryData {
   totalRatings: number;
 }
 
-// Базовый URL для API рейтингов
 const API_RATINGS_URL = "/stories";
 
-// Вспомогательная функция для обработки ошибок
 const handleApiError = (error: unknown, defaultMessage: string): string => {
   const axiosError = error as AxiosError<ServerResponseType<null>>;
   return (
@@ -30,9 +27,7 @@ const handleApiError = (error: unknown, defaultMessage: string): string => {
   );
 };
 
-// Класс RatingApi - содержит статические методы для работы с API рейтингов
 export default class RatingApi {
-  // Получить информацию о рейтинге истории
   static async getStoryRating(
     storyId: number
   ): Promise<StoryRatingInfo> {
@@ -42,7 +37,6 @@ export default class RatingApi {
     return response.data.data as StoryRatingInfo;
   }
 
-  // Поставить или обновить оценку
   static async createOrUpdateRating(
     storyId: number,
     rating: number
@@ -53,7 +47,6 @@ export default class RatingApi {
     return response.data.data as StoryRatingInfo;
   }
 
-  // Удалить оценку
   static async deleteRating(storyId: number): Promise<StoryRatingInfo> {
     const response = await axiosInstance.delete<
       ServerResponseType<StoryRatingInfo>
@@ -61,7 +54,6 @@ export default class RatingApi {
     return response.data.data as StoryRatingInfo;
   }
 
-  // Получить популярные истории
   static async getPopularStories(limit: number = 4): Promise<PopularStory[]> {
     const response = await axiosInstance.get<
       ServerResponseType<PopularStory[]>
@@ -70,11 +62,8 @@ export default class RatingApi {
   }
 }
 
-// ==================== THUNK'И ДЛЯ REDUX ====================
+// THUNK'И ДЛЯ REDUX
 
-/**
- * Получение информации о рейтинге истории
- */
 export const getStoryRatingThunk = createAsyncThunk<
   StoryRatingInfo,
   number,
@@ -103,9 +92,6 @@ export const getStoryRatingThunk = createAsyncThunk<
   }
 );
 
-/**
- * Создание или обновление оценки
- */
 export const createOrUpdateRatingThunk = createAsyncThunk<
   StoryRatingInfo,
   { storyId: number; rating: number },
@@ -125,9 +111,6 @@ export const createOrUpdateRatingThunk = createAsyncThunk<
   }
 );
 
-/**
- * Удаление оценки
- */
 export const deleteRatingThunk = createAsyncThunk<
   StoryRatingInfo,
   number,
@@ -141,9 +124,6 @@ export const deleteRatingThunk = createAsyncThunk<
   }
 });
 
-/**
- * Получение популярных историй
- */
 export const getPopularStoriesThunk = createAsyncThunk<
   PopularStory[],
   number | undefined,

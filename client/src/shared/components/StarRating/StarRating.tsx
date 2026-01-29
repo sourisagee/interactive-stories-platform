@@ -5,10 +5,6 @@ interface StarRatingProps {
   totalRatings: number;
 }
 
-/**
- * Компонент для отображения среднего рейтинга (только чтение)
- * Звезды не кликабельны, показывают только средний рейтинг
- */
 export default function StarRating({
   averageRating,
   totalRatings,

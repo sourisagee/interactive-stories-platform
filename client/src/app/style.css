@@ -154,7 +154,6 @@ a.btn {
   transform: translateY(0);
 }
 
-/* Стиль как у кнопки «Зарегистрироваться» на странице регистрации */
 .btn-primary {
   background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
   border: 2px solid rgba(139, 107, 184, 0.5);
@@ -388,7 +387,6 @@ select.input-base option[selected] {
   line-height: 1.8;
 }
 
-/* Стили для страниц без отдельных CSS файлов */
 .profile {
   padding: 2rem;
   min-height: calc(100vh - 65px);
