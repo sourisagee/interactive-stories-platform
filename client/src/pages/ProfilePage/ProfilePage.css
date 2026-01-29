@@ -29,7 +29,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
@@ -54,20 +54,36 @@
 .profile-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
   gap: 2rem;
   align-items: start;
+}
+
+/* Игрок: блоки «Информация» и «Статистика» в одной строке — одинаковая высота */
+.profile-content-player {
+  align-items: stretch;
 }
 
 @media (max-width: 900px) {
   .profile-content {
     grid-template-columns: 1fr;
   }
+
+  .profile-left,
+  .profile-right {
+    grid-row: auto;
+    display: flex;
+    flex-direction: column;
+    grid-template-rows: unset;
+  }
 }
 
+/* Автор: колонки с subgrid — первый ряд (Информация / Статистика) одной высоты */
 .profile-left,
 .profile-right {
-  display: flex;
-  flex-direction: column;
+  grid-row: span 2;
+  display: grid;
+  grid-template-rows: subgrid;
   gap: 1.5rem;
 }
 
@@ -232,6 +248,7 @@
 
 .profile-game-author,
 .profile-game-genre,
+.profile-game-description,
 .profile-game-updated {
   margin: 0;
   font-size: 0.9rem;
@@ -241,19 +258,32 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
+.profile-game-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .profile-game-actions {
-  padding: 0.75rem 1.15rem 0.85rem;
+  padding: 0.4rem 0.85rem 0.5rem;
   border-top: 1px solid var(--color-border, rgba(139, 107, 184, 0.2));
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
   position: relative;
   z-index: 2;
 }
 
 .profile-game-actions .btn {
   width: 100%;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.7rem;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .profile-page .story-title {
@@ -266,6 +296,7 @@
   line-height: 1.4;
 }
 
+.profile-page .story-author,
 .profile-page .story-genre,
 .profile-page .story-updated {
   margin: 0;
@@ -314,6 +345,40 @@
 }
 
 .profile-page .story-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Черновики: обложка на всю ширину карточки, высота без изменений */
+.profile-page .story-card--draft {
+  flex-direction: column;
+}
+
+.profile-page .story-card--draft .story-cover {
+  width: 100%;
+  min-width: 100%;
+  height: 130px;
+}
+
+.profile-page .story-card--draft .story-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Опубликованные (только в профиле): обложка на всю ширину карточки, высота без изменений */
+.profile-page .story-card--published {
+  flex-direction: column;
+}
+
+.profile-page .story-card--published .story-cover {
+  width: 100%;
+  min-width: 100%;
+  height: 130px;
+}
+
+.profile-page .story-card--published .story-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -457,6 +522,7 @@
 .profile-statistics .stat-item-date {
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
 }
 

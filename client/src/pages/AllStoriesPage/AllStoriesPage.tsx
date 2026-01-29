@@ -11,7 +11,7 @@ import {
 } from "../../entities/rating/api/RatingApi";
 import { UserRole, type UserData } from "../../entities/user/model";
 import { CLIENT_ROUTES, storyDetailPath, gamePlayPath } from "../../shared/enam/clientRouter";
-import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
+import { getCoverImageSrc } from "../../shared/lib/getServerBaseUrl";
 import type { StoryData } from "../../entities/story/model";
 import StarRating from "../../shared/components/StarRating/StarRating";
 import RatingModal from "../../shared/components/RatingModal/RatingModal";
@@ -80,7 +80,7 @@ function StoryCard({
           </div>
         )}
         <div className="story-cover">
-          <img src={`${getServerBaseUrl()}/${story.cover}`} alt={story.title} />
+          <img src={getCoverImageSrc(story.cover)} alt={story.title} />
         </div>
         <div className="story-content">
           <h3 className="story-title">{story.title}</h3>

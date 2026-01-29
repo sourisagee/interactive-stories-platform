@@ -14,7 +14,7 @@ import { editStoryPath } from "@/shared/enam/clientRouter";
 import { useNavigate } from "react-router";
 import CreateStoryModal from "../../shared/components/CreateStoryModal/CreateStoryModal";
 import axiosInstance from "@/shared/lib/axiosInstance";
-import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
+import { getServerBaseUrl, getCoverImageSrc } from "../../shared/lib/getServerBaseUrl";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAppSelector((state) => state.user);
@@ -63,12 +63,15 @@ export default function ProfilePage() {
   ) => (
     <div key={game.id} className="profile-game-card">
       <div className="profile-game-cover">
-        <img src={`${getServerBaseUrl()}/${game.cover}`} alt={game.title} />
+        <img src={getCoverImageSrc(game.cover)} alt={game.title} />
       </div>
       <div className="profile-game-content">
         <h3 className="profile-game-title">{game.title}</h3>
         <p className="profile-game-author">Автор: {game.authorName}</p>
-        <p className="profile-game-genre">{game.genre}</p>
+        <p className="profile-game-genre">Жанр: {game.genre}</p>
+        {game.description && (
+          <p className="profile-game-description">{game.description}</p>
+        )}
         <p className="profile-game-updated">
           Обновлено: {new Date(game.updatedAt).toLocaleDateString("ru-RU")}
         </p>
@@ -82,13 +85,14 @@ export default function ProfilePage() {
   );
 
   const renderAuthorStoryCard = (story: AuthorStory, isDraft: boolean) => (
-    <div key={story.id} className="story-card">
+    <div key={story.id} className={`story-card ${isDraft ? "story-card--draft" : "story-card--published"}`}>
       <div className="story-cover">
-        <img src={`${getServerBaseUrl()}/${story.cover}`} alt={story.title} />
+        <img src={getCoverImageSrc(story.cover)} alt={story.title} />
       </div>
       <div className="story-info">
         <h4 className="story-title">{story.title}</h4>
-        <p className="story-genre">{story.genre}</p>
+        <p className="story-author">Автор: {user?.username ?? ""}</p>
+        <p className="story-genre">Жанр: {story.genre}</p>
         <p className="story-description">{story.description}</p>
         <p className="story-updated">
           Обновлено: {new Date(story.updatedAt).toLocaleDateString("ru-RU")}
@@ -201,7 +205,6 @@ export default function ProfilePage() {
       <div className="profile">
         {user.role === UserRole.AUTHOR && (
           <header className="profile-header">
-            <h1 className="profile-title">Профиль</h1>
             <button
               type="button"
               className="btn btn-primary profile-create-btn"
@@ -370,13 +373,13 @@ export default function ProfilePage() {
                         </span>
                         <span className="stat-label">В разработке</span>
                       </div>
-                      <div className="stat-item">
+                      <div className="stat-item stat-item-date">
+                        <span className="stat-label">Автор с</span>
                         <span className="stat-number">
                           {new Date(
                             profile.authorStats.memberSince
                           ).toLocaleDateString("ru-RU")}
                         </span>
-                        <span className="stat-label">Автор с</span>
                       </div>
                     </div>
                   </div>

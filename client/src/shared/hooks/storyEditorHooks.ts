@@ -66,13 +66,14 @@ export const useEdges = () =>
   useAppSelector((state: RootState) => state.storyEditor.edges);
 
 /**
- * Селектор для выбранного узла
+ * Селектор для выбранного узла.
+ * Сравнение по id через String(), чтобы выбранный узел находился даже при разном типе id (number/string).
  */
 export const useSelectedNode = () => {
   const { selectedNodeId, nodes } = useStoryEditorState();
-  return selectedNodeId
-    ? nodes.find((node) => node.id === selectedNodeId)
-    : null;
+  if (selectedNodeId == null) return null;
+  const id = String(selectedNodeId);
+  return nodes.find((node) => String(node.id) === id) ?? null;
 };
 
 /**
@@ -80,8 +81,8 @@ export const useSelectedNode = () => {
  */
 export const useSelectedEdge = () => {
   const { selectedEdgeId, edges } = useStoryEditorState();
-  return selectedEdgeId
-    ? edges.find((edge) => edge.id === selectedEdgeId)
+  return selectedEdgeId != null
+    ? edges.find((edge) => edge.id === selectedEdgeId) ?? null
     : null;
 };
 

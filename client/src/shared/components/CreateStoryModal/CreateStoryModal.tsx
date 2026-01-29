@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAppDispatch } from "../../hooks/reduxHooks";
 import type { CreateStoryFormData } from "../../../entities/story/model";
+import { getCoverImageSrc } from "../../lib/getServerBaseUrl";
 import "./CreateStoryModal.css";
 
 interface CreateStoryModalProps {
@@ -31,6 +32,7 @@ export default function CreateStoryModal({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<CreateStoryFormData>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -46,6 +48,9 @@ export default function CreateStoryModal({
     if (!formData.description.trim()) {
       newErrors.description = "Описание обязательно";
     }
+    if (!formData.authorName.trim()) {
+      newErrors.authorName = "Укажите автора";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,34 +61,35 @@ export default function CreateStoryModal({
     value: string
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Очищаем ошибку для этого поля
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+    if (submitError) setSubmitError(null);
   };
 
   const handleSubmit = async () => {
     if (!validateForm() || isSubmitting) return;
 
+    setSubmitError(null);
     setIsSubmitting(true);
     try {
-      // Импортируем createStoryThunk динамически, чтобы избежать циклических зависимостей
       const { createStoryThunk } = await import(
         "../../../entities/story/api/StoryApi"
       );
 
-      // Подготавливаем данные с дефолтным значением для cover
       const storyData = {
         ...formData,
-        cover: formData.cover.trim() || "/default-cover.jpg", // Устанавливаем дефолтное значение
+        cover: formData.cover.trim() || "/default-cover.jpg",
       };
 
       const result = await dispatch(createStoryThunk(storyData)).unwrap();
       onStoryCreated(result);
       handleCancel();
-    } catch (error) {
-      console.error("Ошибка при создании истории:", error);
-      // Можно добавить отображение ошибки пользователю
+    } catch (error: unknown) {
+      const err = error as { payload?: string; message?: string };
+      const message =
+        err?.payload ?? err?.message ?? (typeof error === "string" ? error : "Не удалось создать историю");
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -92,6 +98,7 @@ export default function CreateStoryModal({
   const handleCancel = () => {
     setFormData({ ...INITIAL_FORM_DATA, authorName });
     setErrors({});
+    setSubmitError(null);
     setIsSubmitting(false);
     onClose();
   };
@@ -130,6 +137,26 @@ export default function CreateStoryModal({
               />
               {errors.title && (
                 <span className="form-error">{errors.title}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="story-author" className="form-label">
+                Автор *
+              </label>
+              <input
+                id="story-author"
+                type="text"
+                className={`form-input ${
+                  errors.authorName ? "form-input-error" : ""
+                }`}
+                value={formData.authorName}
+                onChange={(e) => handleInputChange("authorName", e.target.value)}
+                placeholder="Введите имя автора"
+                disabled={isSubmitting}
+              />
+              {errors.authorName && (
+                <span className="form-error">{errors.authorName}</span>
               )}
             </div>
 
@@ -188,10 +215,30 @@ export default function CreateStoryModal({
                 placeholder="https://example.com/cover.jpg (если не указано, будет использована стандартная обложка)"
                 disabled={isSubmitting}
               />
+              {formData.cover.trim() && (
+                <div className="create-story-modal-cover-preview">
+                  <img src={getCoverImageSrc(formData.cover)} alt="Превью обложки" />
+                </div>
+              )}
             </div>
           </form>
         </div>
 
+        {submitError && (
+          <div
+            className="form-error"
+            style={{
+              margin: "0 20px 12px",
+              padding: "10px 12px",
+              backgroundColor: "#ffebee",
+              borderRadius: "4px",
+              color: "#c62828",
+              fontSize: "14px",
+            }}
+          >
+            {submitError}
+          </div>
+        )}
         <div className="create-story-modal-actions">
           <button
             type="button"
@@ -209,7 +256,8 @@ export default function CreateStoryModal({
               isSubmitting ||
               !formData.title.trim() ||
               !formData.genre.trim() ||
-              !formData.description.trim()
+              !formData.description.trim() ||
+              !formData.authorName.trim()
             }
           >
             {isSubmitting ? "Создание..." : "Создать историю"}

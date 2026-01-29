@@ -15,6 +15,9 @@ export interface PlaythroughResponse {
     id: number;
     title: string;
     authorName: string;
+    genre: string;
+    description: string;
+    cover: string;
   };
   currentNode: {
     id: number;

@@ -322,24 +322,28 @@ export const updateStoryThunk = createAsyncThunk<
 );
 
 /**
- * Создание нового узла
+ * Создание нового узла.
+ * payload.nodeData — данные для API; payload.temporaryNodeId — id временного узла в стейте (чтобы заменить его после ответа).
  */
 export const createNodeThunk = createAsyncThunk<
   StoryNode,
   {
-    storyId: number;
-    title: string;
-    content: string;
-    picture?: string;
-    isStart?: boolean;
-    isEnd?: boolean;
-    position_x: number;
-    position_y: number;
+    nodeData: {
+      storyId: number;
+      title: string;
+      content: string;
+      picture?: string;
+      isStart?: boolean;
+      isEnd?: boolean;
+      position_x: number;
+      position_y: number;
+    };
+    temporaryNodeId?: number;
   },
   { rejectValue: string }
 >(
   STORY_THUNK_NAMES.CREATE_NODE,
-  async (nodeData, { rejectWithValue }) => {
+  async ({ nodeData }, { rejectWithValue }) => {
     try {
       return await StoryApi.createNode(nodeData);
     } catch (error) {

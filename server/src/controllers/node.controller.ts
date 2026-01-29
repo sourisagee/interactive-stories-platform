@@ -14,7 +14,7 @@ export class NodeController {
         return;
       }
 
-      const { title, content, picture, position_x, position_y, storyId } =
+      const { title, content, picture, position_x, position_y, storyId, isStart, isEnd } =
         req.body;
 
       // Валидация обязательных полей
@@ -54,18 +54,9 @@ export class NodeController {
         return;
       }
 
-      if (
-        !picture ||
-        typeof picture !== "string" ||
-        picture.trim().length === 0
-      ) {
-        res
-          .status(400)
-          .json(formatResponse(400, "Picture is required", null, null));
-        return;
-      }
-
-      if (picture.length > 255) {
+      const pictureVal =
+        typeof picture === "string" ? picture.trim() : "";
+      if (pictureVal.length > 255) {
         res
           .status(400)
           .json(
@@ -78,43 +69,40 @@ export class NodeController {
           );
         return;
       }
-
-      // Проверка на валидный URL
-      try {
-        new URL(picture.trim());
-      } catch {
-        res
-          .status(400)
-          .json(formatResponse(400, "Picture must be a valid URL", null, null));
-        return;
-      }
-
-      // Проверка на формат изображения
-      const imageExtensions = [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".gif",
-        ".webp",
-        ".svg",
-      ];
-      const pictureUrl = picture.trim().toLowerCase();
-      const hasValidExtension = imageExtensions.some(
-        (ext) => pictureUrl.endsWith(ext) || pictureUrl.includes(ext + "?")
-      );
-
-      if (!hasValidExtension) {
-        res
-          .status(400)
-          .json(
-            formatResponse(
-              400,
-              "Picture must be an image file (.jpg, .jpeg, .png, .gif, .webp, .svg)",
-              null,
-              null
-            )
-          );
-        return;
+      if (pictureVal.length > 0) {
+        try {
+          new URL(pictureVal);
+        } catch {
+          res
+            .status(400)
+            .json(formatResponse(400, "Picture must be a valid URL", null, null));
+          return;
+        }
+        const imageExtensions = [
+          ".jpg",
+          ".jpeg",
+          ".png",
+          ".gif",
+          ".webp",
+          ".svg",
+        ];
+        const pictureUrl = pictureVal.toLowerCase();
+        const hasValidExtension = imageExtensions.some(
+          (ext) => pictureUrl.endsWith(ext) || pictureUrl.includes(ext + "?")
+        );
+        if (!hasValidExtension) {
+          res
+            .status(400)
+            .json(
+              formatResponse(
+                400,
+                "Picture must be an image file (.jpg, .jpeg, .png, .gif, .webp, .svg)",
+                null,
+                null
+              )
+            );
+          return;
+        }
       }
 
       if (!storyId || isNaN(Number(storyId)) || Number(storyId) <= 0) {
@@ -141,10 +129,12 @@ export class NodeController {
       const nodeData: CreateNodeDto = {
         title: title.trim(),
         content: content.trim(),
-        picture: picture.trim(),
+        picture: pictureVal,
         position_x: position_x,
         position_y: position_y,
         storyId: Number(storyId),
+        ...(typeof isStart === "boolean" && { isStart }),
+        ...(typeof isEnd === "boolean" && { isEnd }),
       };
 
       const node = await nodeService.createNode(nodeData);
@@ -158,7 +148,7 @@ export class NodeController {
   // Получить узел с выборами GET /api/nodes/:id
   static async getNodeById(req: Request, res: TypedResponse): Promise<void> {
     try {
-      const nodeId = Number(req.params.id);
+      const nodeId = Number(req.params.nodeId);
 
       // Валидация ID
       if (isNaN(nodeId) || nodeId <= 0) {
@@ -191,7 +181,7 @@ export class NodeController {
         return;
       }
 
-      const nodeId = Number(req.params.id);
+      const nodeId = Number(req.params.nodeId);
 
       // Валидация ID
       if (isNaN(nodeId) || nodeId <= 0) {
@@ -344,7 +334,7 @@ export class NodeController {
         return;
       }
 
-      const nodeId = Number(req.params.id);
+      const nodeId = Number(req.params.nodeId);
 
       // Валидация ID
       if (isNaN(nodeId) || nodeId <= 0) {

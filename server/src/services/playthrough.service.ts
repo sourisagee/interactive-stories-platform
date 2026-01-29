@@ -220,6 +220,9 @@ export default class PlaythroughService {
         id: playthrough.story.id,
         title: playthrough.story.title,
         authorName: playthrough.story.authorName,
+        genre: playthrough.story.genre ?? "",
+        description: playthrough.story.description ?? "",
+        cover: playthrough.story.cover ?? "",
       },
       currentNode: {
         id: playthrough.currentNode.id,

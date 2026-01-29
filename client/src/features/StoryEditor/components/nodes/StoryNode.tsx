@@ -19,7 +19,9 @@ export default function StoryNode({ data, selected }: NodeProps) {
         padding: "12px",
         borderRadius: "8px",
         border: selected ? "2px solid #1976d2" : "2px solid #ccc",
-        backgroundColor: isStart ? "#e3f2fd" : isEnd ? "#fff3e0" : "#f5f5f5",
+        backgroundColor: isStart || isEnd
+          ? "rgba(248, 246, 252, 0.98)"
+          : "#f5f5f5",
         boxShadow: selected
           ? "0 4px 8px rgba(0,0,0,0.2)"
           : "0 2px 4px rgba(0,0,0,0.1)",
@@ -55,7 +57,7 @@ export default function StoryNode({ data, selected }: NodeProps) {
         {nodeData.title || "Без названия"}
       </div>
 
-      {/* Бейдж типа узла */}
+      {/* Бейдж типа узла: для Старт/Конец — цвета в стилистике проекта, для обычного узла — серый */}
       <div
         style={{
           display: "flex",
@@ -69,12 +71,14 @@ export default function StoryNode({ data, selected }: NodeProps) {
             borderRadius: "12px",
             fontSize: "10px",
             fontWeight: "600",
-            backgroundColor: isStart
-              ? "#1976d2"
+            backgroundColor: isStart || isEnd
+              ? "rgba(139, 107, 184, 0.25)"
+              : "#757575",
+            color: isStart
+              ? "var(--color-purple-mid, #4a2d6a)"
               : isEnd
-                ? "#f57c00"
-                : "#757575",
-            color: "#fff",
+                ? "var(--color-burgundy-mid, #5c2438)"
+                : "#fff",
             textTransform: "uppercase",
           }}
         >

@@ -73,8 +73,6 @@ export const createTemporaryNode = (
 ): FlowNode => {
   const tempId = -Date.now();
 
-  console.log("createTemporaryNode получает position:", position); 
-
   return {
     id: tempId,
     picture: "",

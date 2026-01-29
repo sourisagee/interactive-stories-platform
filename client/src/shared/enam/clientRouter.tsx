@@ -5,6 +5,7 @@ export const CLIENT_ROUTES = {
   SIGN_UP: "/signUp",
   SIGN_IN: "/signIn",
   SIGN_OUT: "/signOut",
+  AI_ASSISTANT: "/ai",
 };
 
 /** Маршруты с :param — для кнопок играть и подробнее */

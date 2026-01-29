@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../shared/hooks/reduxHooks";
 import { getStoryByIdThunk } from "../../entities/story/api/StoryApi";
-import { getServerBaseUrl } from "../../shared/lib/getServerBaseUrl";
+import { getCoverImageSrc } from "../../shared/lib/getServerBaseUrl";
 import { CLIENT_ROUTES } from "../../shared/enam/clientRouter";
 import "./StoryDetailPage.css";
 
@@ -50,13 +50,11 @@ export default function StoryDetailPage() {
     );
   }
 
-  const base = getServerBaseUrl();
-
   return (
     <div className="story-detail-page">
       <div className="story-detail-card">
         <div className="story-detail-cover">
-          <img src={`${base}/${currentStory.cover}`} alt={currentStory.title} />
+          <img src={getCoverImageSrc(currentStory.cover)} alt={currentStory.title} />
         </div>
         <div className="story-detail-body">
           <h1 className="story-detail-title">{currentStory.title}</h1>

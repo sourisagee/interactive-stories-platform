@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   getFullStoryThunk,
+  updateStoryThunk,
   createNodeThunk,
   updateNodeThunk,
   deleteNodeThunk,
@@ -14,6 +15,7 @@ import {
   type FlowNode,
   type FlowEdge,
   type Story,
+  type Choice,
 } from "../model";
 import {
   convertToFlowNode,
@@ -206,24 +208,48 @@ const storyEditorSlice = createSlice({
       })
       .addCase(getFullStoryThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentStory = action.payload;
 
-        const allChoices = action.payload.nodes.reduce(
-          (acc, currentNode) =>
-            acc.concat(currentNode.fromChoices, currentNode.toChoices),
-          []
-        );
-        const uniqueChoices = allChoices.filter(
-          (choice, index, self) =>
-            index === self.findIndex((t) => t.id === choice.id)
-        );
+        const payload = action.payload as unknown as {
+          story?: Story;
+          nodes?: unknown[];
+          choices?: unknown[];
+        } & Story;
+
+        // Поддерживаем оба варианта ответа:
+        // 1) StoryWithNodes: { story, nodes, choices }
+        // 2) StoryFullData:  Story & { nodes }
+        const story = payload.story ?? (payload as Story);
+        const rawNodes = ((payload as { nodes?: unknown[] }).nodes ?? []) as FlowNode[];
+        const rawChoices = ((payload as { choices?: unknown[] }).choices ??
+          []) as Choice[];
+
+        state.currentStory = story;
 
         // Конвертируем узлы из БД в FlowNode
-        const rawNodes = action.payload?.nodes ?? [];
         state.nodes = rawNodes.map(convertToFlowNode);
 
+        // Вариант 1: сервер вернул плоский список choices
+        let choices: Choice[] = rawChoices;
+
+        // Вариант 2: сервер вернул choices, вложенные в узлы (NodeWithChoices.fromChoices)
+        if (!choices.length && rawNodes.length) {
+          const fromNested = (rawNodes as unknown as Array<
+            FlowNode & { fromChoices?: Choice[] }
+          >).flatMap((node) => node.fromChoices ?? []);
+
+          // Убираем дубликаты по id
+          const uniqueById = new Map<number, Choice>();
+          fromNested.forEach((ch) => {
+            if (ch && typeof ch.id === "number" && !uniqueById.has(ch.id)) {
+              uniqueById.set(ch.id, ch);
+            }
+          });
+
+          choices = Array.from(uniqueById.values());
+        }
+
         // Конвертируем выборы из БД в FlowEdge
-        state.edges = uniqueChoices.map(convertToFlowEdge);
+        state.edges = choices.map(convertToFlowEdge);
 
         // Сбрасываем выбранные элементы
         state.selectedNodeId = null;
@@ -241,6 +267,13 @@ const storyEditorSlice = createSlice({
       state.edges = rawChoices.map(convertToFlowEdge);
     });
 
+    // ---------- updateStoryThunk ----------
+    builder.addCase(updateStoryThunk.fulfilled, (state, action) => {
+      if (state.currentStory?.id === action.payload.id) {
+        state.currentStory = action.payload;
+      }
+    });
+
     // ---------- createNodeThunk ----------
     builder
       .addCase(createNodeThunk.pending, (state) => {
@@ -249,24 +282,21 @@ const storyEditorSlice = createSlice({
       .addCase(createNodeThunk.fulfilled, (state, action) => {
         state.isSaving = false;
 
-        // Находим временный узел и заменяем его на сохраненный
         const savedNode = action.payload;
         const flowNode = convertToFlowNode(savedNode);
+        const temporaryNodeId = action.meta.arg.temporaryNodeId;
 
-        // Ищем временный узел с negative ID
-        const tempNodeIndex = state.nodes.findIndex((n) =>
-          isTemporaryNode(n.id)
-        );
+        const tempNodeIndex =
+          temporaryNodeId != null
+            ? state.nodes.findIndex((n) => n.id === temporaryNodeId)
+            : state.nodes.findIndex((n) => isTemporaryNode(n.id));
 
         if (tempNodeIndex !== -1) {
-          // Заменяем временный узел на сохраненный
           state.nodes[tempNodeIndex] = flowNode;
         } else {
-          // Или добавляем новый
           state.nodes.push(flowNode);
         }
 
-        // Выбираем созданный узел
         state.selectedNodeId = savedNode.id;
       })
       .addCase(createNodeThunk.rejected, (state, action) => {
