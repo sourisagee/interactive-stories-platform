@@ -1,0 +1,164 @@
+/* Кнопки панели редактора — в стилистике проекта (purple/burgundy, как .btn-primary) */
+
+.editor-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(139, 107, 184, 0.08) 0%, rgba(45, 31, 78, 0.06) 100%);
+  border-bottom: 1px solid var(--color-border, rgba(139, 107, 184, 0.25));
+  align-items: center;
+}
+
+.editor-toolbar-title {
+  margin-left: auto;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.85));
+}
+
+.editor-toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border, rgba(139, 107, 184, 0.25));
+  margin: 0 8px;
+}
+
+.editor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--color-text, #e8e4f0);
+}
+
+.editor-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Основная кнопка: градиент как в проекте */
+.editor-btn-primary {
+  background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
+  border-color: rgba(139, 107, 184, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.editor-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-purple-light, #6b4a8a) 0%, var(--color-burgundy-light, #8b3a52) 100%);
+  border-color: rgba(139, 107, 184, 0.8);
+  box-shadow: 0 6px 20px rgba(139, 107, 184, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Вторичная: для «Свойства» когда панель скрыта */
+.editor-btn-secondary {
+  background: rgba(139, 107, 184, 0.2);
+  border-color: rgba(139, 107, 184, 0.35);
+  color: var(--color-text, #e8e4f0);
+}
+
+.editor-btn-secondary:hover:not(:disabled) {
+  background: rgba(139, 107, 184, 0.3);
+  border-color: rgba(139, 107, 184, 0.5);
+  box-shadow: 0 4px 12px rgba(139, 107, 184, 0.2);
+}
+
+/* Удаление — в духе проекта (тёмно-красный) */
+.editor-btn-danger {
+  background: linear-gradient(135deg, rgba(92, 36, 56, 0.9) 0%, rgba(120, 40, 50, 0.95) 100%);
+  border-color: rgba(180, 80, 80, 0.5);
+  color: #f0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.editor-btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(120, 45, 60, 0.95) 0%, rgba(140, 50, 60, 1) 100%);
+  border-color: rgba(200, 90, 90, 0.6);
+  box-shadow: 0 6px 20px rgba(180, 60, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Неактивное состояние (нет истории / ничего не выбрано) */
+.editor-btn-muted {
+  background: rgba(139, 107, 184, 0.15);
+  border-color: rgba(139, 107, 184, 0.2);
+  color: var(--color-text-muted, rgba(232, 228, 240, 0.6));
+}
+
+/* Кнопки в панели свойств (Сохранить / Удалить) */
+.editor-panel-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.editor-panel-btn-save {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid rgba(139, 107, 184, 0.5);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--color-text, #e8e4f0);
+  background: linear-gradient(135deg, var(--color-purple-mid, #4a2d6a) 0%, var(--color-burgundy-mid, #5c2438) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.editor-panel-btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-purple-light, #6b4a8a) 0%, var(--color-burgundy-light, #8b3a52) 100%);
+  border-color: rgba(139, 107, 184, 0.8);
+  box-shadow: 0 6px 20px rgba(139, 107, 184, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.editor-panel-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.editor-panel-btn-delete {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid rgba(180, 80, 80, 0.5);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: #f0e0e0;
+  background: linear-gradient(135deg, rgba(92, 36, 56, 0.9) 0%, rgba(120, 40, 50, 0.95) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.editor-panel-btn-delete:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(120, 45, 60, 0.95) 0%, rgba(140, 50, 60, 1) 100%);
+  border-color: rgba(200, 90, 90, 0.6);
+  box-shadow: 0 6px 20px rgba(180, 60, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.editor-panel-btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Панель редактора: основной текст тем же шрифтом, что и в проекте (поле «автор» на «Все истории») */
+.story-editor-panel {
+  font-family: 'Firlest', serif;
+}
+.story-editor-panel h3 {
+  font-family: 'ChristmasReign', serif;
+}
+
+.editor-panel-end-hint {
+  font-size: 12px;
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+}

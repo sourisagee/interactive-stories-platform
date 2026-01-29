@@ -1,0 +1,122 @@
+/* Страница панели редактора — светлая тема с откликами стилистики проекта */
+
+.story-editor-page {
+  min-height: 100vh;
+  font-family: 'Firlest', serif;
+  background: linear-gradient(
+    160deg,
+    #f8f6fc 0%,
+    #f0ecf8 30%,
+    #ebe6f5 60%,
+    #f5f2fa 100%
+  );
+  padding: 2rem 1.25rem 2.5rem;
+}
+
+.story-editor-page .story-editor-page-header {
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+  padding: 0 0.25rem;
+}
+
+.story-editor-page .story-editor-page-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-family: var(--font-tupo-vyaz, 'ChristmasReign', serif);
+  letter-spacing: 0.12em;
+  color: var(--color-purple-mid, #4a2d6a);
+  text-shadow: 0 1px 2px rgba(139, 107, 184, 0.15);
+}
+
+.story-editor-page .story-editor-page-meta {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-purple-light, #6b4a8a);
+  opacity: 0.85;
+}
+
+.story-editor-page .story-editor-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 8px 32px rgba(74, 45, 106, 0.12),
+    0 0 0 1px rgba(139, 107, 184, 0.15);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+/* Светлая тема внутри редактора: тёмный текст, акценты проекта */
+.story-editor-page .editor-toolbar {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(248, 246, 252, 0.98) 100%
+  );
+  border-bottom: 1px solid rgba(139, 107, 184, 0.2);
+}
+
+.story-editor-page .editor-toolbar-title {
+  color: var(--color-purple-mid, #4a2d6a);
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.story-editor-page .editor-toolbar-divider {
+  background: rgba(139, 107, 184, 0.25);
+}
+
+.story-editor-page .editor-btn-muted {
+  color: var(--color-purple-mid, #4a2d6a);
+  background: rgba(139, 107, 184, 0.12);
+  border-color: rgba(139, 107, 184, 0.25);
+}
+
+.story-editor-page .editor-btn-muted:hover {
+  background: rgba(139, 107, 184, 0.18);
+  border-color: rgba(139, 107, 184, 0.35);
+  color: var(--color-purple-mid, #4a2d6a);
+}
+
+.story-editor-page .editor-btn-primary,
+.story-editor-page .editor-btn-danger,
+.story-editor-page .editor-btn-secondary {
+  color: #fff;
+}
+
+.story-editor-page .story-editor-canvas-wrap {
+  background: linear-gradient(
+    135deg,
+    rgba(248, 246, 252, 0.6) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+  border-right: 1px solid rgba(139, 107, 184, 0.12);
+}
+
+.story-editor-page .story-editor-panel {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 246, 252, 0.98) 100%
+  );
+  border-left: 1px solid rgba(139, 107, 184, 0.15);
+}
+
+.story-editor-page .story-editor-loading,
+.story-editor-page .story-editor-error {
+  border-bottom: 1px solid rgba(139, 107, 184, 0.15);
+}
+
+.story-editor-page .story-editor-loading {
+  color: var(--color-purple-mid, #4a2d6a);
+  background: rgba(248, 246, 252, 0.9);
+}
+
+.story-editor-page .story-editor-error {
+  color: var(--color-burgundy-mid, #5c2438);
+  background: rgba(255, 240, 242, 0.95);
+}

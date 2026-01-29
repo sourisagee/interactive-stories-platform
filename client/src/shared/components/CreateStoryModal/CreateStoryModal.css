@@ -152,6 +152,20 @@
   min-height: 100px;
 }
 
+.create-story-modal-cover-preview {
+  margin-top: 0.75rem;
+  max-width: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(139, 107, 184, 0.3);
+}
+
+.create-story-modal-cover-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .create-story-modal-actions {
   display: flex;
   gap: 0.75rem;

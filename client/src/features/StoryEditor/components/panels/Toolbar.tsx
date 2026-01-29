@@ -4,20 +4,29 @@ import {
   useSelectedEdge,
   useCurrentStory,
   useIsPropertiesPanelOpen,
+  useNodes,
+  useEdges,
 } from "../../../../shared/hooks/storyEditorHooks";
+import { isTemporaryEdge } from "../../../../entities/story/model/converters";
+import "./EditorPanels.css";
 
 /**
  * Панель инструментов редактора историй
  */
 export default function Toolbar() {
   const currentStory = useCurrentStory();
+  const nodes = useNodes();
+  const edges = useEdges();
   const selectedNode = useSelectedNode();
   const selectedEdge = useSelectedEdge();
   const isPropertiesPanelOpen = useIsPropertiesPanelOpen();
   const {
     addTemporaryNode,
+    deleteNode,
     deleteNodeThunk,
     deleteChoiceThunk,
+    deleteEdge,
+    getFullStory,
     togglePropertiesPanel,
     selectNode,
     selectEdge,
@@ -30,22 +39,66 @@ export default function Toolbar() {
       return;
     }
 
-    // Добавляем узел в центр экрана (примерные координаты)
-    // В реальном редакторе координаты будут определяться позицией клика или центром viewport
-    addTemporaryNode({ x: 400, y: 300 }, "Новый узел");
+    // Простое авто-размещение: новые узлы идут «цепочкой» по оси X
+    const index = nodes.length;
+    const baseX = 200;
+    const baseY = 150;
+    const offsetX = 260;
+
+    const position_x = baseX + index * offsetX;
+    const position_y = baseY;
+
+    // Создаём временный узел только на клиенте; реальные данные и координаты
+    // сохраняются на сервере при нажатии «Сохранить» в панели свойств
+    addTemporaryNode({ x: position_x, y: position_y }, "Новый узел");
   };
 
   // Обработчик удаления выбранного элемента
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedNode) {
-      if (confirm("Вы уверены, что хотите удалить этот узел?")) {
-        deleteNodeThunk(selectedNode.id);
+      if (!confirm("Вы уверены, что хотите удалить этот узел?")) return;
+      const id = selectedNode.id;
+      if (typeof id === "number" && id < 0) {
+        deleteNode(id);
         selectNode(null);
+        return;
       }
-    } else if (selectedEdge && selectedEdge.data.choiceId) {
+      const numId = Number(id);
+      if (Number.isNaN(numId)) {
+        selectNode(null);
+        return;
+      }
+      const nodeIdStr = String(numId);
+      const connectedEdges = edges.filter(
+        (e) => e.source === nodeIdStr || e.target === nodeIdStr
+      );
+      // Сразу убираем узел и его связи из состояния — UI обновляется мгновенно
+      deleteNode(numId);
+      selectNode(null);
+      // В фоне удаляем на сервере: сначала связи, затем узел
+      try {
+        for (const edge of connectedEdges) {
+          if (edge.data.choiceId) {
+            try {
+              await deleteChoiceThunk(edge.data.choiceId);
+            } catch {
+              // игнорируем ошибку отдельной связи
+            }
+          }
+        }
+        await deleteNodeThunk(numId);
+      } catch {
+        if (currentStory?.id) getFullStory(currentStory.id);
+      }
+    } else if (selectedEdge) {
       if (confirm("Вы уверены, что хотите удалить эту связь?")) {
-        deleteChoiceThunk(selectedEdge.data.choiceId);
-        selectEdge(null);
+        if (isTemporaryEdge(selectedEdge.id)) {
+          deleteEdge(selectedEdge.id);
+          selectEdge(null);
+        } else if (selectedEdge.data.choiceId) {
+          deleteChoiceThunk(selectedEdge.data.choiceId);
+          selectEdge(null);
+        }
       }
     } else {
       alert("Выберите узел или связь для удаления");
@@ -58,79 +111,32 @@ export default function Toolbar() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "8px",
-        padding: "12px",
-        backgroundColor: "#f5f5f5",
-        borderBottom: "1px solid #ddd",
-        alignItems: "center",
-      }}
-    >
-      {/* Кнопка добавления узла */}
+    <div className="editor-toolbar">
       <button
+        type="button"
         onClick={handleAddNode}
         disabled={!currentStory}
-        style={{
-          padding: "8px 16px",
-          backgroundColor: currentStory ? "#1976d2" : "#ccc",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          fontSize: "14px",
-          fontWeight: "500",
-          cursor: currentStory ? "pointer" : "not-allowed",
-          opacity: currentStory ? 1 : 0.6,
-        }}
+        className={`editor-btn ${currentStory ? "editor-btn-primary" : "editor-btn-muted"}`}
         title="Добавить новый узел"
       >
         + Узел
       </button>
 
-      {/* Кнопка удаления выбранного элемента */}
       <button
+        type="button"
         onClick={handleDelete}
-        disabled={!selectedNode && !selectedEdge}
-        style={{
-          padding: "8px 16px",
-          backgroundColor: selectedNode || selectedEdge ? "#d32f2f" : "#ccc",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          fontSize: "14px",
-          fontWeight: "500",
-          cursor: selectedNode || selectedEdge ? "pointer" : "not-allowed",
-          opacity: selectedNode || selectedEdge ? 1 : 0.6,
-        }}
-        title="Удалить выбранный элемент"
+        className={`editor-btn ${selectedNode || selectedEdge ? "editor-btn-danger" : "editor-btn-muted"}`}
+        title={selectedNode ? "Удалить узел" : selectedEdge ? "Удалить связь" : "Выберите узел или связь и нажмите для удаления"}
       >
         Удалить
       </button>
 
-      {/* Разделитель */}
-      <div
-        style={{
-          width: "1px",
-          height: "24px",
-          backgroundColor: "#ddd",
-          margin: "0 8px",
-        }}
-      />
+      <div className="editor-toolbar-divider" />
 
-      {/* Кнопка переключения панели свойств */}
       <button
+        type="button"
         onClick={handleTogglePropertiesPanel}
-        style={{
-          padding: "8px 16px",
-          backgroundColor: isPropertiesPanelOpen ? "#1976d2" : "#757575",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          fontSize: "14px",
-          fontWeight: "500",
-          cursor: "pointer",
-        }}
+        className={`editor-btn ${isPropertiesPanelOpen ? "editor-btn-primary" : "editor-btn-secondary"}`}
         title={
           isPropertiesPanelOpen
             ? "Скрыть панель свойств"
@@ -140,17 +146,8 @@ export default function Toolbar() {
         {isPropertiesPanelOpen ? "◀ Свойства" : "Свойства ▶"}
       </button>
 
-      {/* Информация о текущей истории */}
       {currentStory && (
-        <div
-          style={{
-            marginLeft: "auto",
-            padding: "4px 12px",
-            fontSize: "14px",
-            color: "#666",
-            fontWeight: "500",
-          }}
-        >
+        <div className="editor-toolbar-title">
           {currentStory.title}
         </div>
       )}

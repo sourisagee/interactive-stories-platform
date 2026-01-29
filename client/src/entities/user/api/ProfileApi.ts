@@ -28,6 +28,7 @@ export interface GameInfo {
   title: string;
   cover: string;
   genre: string;
+  description: string;
   authorName: string;
   isCompleted: boolean;
   updatedAt: string; // ISO date string
@@ -98,8 +99,9 @@ export const profileApi = {
                 id: playthrough.story.id,
                 title: playthrough.story.title,
                 cover: playthrough.story.cover || "/default-cover.jpg",
-                genre: playthrough.story.genre || "Неизвестно",
-                authorName: playthrough.story.authorName,
+                genre: playthrough.story.genre ?? "",
+                description: playthrough.story.description ?? "",
+                authorName: playthrough.story.authorName ?? "",
                 isCompleted: playthrough.isCompleted,
                 updatedAt: playthrough.updatedAt,
               };
@@ -121,6 +123,7 @@ export const profileApi = {
             title: "Тестовая незавершенная история",
             cover: "/default-cover.jpg",
             genre: "Фантастика",
+            description: "Тестовое описание",
             authorName: "Тестовый автор",
             isCompleted: false,
             updatedAt: new Date().toISOString(),
@@ -132,6 +135,7 @@ export const profileApi = {
             title: "Тестовая завершенная история",
             cover: "/default-cover.jpg",
             genre: "Приключения",
+            description: "Тестовое описание",
             authorName: "Другой автор",
             isCompleted: true,
             updatedAt: new Date(Date.now() - 86400000).toISOString(), // вчера
