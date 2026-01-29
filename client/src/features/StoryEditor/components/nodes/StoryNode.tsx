@@ -24,6 +24,7 @@ export default function StoryNode({ data, selected }: NodeProps) {
           ? "0 4px 8px rgba(0,0,0,0.2)"
           : "0 2px 4px rgba(0,0,0,0.1)",
         transition: "all 0.2s",
+        cursor: "pointer",
       }}
     >
       {/* Handle для входящих соединений (слева) - только если не стартовый узел */}
@@ -103,18 +104,18 @@ export default function StoryNode({ data, selected }: NodeProps) {
 
       {/* Handle для исходящих соединений (справа) - только если не конечный узел */}
 
-        <Handle
-          type="source"
-          position={Position.Right}
-          isConnectable={!isEnd}
-          style={{
-            background: "#555",
-            width: "10px",
-            height: "10px",
-            opacity: isEnd ? 0 : 1,       // optional: hide but keep DOM node
-            pointerEvents: isEnd ? "none" : "auto",
-          }}
-        />
+      <Handle
+        type="source"
+        position={Position.Right}
+        isConnectable={!isEnd}
+        style={{
+          background: "#555",
+          width: "10px",
+          height: "10px",
+          opacity: isEnd ? 0 : 1, // optional: hide but keep DOM node
+          pointerEvents: isEnd ? "none" : "auto",
+        }}
+      />
     </div>
   );
 }

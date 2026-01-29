@@ -1,5 +1,5 @@
-import type { StoryNode, Choice, FlowNode, FlowEdge } from './index';
-import { nanoid } from 'nanoid';
+import type { StoryNode, Choice, FlowNode, FlowEdge } from "./index";
+import { nanoid } from "nanoid";
 
 /**
  * Конвертирует StoryNode из БД в FlowNode для React Flow
@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid';
 export const convertToFlowNode = (node: StoryNode): FlowNode => ({
   ...node,
   position: { x: node.position_x, y: node.position_y },
-  type: node.isStart ? 'start' : node.isEnd ? 'end' : 'normal',
+  type: node.isStart ? "start" : node.isEnd ? "end" : "normal",
 });
 
 /**
@@ -37,7 +37,9 @@ export const convertToFlowEdge = (choice: Choice): FlowEdge => ({
 /**
  * Конвертирует FlowEdge обратно в Choice для отправки в БД
  */
-export const convertFromFlowEdge = (edge: FlowEdge): Omit<Choice, 'id' | 'createdAt' | 'updatedAt'> => ({
+export const convertFromFlowEdge = (
+  edge: FlowEdge,
+): Omit<Choice, "id" | "createdAt" | "updatedAt"> => ({
   choiceText: edge.data.choiceText,
   fromNodeId: parseInt(edge.source),
   toNodeId: parseInt(edge.target),
@@ -46,7 +48,11 @@ export const convertFromFlowEdge = (edge: FlowEdge): Omit<Choice, 'id' | 'create
 /**
  * Создает временный FlowEdge (перед сохранением в БД)
  */
-export const createTemporaryEdge = (sourceNodeId: number, targetNodeId: number, choiceText: string): FlowEdge => ({
+export const createTemporaryEdge = (
+  sourceNodeId: number,
+  targetNodeId: number,
+  choiceText: string,
+): FlowEdge => ({
   id: `temp-edge-${nanoid()}`,
   source: sourceNodeId.toString(),
   target: targetNodeId.toString(),
@@ -63,29 +69,37 @@ export const createTemporaryEdge = (sourceNodeId: number, targetNodeId: number, 
 export const createTemporaryNode = (
   position: { x: number; y: number },
   storyId: number,
-  title: string = 'Новый узел'
+  title: string = "Новый узел",
 ): FlowNode => {
-  const tempId = -Date.now(); // отрицательный ID для временных узлов
-  
+  const tempId = -Date.now();
+
+  console.log("createTemporaryNode получает position:", position); 
+
   return {
     id: tempId,
-    picture: '',
+    picture: "",
     title,
-    content: 'Опишите содержимое узла...',
+    content: "Опишите содержимое узла...",
     isStart: false,
     isEnd: false,
     storyId,
-    position,
-    type: 'normal',
+    position, 
+    type: "normal",
   };
 };
 
 /**
  * Проверяет, является ли узел временным (имеет отрицательный ID)
  */
-export const isTemporaryNode = (nodeId: number): boolean => nodeId < 0;
+export const isTemporaryNode = (nodeId: number | string): boolean => {
+  if (typeof nodeId === "string") {
+    return nodeId.startsWith("temp-");
+  }
+  return nodeId < 0;
+};
 
 /**
  * Проверяет, является ли связь временной
  */
-export const isTemporaryEdge = (edgeId: string): boolean => edgeId.startsWith('temp-edge-');
+export const isTemporaryEdge = (edgeId: string): boolean =>
+  edgeId.startsWith("temp-edge-");
