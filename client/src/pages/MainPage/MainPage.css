@@ -41,12 +41,12 @@
 }
 
 .hero-subtitle {
-  margin: -0.3rem 0 2rem;
-  font-size: 2.4rem; /* ещё крупнее, чем "ПЛАТФОРМА" */
+  margin: 0 0 1.25rem;
+  font-size: 3rem; /* крупнее, чем "ПЛАТФОРМА" */
   font-weight: 900;
   text-transform: uppercase; /* WISP заглавными */
   letter-spacing: 0.4em; /* ещё больше интервал между буквами */
-  color: var(--color-accent, #8b6bb8);
+  color: var(--color-text, #e8e4f0); /* тот же цвет, что и у "ПЛАТФОРМА" */
   text-shadow:
     0 0 18px rgba(139, 107, 184, 0.9),
     0 0 30px rgba(200, 180, 255, 0.8);

@@ -12,12 +12,12 @@ export default function MainPage() {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
-          <h1 className="hero-title">
-            ПЛАТФОРМА <span className="highlight">интерактивных новелл</span>
-          </h1>
           <h2 className="hero-subtitle">
             WISP
           </h2>
+          <h1 className="hero-title">
+            ПЛАТФОРМА <span className="highlight">интерактивных новелл</span>
+          </h1>
           <p className="hero-description">
             Современная платформа для создания и чтения интерактивных историй с
             разветвленным сюжетом. Здесь каждый может стать автором
