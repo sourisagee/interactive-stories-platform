@@ -6,7 +6,7 @@ import StoryEditor from "../../features/StoryEditor/StoryEditor";
 import { useStoryEditorState } from "../../shared/hooks/storyEditorHooks";
 import {
   setCurrentStory,
-  resetEditor,
+//   resetEditor,
 } from "@/entities/story/slice/storyEditorSlice";
 
 const StoryEditorPage: React.FC = () => {

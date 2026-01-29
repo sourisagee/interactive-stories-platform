@@ -14,7 +14,7 @@ export default function PropertiesPanel() {
   const selectedNode = useSelectedNode();
   const selectedEdge = useSelectedEdge();
   const {
-    updateNodeThunk,
+    // updateNodeThunk,
     updateChoiceThunk,
     deleteNodeThunk,
     deleteChoiceThunk,
@@ -38,6 +38,8 @@ export default function PropertiesPanel() {
   const [edgeForm, setEdgeForm] = useState({
     choiceText: "",
   });
+
+  const actions = useStoryEditorActions();
 
   // Обновляем форму узла только при изменении ID выбранного узла
   useEffect(() => {
@@ -75,28 +77,69 @@ export default function PropertiesPanel() {
   const handleSaveNode = () => {
     if (!selectedNode) return;
 
-    const updates: UpdateNodeFormData = {};
+    const isTemporaryNode =
+      typeof selectedNode.id === "number" && selectedNode.id < 0;
 
-    // Добавляем только измененные поля
-    if (nodeForm.title !== selectedNode.title) {
-      updates.title = nodeForm.title;
-    }
-    if (nodeForm.content !== selectedNode.content) {
-      updates.content = nodeForm.content;
-    }
-    if (nodeForm.picture !== selectedNode.picture) {
-      updates.picture = nodeForm.picture;
-    }
-    if (nodeForm.isStart !== selectedNode.isStart) {
-      updates.isStart = nodeForm.isStart;
-    }
-    if (nodeForm.isEnd !== selectedNode.isEnd) {
-      updates.isEnd = nodeForm.isEnd;
-    }
+    // Для создания узла нужны обязательные поля
+    const title = nodeForm.title ?? selectedNode.title ?? "";
+    const content = nodeForm.content ?? selectedNode.content ?? "";
+    const picture = nodeForm.picture ?? selectedNode.picture ?? "";
+    const isStart = nodeForm.isStart ?? selectedNode.isStart ?? false;
+    const isEnd = nodeForm.isEnd ?? selectedNode.isEnd ?? false;
 
-    // Сохраняем только если есть изменения
-    if (Object.keys(updates).length > 0) {
-      updateNodeThunk(selectedNode.id, updates);
+    if (isTemporaryNode) {
+      // Временный узел - создаем новый через createNodeThunk
+      // ВСЕ поля обязательны для создания
+      actions.createNodeThunk({
+        storyId: selectedNode.storyId,
+        title: title, // гарантированно string
+        content: content, // гарантированно string
+        picture: picture, // string (может быть пустой)
+        isStart: isStart, // boolean
+        isEnd: isEnd, // boolean
+        position_x: selectedNode.position.x,
+        position_y: selectedNode.position.y,
+      });
+    } else {
+      // Существующий узел - обновляем через updateNodeThunk
+      // Только измененные поля (опциональные)
+      const updates: UpdateNodeFormData = {};
+
+      if (
+        nodeForm.title !== undefined &&
+        nodeForm.title !== selectedNode.title
+      ) {
+        updates.title = nodeForm.title;
+      }
+      if (
+        nodeForm.content !== undefined &&
+        nodeForm.content !== selectedNode.content
+      ) {
+        updates.content = nodeForm.content;
+      }
+      if (
+        nodeForm.picture !== undefined &&
+        nodeForm.picture !== selectedNode.picture
+      ) {
+        updates.picture = nodeForm.picture;
+      }
+      if (
+        nodeForm.isStart !== undefined &&
+        nodeForm.isStart !== selectedNode.isStart
+      ) {
+        updates.isStart = nodeForm.isStart;
+      }
+      if (
+        nodeForm.isEnd !== undefined &&
+        nodeForm.isEnd !== selectedNode.isEnd
+      ) {
+        updates.isEnd = nodeForm.isEnd;
+      }
+
+      // Сохраняем только если есть изменения
+      if (Object.keys(updates).length > 0) {
+        actions.updateNodeThunk(selectedNode.id, updates);
+      }
     }
   };
 
