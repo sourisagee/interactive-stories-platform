@@ -64,6 +64,26 @@ export default function StoryDetailPage() {
           </button>
         </div>
       </div>
+
+      <footer className="main-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>Интерактивные новеллы</h4>
+              <p>
+                Платформа для создания и чтения интерактивных историй нового
+                поколения.
+              </p>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>
+              &copy; 2026 Интерактивные новеллы. Создано с ❤️ для любителей
+              хороших историй.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
