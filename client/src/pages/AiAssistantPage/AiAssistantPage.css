@@ -4,12 +4,15 @@
   max-width: 800px;
   margin: 0 auto;
   font-family: "Firlest", serif;
+  display: flex;
+  flex-direction: column;
 }
 
 .ai-assistant-page-header {
   margin-bottom: 1.5rem;
   padding: 0 0.25rem;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .ai-assistant-page-title {
@@ -32,14 +35,17 @@
 }
 
 .ai-assistant-chat {
+  margin-top: 2.5rem;
+  margin-bottom: 5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
   background: rgba(248, 246, 246, 0.04);
   border: 1px solid rgba(139, 107, 184, 0.25);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 420px;
 }
 
 .ai-assistant-messages {
@@ -213,11 +219,30 @@
   cursor: not-allowed;
 }
 
-/* Футер — как на главной странице */
+/* Футер прижат к низу страницы. Отступ сверху — расстояние между формой и чертой.
+   Черта через ::before на всю ширину экрана (breakout из max-width контейнера). */
 .ai-assistant-page .main-footer {
-  border-top: 1px solid var(--color-border, rgba(139, 107, 184, 0.3));
+  flex-shrink: 0;
+  margin-top: auto;
   padding-top: 2rem;
-  margin-top: 2rem;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+  border-top: none;
+}
+
+/* Черта на всю ширину страницы: выход из контейнера 800px */
+.ai-assistant-page .main-footer::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  top: 0;
+  height: 1px;
+  background: var(--color-border, rgba(139, 107, 184, 0.3));
+  z-index: 1;
 }
 
 .ai-assistant-page .main-footer .container {

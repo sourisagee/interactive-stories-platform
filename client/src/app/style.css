@@ -412,3 +412,8 @@ select.input-base option[selected] {
   line-height: 1.8;
   color: var(--color-text-muted, rgba(232, 228, 240, 0.7));
 }
+
+/* Разделительная черта перед футером на всех страницах */
+.main-footer {
+  border-top: 1px solid var(--color-border, rgba(139, 107, 184, 0.3));
+}
